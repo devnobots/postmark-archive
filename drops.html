@@ -255,7 +255,7 @@ function stampHTML(d, view, opts) {
     '<div class="stamp-art" style="height:' + sz.art + 'px;background:' + d.bg + '">' + pic +
     '<div class="stamp-price" style="color:' + (d.ink || '#1E2A3A') + '">' + esc(d.price) + '</div></div>' +
     '<div class="stamp-cap"><div class="cap-name">' + esc(d.capJa || d.nameJa) + '</div><div class="cap-size">' + esc(d.size) + '</div></div>' +
-    (tall ? '' : '<div class="cap-issue">' + DROP_LABEL + ' · ' + DROP.date + '</div>') +
+    (tall ? '' : '<div class="cap-issue">' + DROP_LABEL + '</div>') +
     '</div></div></div>' + pm + '</div>';
 }
 
