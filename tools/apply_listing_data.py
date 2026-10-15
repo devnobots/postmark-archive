@@ -45,7 +45,7 @@ ITEMS = [
      'nameEn': '1980s Canvas Bucket Hat', 'nameJa': '80年代 キャンバス バケットハット',
      'capJa': 'バケットハット', 'size': '頭囲 58 · つば 6', 'grade': 'B', 'gradeNote': '内側に汗じみ'},
     {'key': 'neck', 'category': 'neckwear', 'values': ['60 cm', '22 cm'],
-     'nameEn': '1970s Nordic-Pattern Knit Neck Warmer', 'nameJa': '70年代 ノルディック柄 ニットネックウォーマー',
+     'nameEn': '1970s Sweet Doi- Knit Neck Warmer', 'nameJa': '70年代 ノルディック柄 ニットネックウォーマー',
      'capJa': 'ネックウォーマー', 'size': '全長 60 · 幅 22', 'grade': 'B', 'gradeNote': '小さな毛玉あり'},
 ]
 
