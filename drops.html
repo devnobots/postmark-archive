@@ -160,6 +160,11 @@
   #overlay, #full { position: fixed; }
   #overlay .panel, #full .full-box { flex: none; transform-origin: center center; }
   .cart.sold { background: none; color: #6b6e72; border: 1px solid rgba(107,110,114,0.5); cursor: default; letter-spacing: 0.2em; }
+  /* sold pieces: black-and-white, 売約済, color on mouse over, never open */
+  .stamp.is-sold .stamp-art { filter: grayscale(1) contrast(1.25) brightness(1.04); transition: filter 0.5s ease; }
+  .stamp.is-sold .stamp-price { font-family: 'Shippori Mincho', serif; font-weight: 600; font-size: 11px; letter-spacing: 0.18em; }
+  .past-stamp:hover .stamp.is-sold .stamp-art, .past-stamp:focus-visible .stamp.is-sold .stamp-art { filter: none; }
+  .past-stamp { cursor: default; }
 </style>
 </head>
 <body>
@@ -251,9 +256,9 @@ function stampHTML(d, view, opts) {
     '<text x="80" y="32" font-size="8" font-weight="700">' + esc(d.date) + '</text>' +
     '<text x="80" y="41.5" font-size="7" font-weight="700">' + esc(d.year) + '</text>' +
     '<text x="80" y="54" font-size="5.6">U.S.A.</text></g></svg></div>') : '';
-  return '<div class="stamp" style="height:' + sz.h + 'px"><div class="stamp-shadow" style="height:' + sz.h + 'px"><div class="stamp-paper" style="height:' + sz.h + 'px"><div class="stamp-inner">' +
+  return '<div class="stamp' + (d.sold ? ' is-sold' : '') + '" style="height:' + sz.h + 'px"><div class="stamp-shadow" style="height:' + sz.h + 'px"><div class="stamp-paper" style="height:' + sz.h + 'px"><div class="stamp-inner">' +
     '<div class="stamp-art" style="height:' + sz.art + 'px;background:' + d.bg + '">' + pic +
-    '<div class="stamp-price" style="color:' + (d.ink || '#1E2A3A') + '">' + esc(d.price) + '</div></div>' +
+    '<div class="stamp-price" style="color:' + (d.ink || '#1E2A3A') + '">' + esc(d.sold ? '売約済' : d.price) + '</div></div>' +
     '<div class="stamp-cap"><div class="cap-name">' + esc(d.capJa || d.nameJa) + '</div><div class="cap-size">' + esc(d.size) + '</div></div>' +
     (tall ? '' : '<div class="cap-issue">' + DROP_LABEL + '</div>') +
     '</div></div></div>' + pm + '</div>';
@@ -283,7 +288,7 @@ PAST.forEach(function (drop) {
   html += '<section class="drop"><div class="drop-head"><b>' + DROP_LABEL + '</b><span>·</span><span>' + drop.date + ' 公開</span><span>·</span><span>' +
           drop.pieces.length + '点 完売</span></div><div class="drop-row">';
   drop.pieces.forEach(function (p) {
-    var d = Object.assign({}, ITEMS[p.base], { price: p.price, grade: p.grade, gradeNote: p.gradeNote, city: p.city, date: p.date, year: '2026', drop: { no: drop.no, date: drop.date } });
+    var d = Object.assign({}, ITEMS[p.base], { price: p.price, grade: p.grade, gradeNote: p.gradeNote, city: p.city, date: p.date, year: '2026', sold: true, drop: { no: drop.no, date: drop.date } });
     var n = PIECES.push(d) - 1;
     html += '<button class="past-stamp" data-piece="' + n + '" aria-label="' + esc(d.nameJa + ' ' + d.price + ' 売約済') + '">' + stampHTML(d, d.views[0], { postmark: false }) + '</button>';
   });
@@ -339,7 +344,7 @@ function moveLoupe(e) {
   loupe.style.backgroundSize = bgW + 'px auto';
   loupe.style.backgroundPosition = Math.round(80 - fx * bgW) + 'px ' + Math.round(80 - fy * bgH) + 'px';
 }
-function openItem(i) {
+function openItem(i) { if (ITEMS[i] && ITEMS[i].sold) return; /* sold pieces never open */
   state.open = i; state.view = 0;
   DROP = ITEMS[i].drop; DROP_LABEL = '第' + DROP.no + '便';
   renderListing(); overlay.classList.add('open'); document.getElementById('closeBtn').focus();
@@ -392,6 +397,7 @@ document.addEventListener('keydown', function (e) {
   }
   var baseOpen = openItem, baseClose = closeItem, pushed = false;
   openItem = function (i) {
+    if (ITEMS[i] && ITEMS[i].sold) return;                          // sold: no listing, no address
     baseOpen(i);
     var h = '#' + slug(ITEMS[i]);
     if (location.hash !== h) { history.pushState({ sg: 1 }, '', h); pushed = true; }

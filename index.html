@@ -157,6 +157,10 @@
   .drop-status-lockup { font-size: 13px; }
   .found { font-size: 14px; }
   .legend { font-size: 12.5px; }
+  /* sold pieces: black-and-white, 売約済, color on mouse over, never open */
+  .stamp.is-sold .stamp-art { filter: grayscale(1) contrast(1.25) brightness(1.04); transition: filter 0.5s ease; }
+  .stamp.is-sold .stamp-price { font-family: 'Shippori Mincho', serif; font-weight: 600; font-size: 11px; letter-spacing: 0.18em; }
+  .fan-stamp.up .stamp.is-sold .stamp-art { filter: none; }
 </style>
 </head>
 <body class="locked">
@@ -288,9 +292,9 @@ function stampHTML(d, view, opts) {
     '<text x="80" y="32" font-size="8" font-weight="700">' + esc(d.date) + '</text>' +
     '<text x="80" y="41.5" font-size="7" font-weight="700">' + esc(d.year) + '</text>' +
     '<text x="80" y="54" font-size="5.6">U.S.A.</text></g></svg></div>') : '';
-  return '<div class="stamp" style="height:' + sz.h + 'px"><div class="stamp-shadow" style="height:' + sz.h + 'px"><div class="stamp-paper" style="height:' + sz.h + 'px"><div class="stamp-inner">' +
+  return '<div class="stamp' + (d.sold ? ' is-sold' : '') + '" style="height:' + sz.h + 'px"><div class="stamp-shadow" style="height:' + sz.h + 'px"><div class="stamp-paper" style="height:' + sz.h + 'px"><div class="stamp-inner">' +
     '<div class="stamp-art" style="height:' + sz.art + 'px;background:' + d.bg + '">' + pic +
-    '<div class="stamp-price" style="color:' + (d.ink || '#1E2A3A') + '">' + esc(d.price) + '</div></div>' +
+    '<div class="stamp-price" style="color:' + (d.ink || '#1E2A3A') + '">' + esc(d.sold ? '売約済' : d.price) + '</div></div>' +
     '<div class="stamp-cap"><div class="cap-name">' + esc(d.capJa || d.nameJa) + '</div><div class="cap-size">' + esc(d.size) + '</div></div>' +
     (tall ? '' : '<div class="cap-issue">' + DROP_LABEL + '</div>') +
     '</div></div></div>' + pm + '</div>';
@@ -399,7 +403,7 @@ function startOpening() {
 var overlay = document.getElementById('overlay');
 var stampBtn = document.getElementById('stampBtn'), loupe = document.getElementById('loupe');
 var loupePos = { x: 0, y: 0 };
-function openItem(i) { state.open = i; state.view = 0; setLift(-1); renderListing(); overlay.classList.add('open'); document.getElementById('closeBtn').focus(); }
+function openItem(i) { if (ITEMS[i] && ITEMS[i].sold) return; /* sold pieces never open */ state.open = i; state.view = 0; setLift(-1); renderListing(); overlay.classList.add('open'); document.getElementById('closeBtn').focus(); }
 function closeItem() { overlay.classList.remove('open'); state.open = -1; closeFull(); }
 function renderListing() {
   var d = ITEMS[state.open], v = d.views[state.view];
@@ -510,6 +514,7 @@ document.addEventListener('keydown', function (e) {
   }
   var baseOpen = openItem, baseClose = closeItem, pushed = false;
   openItem = function (i) {
+    if (ITEMS[i] && ITEMS[i].sold) return;                          // sold: no listing, no address
     baseOpen(i);
     var h = '#' + slug(ITEMS[i]);
     if (location.hash !== h) { history.pushState({ sg: 1 }, '', h); pushed = true; }
