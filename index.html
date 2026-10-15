@@ -143,6 +143,12 @@
   .title h2 { word-break: keep-all; } /* long names wrap at their spaces, never mid-word */
   .site-header { position: absolute; left: 0; right: 0; top: 0; display: flex; justify-content: center; align-items: center; padding: 48px 0 24px; z-index: 70; }
   .brand-title { font-family: 'Old Standard TT', serif; font-size: 16px; font-weight: 400; letter-spacing: 0.32em; text-indent: 0.32em; text-transform: uppercase; color: #1a2433; margin: 0; }
+  .drop-status-lockup { display: flex; justify-content: center; align-items: center; gap: 12px; font-size: 11px; letter-spacing: 0.16em; color: #6b6e72; }
+  .drop-status-lockup.at-top { position: absolute; left: 0; right: 0; top: 82px; z-index: 70; }
+  .drop-status-lockup.at-bottom { margin-top: 2px; }
+  .drop-status-current { color: #1a2433; font-weight: 500; }
+  .drop-status-link { color: #6b6e72; text-decoration: none; border-bottom: 1px solid rgba(107, 110, 114, 0.35); padding-bottom: 2px; transition: color 150ms ease, border-color 150ms ease; }
+  .drop-status-link:hover { color: #1a2433; border-bottom-color: #1a2433; }
 </style>
 </head>
 <body class="locked">
@@ -169,6 +175,7 @@
     <h1>アメリカから、一点もの。</h1>
     <p class="sub">見つけた町の消印つきで、ひとつずつお届けします。</p>
     <p class="hint" id="hint">切手にカーソル → 拡大　クリック → 詳細</p>
+    <div class="drop-status-lockup at-bottom"><span class="drop-status-current">第12便 公開中</span><span class="drop-status-dot" aria-hidden="true">·</span><a class="drop-status-link" href="#drops">過去の便を見る →</a></div>
   </div>
 
 
