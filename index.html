@@ -1,0 +1,367 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Standard Gauge — スタンダードゲージ</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Old+Standard+TT:ital,wght@0,400;0,700;1,400&family=Shippori+Mincho:wght@400;600;800&display=swap">
+<style>
+  :root {
+    --paper: #F4F1EA;
+    --card: #FFFDF6;
+    --ink: #1E2A3A;
+    --ink-2: #3A4658;
+    --ink-3: #5A6578;
+    --rule: #E2DCCD;
+    --post: #24418A;
+    --serif: 'Old Standard TT', 'Shippori Mincho', serif;
+  }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; height: 100%; background: var(--paper); }
+  body { font-family: var(--serif); color: var(--ink); overflow: hidden; }
+
+  /* the design is drawn at 1280x880 and scaled to fit the window */
+  #frame { position: absolute; left: 50%; top: 50%; }
+  #stage { position: absolute; left: 0; top: 0; width: 1280px; height: 880px; overflow: hidden; background: var(--paper); transform-origin: 0 0; }
+
+  .topbar { position: absolute; left: 48px; right: 48px; top: 28px; display: flex; justify-content: space-between; font-size: 13px; color: var(--ink-2); }
+
+  /* ---------- stamp ---------- */
+  .stamp { position: relative; width: 156px; color: var(--ink); font-family: var(--serif); text-align: left; }
+  .stamp-shadow { width: 156px; filter: drop-shadow(0 6px 10px rgba(30,42,58,0.22)); }
+  .stamp-paper {
+    width: 156px; padding: 6px; background: var(--card);
+    -webkit-mask: radial-gradient(circle at 6px 6px, transparent 3.4px, #000 3.9px) -6px -6px / 12px 12px, linear-gradient(#000 0 0) content-box;
+            mask: radial-gradient(circle at 6px 6px, transparent 3.4px, #000 3.9px) -6px -6px / 12px 12px, linear-gradient(#000 0 0) content-box;
+  }
+  .stamp-inner { height: 100%; padding: 6px; display: flex; flex-direction: column; gap: 6px; }
+  .stamp-art { position: relative; overflow: hidden; flex: none; }
+  .stamp-art img.cut { position: absolute; left: 10px; width: 112px; object-fit: contain; filter: drop-shadow(0 3px 4px rgba(30,42,58,0.3)); }
+  .stamp-art img.bleed { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
+  .stamp-price { position: absolute; top: 5px; right: 6px; font-weight: 700; font-size: 12px; letter-spacing: -0.2px; }
+  .stamp-cap { display: flex; flex-direction: column; gap: 2px; padding: 0 2px; }
+  .cap-name { font-size: 10.5px; font-weight: 700; line-height: 1.2; white-space: nowrap; overflow: hidden; }
+  .cap-size { font-size: 8.5px; color: var(--ink-2); }
+  .postmark { position: absolute; right: -34px; width: 110px; height: 64px; transform: rotate(-12deg); mix-blend-mode: multiply; opacity: 0.85; pointer-events: none; }
+
+  /* ---------- fan ---------- */
+  .fan-stamp {
+    position: absolute; left: 562px; top: 168px; width: 156px; height: 192px; padding: 0; border: 0; background: none;
+    pointer-events: none; transform-origin: 78px 352px; opacity: 0;
+  }
+  .fan-stamp:focus-visible { outline: 2px solid var(--post); outline-offset: 4px; }
+  #hit { position: absolute; left: 160px; top: 40px; width: 960px; height: 480px; z-index: 55; }
+
+  #seal {
+    position: absolute; left: 572px; top: 452px; width: 136px; height: 136px; border-radius: 50%; border: 0; padding: 0;
+    background: var(--ink); color: var(--card); cursor: pointer; z-index: 60; display: flex; align-items: center; justify-content: center;
+    transform: scale(1.35); opacity: 0; box-shadow: 0 30px 50px rgba(30,42,58,0);
+    transition: transform 0.6s cubic-bezier(0.34, 1.56, 0.64, 1), opacity 0.3s ease, box-shadow 0.6s ease;
+  }
+  #seal.in { transform: scale(1); opacity: 1; box-shadow: 0 10px 24px rgba(30,42,58,0.28); }
+  .seal-ring { width: 118px; height: 118px; border-radius: 50%; border: 1.5px dashed rgba(255,253,246,0.55); display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 4px; }
+  .seal-top { font-style: italic; font-size: 10px; letter-spacing: 1px; opacity: 0.85; }
+  .seal-name { font-weight: 700; font-size: 16px; line-height: 1.05; letter-spacing: 1px; text-align: center; }
+  .seal-kana { font-family: 'Shippori Mincho', serif; font-size: 9px; letter-spacing: 1px; opacity: 0.8; }
+
+  .copy { position: absolute; left: 0; right: 0; top: 640px; display: flex; flex-direction: column; align-items: center; gap: 14px; text-align: center; opacity: 0; transform: translateY(14px); transition: opacity 0.6s ease, transform 0.6s ease; }
+  .copy.in { opacity: 1; transform: none; }
+  .copy h1 { margin: 0; font-weight: 800; font-size: 52px; letter-spacing: 1px; line-height: 1.15; }
+  .copy p { margin: 0; }
+  .sub { font-size: 17px; color: var(--ink-2); }
+  .hint { font-size: 12px; color: var(--ink-3); }
+  .note { position: absolute; left: 0; right: 0; bottom: 22px; text-align: center; font-size: 12px; color: #6B7586; }
+
+  /* ---------- listing ---------- */
+  #overlay { position: absolute; inset: 0; z-index: 100; background: rgba(244,241,234,0.94); display: none; align-items: center; justify-content: center; }
+  #overlay.open { display: flex; }
+  .panel { position: relative; width: 1040px; height: 640px; background: var(--card); border: 1px solid var(--rule); box-shadow: 0 30px 60px rgba(30,42,58,0.18); padding: 48px 72px; display: flex; gap: 88px; align-items: center; }
+  .icon-btn { position: absolute; width: 44px; height: 44px; border: 0; background: none; cursor: pointer; color: var(--ink); display: flex; align-items: center; justify-content: center; }
+  .panel > .icon-btn { top: 16px; right: 16px; }
+  .left-col { flex: none; align-self: stretch; display: flex; flex-direction: column; justify-content: center; gap: 18px; }
+  #stampBtn { position: relative; display: block; width: 281px; height: 432px; padding: 0; border: 0; background: none; cursor: none; }
+  #stampBtn .scaler { position: absolute; left: 0; top: 0; width: 156px; height: 240px; transform: scale(1.8); transform-origin: 0 0; }
+  #loupe { position: absolute; width: 160px; height: 160px; border-radius: 50%; border: 4px solid var(--ink); box-shadow: 0 12px 28px rgba(30,42,58,0.35); pointer-events: none; background-color: #fff; background-repeat: no-repeat; display: none; }
+  .small { font-size: 12px; color: var(--ink-3); }
+  .right-col { flex: 1; display: flex; flex-direction: column; gap: 20px; }
+  .found { font-size: 13px; color: var(--post); letter-spacing: 0.5px; }
+  .title h2 { margin: 0; font-weight: 800; font-size: 40px; line-height: 1.15; }
+  .title div { font-size: 15px; color: var(--ink-3); margin-top: 6px; }
+  .meas { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px 32px; padding: 16px 0; border-top: 1px solid var(--rule); border-bottom: 1px solid var(--rule); }
+  .meas div { display: flex; justify-content: space-between; font-size: 15px; }
+  .meas span:first-child { color: var(--ink-3); }
+  .meas span:last-child { font-weight: 700; }
+  .cond { display: flex; gap: 14px; font-size: 15px; }
+  .cond span { color: var(--ink-3); }
+  .cond b { font-weight: 700; }
+  .buy-row { display: flex; justify-content: space-between; align-items: flex-end; gap: 24px; }
+  .buy { display: flex; flex-direction: column; gap: 16px; }
+  .price { display: flex; align-items: baseline; gap: 12px; }
+  .price b { font-weight: 700; font-size: 34px; }
+  .price span { font-size: 13px; color: var(--ink-3); }
+  .cart { align-self: flex-start; min-height: 52px; padding: 0 36px; border: 0; background: var(--ink); color: var(--card); font-family: var(--serif); font-weight: 700; font-size: 16px; cursor: pointer; }
+  .thumbs { display: flex; gap: 10px; }
+  .thumbs button { width: 78px; height: 104px; padding: 0; background: #fff; border: 1px solid #D9D2C2; cursor: pointer; overflow: hidden; }
+  .thumbs button.on { border: 3px solid var(--ink); }
+  .thumbs img { display: block; width: 100%; height: 100%; object-fit: cover; }
+
+  #full { position: absolute; inset: 0; z-index: 200; display: none; align-items: center; justify-content: center; }
+  #full.open { display: flex; }
+  #fullBg { position: absolute; inset: 0; border: 0; padding: 0; background: rgba(30,42,58,0.82); cursor: zoom-out; }
+  .full-box { position: relative; width: 576px; height: 768px; background: #fff; box-shadow: 0 30px 60px rgba(0,0,0,0.35); pointer-events: none; }
+  .full-box img { display: block; width: 100%; height: 100%; object-fit: contain; }
+  #full .icon-btn { top: 20px; right: 20px; color: var(--card); }
+</style>
+</head>
+<body>
+<div id="frame"><div id="stage">
+
+  <div class="topbar"><div>今週の入荷 · 第12便</div><div>全品送料込み</div></div>
+
+  <div id="fan"></div>
+  <div id="hit" aria-hidden="true"></div>
+
+  <button id="seal" aria-label="Standard Gauge: open this week's stamps">
+    <div class="seal-ring">
+      <div class="seal-top">U.S.A. → 日本</div>
+      <div class="seal-name">STANDARD<br>GAUGE</div>
+      <div class="seal-kana">スタンダードゲージ</div>
+    </div>
+  </button>
+
+  <div class="copy" id="copy">
+    <h1>アメリカから、一点もの。</h1>
+    <p class="sub">見つけた町の消印つきで、ひとつずつお届けします。</p>
+    <p class="hint" id="hint">ロゴにカーソルを合わせてください</p>
+  </div>
+
+  <div class="note">※ 掲載中の商品写真は、デザイン確認用のサンプルです。</div>
+
+  <div id="overlay" role="dialog" aria-modal="true" aria-label="商品詳細">
+    <div class="panel">
+      <button class="icon-btn" id="closeBtn" aria-label="閉じる"><svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M5 5 L19 19 M19 5 L5 19"/></svg></button>
+      <div class="left-col">
+        <button id="stampBtn" aria-label="写真を大きく表示">
+          <div class="scaler" id="bigStamp"></div>
+          <div id="loupe"></div>
+        </button>
+        <div class="small">ルーペで拡大 · クリックで全体表示</div>
+      </div>
+      <div class="right-col">
+        <div class="found" id="found"></div>
+        <div class="title"><h2 id="nameJa"></h2><div id="nameEn"></div></div>
+        <div class="meas" id="meas"></div>
+        <div class="cond"><span>状態ランク</span><b>[S–D]</b><span>[状態メモ]</span></div>
+        <div class="buy-row">
+          <div class="buy">
+            <div class="price"><b id="price"></b><span>送料込み</span></div>
+            <button class="cart">カートに入れる</button>
+          </div>
+          <div class="thumbs" id="thumbs"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div id="full" role="dialog" aria-modal="true" aria-label="写真">
+    <button id="fullBg" aria-label="閉じる"></button>
+    <div class="full-box"><img id="fullImg" alt=""></div>
+    <button class="icon-btn" id="fullClose" aria-label="閉じる"><svg viewBox="0 0 24 24" width="24" height="24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M5 5 L19 19 M19 5 L5 19"/></svg></button>
+  </div>
+
+</div></div>
+
+<script>
+// ---------------- data (names, prices, sizes and towns are samples) ----------------
+var ITEMS = [
+  { bg: '#F2D98A', nameJa: 'コンチョ付きリンガーTシャツ', capJa: 'リンガーTシャツ', nameEn: 'Ringer tee with concho details', size: '着丈 70 · 身幅 54', price: '¥8,600', city: 'TUCSON AZ', date: 'FEB 19', year: '2026',
+    meas: [['着丈', '70 cm'], ['身幅', '54 cm'], ['肩幅', '47 cm'], ['袖丈', '21 cm']],
+    views: [{ img: 'assets/tee.png', full: 'assets/tee-full.jpg', ar: 0.99 }] },
+  { bg: '#E8B53A', nameJa: 'デニムショルダーバッグ', nameEn: 'Denim shoulder bag', size: '幅 50 · 高さ 30 cm', price: '¥12,800', city: 'ASHEVILLE NC', date: 'MAR 21', year: '2026',
+    meas: [['幅', '50 cm'], ['高さ', '30 cm'], ['マチ', '12 cm'], ['ストラップ', '62 cm']],
+    views: [{ img: 'assets/bag.png', full: 'assets/bag-full.jpg', ar: 0.905 }] },
+  { bg: '#D98C6A', nameJa: 'MA-1 フライトジャケット', nameEn: 'MA-1 flight jacket', size: '着丈 66 · 身幅 64', price: '¥26,000', city: 'DAYTON OH', date: 'MAR 12', year: '2026',
+    meas: [['着丈', '66 cm'], ['身幅', '64 cm'], ['肩幅', '55 cm'], ['袖丈', '62 cm']],
+    views: [
+      { img: 'assets/bomber.png', full: 'assets/bomber-full.jpg', ar: 0.88, label: '表' },
+      { img: 'assets/bomber2-full.jpg', full: 'assets/bomber2-full.jpg', ar: 1.333, bleed: true, label: '裏地ポケット' },
+      { img: 'assets/bomber3-full.jpg', full: 'assets/bomber3-full.jpg', ar: 1.333, bleed: true, label: '袖口・裾' }
+    ] },
+  { bg: '#C2412D', ink: '#FFFDF6', nameJa: 'キルティングジャケット', nameEn: 'Quilted varsity jacket', size: '着丈 64 · 身幅 66', price: '¥29,000', city: 'PORTLAND ME', date: 'FEB 6', year: '2026',
+    meas: [['着丈', '64 cm'], ['身幅', '66 cm'], ['肩幅', '58 cm'], ['袖丈', '57 cm']],
+    views: [{ img: 'assets/jacket.png', full: 'assets/jacket-full.jpg', ar: 1.07 }] },
+  { bg: '#9DC3D9', nameJa: 'ジャカードソックス', nameEn: 'Jacquard knit socks', size: 'フリー · 23–27 cm', price: '¥3,200', city: 'SANTA FE NM', date: 'MAR 3', year: '2026',
+    meas: [['サイズ', 'フリー'], ['対応サイズ', '23–27 cm']],
+    views: [{ img: 'assets/socks.png', full: 'assets/socks-full.jpg', ar: 1.57 }] }
+];
+var ANG = [-34, -17, 0, 17, 34];
+var MID = (ITEMS.length - 1) / 2;
+
+// ---------------- scale the 1280x880 design to the window ----------------
+var frame = document.getElementById('frame'), stage = document.getElementById('stage');
+function fit() {
+  var k = Math.min(window.innerWidth / 1280, window.innerHeight / 880);
+  stage.style.transform = 'scale(' + k + ')';
+  frame.style.width = (1280 * k) + 'px'; frame.style.height = (880 * k) + 'px';
+  frame.style.marginLeft = (-640 * k) + 'px'; frame.style.marginTop = (-440 * k) + 'px';
+}
+window.addEventListener('resize', fit); fit();
+
+// ---------------- stamp markup ----------------
+function esc(s) { return String(s).replace(/[&<>"]/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]; }); }
+function stampHTML(d, view, opts) {
+  var tall = opts && opts.tall, postmark = !(opts && opts.postmark === false);
+  var sz = tall ? { h: 240, art: 176, img: 124, imgTop: 26, pm: 48 } : { h: 192, art: 122, img: 94, imgTop: 22, pm: 46 };
+  var pic = view.bleed
+    ? '<img class="bleed" src="' + view.img + '" alt="' + esc(d.nameJa) + '">'
+    : '<img class="cut" src="' + view.img + '" alt="' + esc(d.nameJa) + '" style="top:' + sz.imgTop + 'px;height:' + sz.img + 'px">';
+  var pm = postmark ? (
+    '<div class="postmark" style="bottom:' + sz.pm + 'px"><svg viewBox="0 0 110 64" width="110" height="64" aria-hidden="true" fill="none" stroke="#24418A" stroke-width="1.6">' +
+    '<path d="M0 22 q6 -5 12 0 t12 0 t12 0 t12 0"/><path d="M0 32 q6 -5 12 0 t12 0 t12 0 t12 0"/><path d="M0 42 q6 -5 12 0 t12 0 t12 0 t12 0"/>' +
+    '<circle cx="80" cy="32" r="25"/><circle cx="80" cy="32" r="17" stroke-width="0.9"/>' +
+    '<g fill="#24418A" stroke="none" font-family="Old Standard TT, serif" text-anchor="middle">' +
+    '<text x="80" y="13.5" font-size="5.6" font-weight="700">' + esc(d.city) + '</text>' +
+    '<text x="80" y="32" font-size="8" font-weight="700">' + esc(d.date) + '</text>' +
+    '<text x="80" y="41.5" font-size="7" font-weight="700">' + esc(d.year) + '</text>' +
+    '<text x="80" y="54" font-size="5.6">U.S.A.</text></g></svg></div>') : '';
+  return '<div class="stamp" style="height:' + sz.h + 'px"><div class="stamp-shadow" style="height:' + sz.h + 'px"><div class="stamp-paper" style="height:' + sz.h + 'px"><div class="stamp-inner">' +
+    '<div class="stamp-art" style="height:' + sz.art + 'px;background:' + d.bg + '">' + pic +
+    '<div class="stamp-price" style="color:' + (d.ink || '#1E2A3A') + '">' + esc(d.price) + '</div></div>' +
+    '<div class="stamp-cap"><div class="cap-name">' + esc(d.capJa || d.nameJa) + '</div><div class="cap-size">' + esc(d.size) + '</div></div>' +
+    '</div></div></div>' + pm + '</div>';
+}
+
+// ---------------- fan ----------------
+var state = { fanned: false, lifted: -1, mode: 'fan', open: -1, view: 0 };
+var fanEl = document.getElementById('fan');
+var fanBtns = ITEMS.map(function (d, i) {
+  var b = document.createElement('button');
+  b.className = 'fan-stamp';
+  b.setAttribute('aria-label', d.nameJa + ' ' + d.price);
+  b.innerHTML = stampHTML(d, d.views[0], { postmark: false });
+  b.addEventListener('focus', function () { if (state.fanned) setLift(i); });
+  b.addEventListener('blur', function () { setLift(-1); });
+  b.addEventListener('click', function () { if (state.fanned) openItem(i); });
+  fanEl.appendChild(b);
+  return b;
+});
+
+function renderFan() {
+  fanBtns.forEach(function (b, i) {
+    var a = ANG[i], dist = Math.abs(i - MID);
+    var tf, z = 10 + i, delay = 0, op = 1, dur = 450, ease = 'cubic-bezier(0.2, 0.8, 0.2, 1)';
+    if (!state.fanned) {
+      tf = 'rotate(' + (a * 0.1) + 'deg) translateY(256px) scale(0.3)'; // tucked behind the seal
+      op = 0; dur = 380;
+      delay = state.mode === 'fan' ? Math.round((MID - dist) * 40) : 0;
+    } else if (state.lifted === i) {
+      tf = 'rotate(' + a + 'deg) translateY(-70px) scale(1.24)';
+      z = 50; dur = 1250; // the hover rise
+    } else {
+      tf = 'rotate(' + a + 'deg) translateY(-14px)';
+      if (state.mode === 'fan') { delay = Math.round(dist * 110 + (i > MID ? 55 : 0)); dur = 720; ease = 'cubic-bezier(0.34, 1.4, 0.64, 1)'; }
+    }
+    b.style.transition = 'transform ' + dur + 'ms ' + ease + ' ' + delay + 'ms, opacity 0.25s ease ' + delay + 'ms';
+    b.style.transform = tf; b.style.opacity = op; b.style.zIndex = z;
+  });
+  document.getElementById('hint').textContent = state.fanned ? '切手にカーソル → 拡大　クリック → 詳細' : 'ロゴにカーソルを合わせてください';
+  hit.style.cursor = state.lifted >= 0 ? 'pointer' : 'default';
+}
+function setLift(i) { if (i === state.lifted) return; state.lifted = i; state.mode = 'lift'; renderFan(); }
+function setFanned(v) { state.fanned = v; state.mode = 'fan'; state.lifted = -1; renderFan(); }
+
+// hover is decided by the mouse's angle around the seal (the fan's pivot), not by the moving stamps
+var hit = document.getElementById('hit');
+hit.addEventListener('mousemove', function (e) {
+  if (!state.fanned || state.open >= 0) return;
+  var r = hit.getBoundingClientRect(), k = 960 / (r.width || 960);
+  var x = 160 + (e.clientX - r.left) * k, y = 40 + (e.clientY - r.top) * k;
+  var dx = x - 640, dy = 520 - y, rad = Math.sqrt(dx * dx + dy * dy), idx = -1;
+  if (rad > 105 && rad < 480 && dy > -20) {
+    var ang = Math.atan2(dx, dy) * 180 / Math.PI, half = (ANG[1] - ANG[0]) / 2, cur = state.lifted;
+    if (cur >= 0 && Math.abs(ang - ANG[cur]) < half + 4) idx = cur; // hysteresis
+    else {
+      var best = -1, bd = 1e9;
+      ANG.forEach(function (a, i) { var dd = Math.abs(ang - a); if (dd < bd) { bd = dd; best = i; } });
+      if (bd < half + 8) idx = best;
+    }
+  }
+  setLift(idx);
+});
+hit.addEventListener('mouseleave', function () { setLift(-1); });
+hit.addEventListener('click', function () { if (state.fanned && state.lifted >= 0) openItem(state.lifted); });
+
+var seal = document.getElementById('seal');
+seal.addEventListener('mouseenter', function () { if (!state.fanned) setFanned(true); });
+seal.addEventListener('click', function () { setFanned(!state.fanned); });
+
+// ---------------- opening: seal presses in, headline rises, stamps deal out once images are ready ----------------
+renderFan();
+setTimeout(function () { seal.classList.add('in'); }, 120);
+setTimeout(function () { document.getElementById('copy').classList.add('in'); }, 380);
+(function () {
+  var srcs = []; ITEMS.forEach(function (d) { d.views.forEach(function (v) { srcs.push(v.img); }); });
+  var left = srcs.length, ready = false, waited = false, done = false;
+  function go() { if (!done && ready && waited) { done = true; setFanned(true); } }
+  srcs.forEach(function (u) { var im = new Image(); im.onload = im.onerror = function () { if (--left === 0) { ready = true; go(); } }; im.src = u; });
+  setTimeout(function () { waited = true; go(); }, 820);
+  setTimeout(function () { ready = true; waited = true; go(); }, 2500); // never wait longer than this
+})();
+
+// ---------------- listing ----------------
+var overlay = document.getElementById('overlay');
+var stampBtn = document.getElementById('stampBtn'), loupe = document.getElementById('loupe');
+var loupePos = { x: 0, y: 0 };
+function openItem(i) { state.open = i; state.view = 0; setLift(-1); renderListing(); overlay.classList.add('open'); document.getElementById('closeBtn').focus(); }
+function closeItem() { overlay.classList.remove('open'); state.open = -1; closeFull(); }
+function renderListing() {
+  var d = ITEMS[state.open], v = d.views[state.view];
+  document.getElementById('bigStamp').innerHTML = stampHTML(d, v, { tall: true });
+  document.getElementById('found').textContent = 'FOUND · ' + d.city + ' · ' + d.date + ', ' + d.year;
+  document.getElementById('nameJa').textContent = d.nameJa;
+  document.getElementById('nameEn').textContent = d.nameEn;
+  document.getElementById('price').textContent = d.price;
+  document.getElementById('meas').innerHTML = d.meas.map(function (m) { return '<div><span>' + esc(m[0]) + '</span><span>' + esc(m[1]) + '</span></div>'; }).join('');
+  var th = document.getElementById('thumbs');
+  th.innerHTML = '';
+  if (d.views.length > 1) d.views.forEach(function (vv, j) {
+    var b = document.createElement('button');
+    b.className = j === state.view ? 'on' : '';
+    b.setAttribute('aria-label', vv.label || ('表示 ' + (j + 1)));
+    b.innerHTML = '<img src="' + vv.full + '" alt="">';
+    b.addEventListener('click', function () { state.view = j; loupe.style.display = 'none'; renderListing(); });
+    th.appendChild(b);
+  });
+  loupe.style.backgroundImage = 'url(' + v.img + ')';
+}
+function moveLoupe(e) {
+  var d = ITEMS[state.open], v = d.views[state.view];
+  var r = stampBtn.getBoundingClientRect(), k = 281 / (r.width || 281);
+  var lx = (e.clientX - r.left) * k, ly = (e.clientY - r.top) * k;
+  var bgW = 900, bgH = bgW * (v.ar || 1);
+  var fx = Math.min(1, Math.max(0, (lx - 22) / 238)), fy = Math.min(1, Math.max(0, (ly - 22) / 316));
+  loupe.style.display = 'block';
+  loupe.style.left = Math.round(lx - 80) + 'px'; loupe.style.top = Math.round(ly - 80) + 'px';
+  loupe.style.backgroundSize = bgW + 'px auto';
+  loupe.style.backgroundPosition = Math.round(80 - fx * bgW) + 'px ' + Math.round(80 - fy * bgH) + 'px';
+}
+stampBtn.addEventListener('mousemove', moveLoupe);
+stampBtn.addEventListener('mouseleave', function () { loupe.style.display = 'none'; });
+stampBtn.addEventListener('click', openFull);
+document.getElementById('closeBtn').addEventListener('click', closeItem);
+
+// ---------------- full photo ----------------
+var full = document.getElementById('full');
+function openFull() { var d = ITEMS[state.open], v = d.views[state.view]; loupe.style.display = 'none'; document.getElementById('fullImg').src = v.full; document.getElementById('fullImg').alt = d.nameEn; full.classList.add('open'); }
+function closeFull() { full.classList.remove('open'); }
+document.getElementById('fullBg').addEventListener('click', closeFull);
+document.getElementById('fullClose').addEventListener('click', closeFull);
+document.addEventListener('keydown', function (e) {
+  if (e.key !== 'Escape') return;
+  if (full.classList.contains('open')) closeFull(); else if (state.open >= 0) closeItem();
+});
+</script>
+</body>
+</html>
