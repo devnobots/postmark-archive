@@ -150,6 +150,13 @@
   .drop-status-link { color: #6b6e72; text-decoration: none; border-bottom: 1px solid rgba(107, 110, 114, 0.35); padding-bottom: 2px; transition: color 150ms ease, border-color 150ms ease; }
   .drop-status-link:hover { color: #1a2433; border-bottom-color: #1a2433; }
   .cap-issue { margin-top: auto; padding: 0 2px 1px; font-size: 6.5px; letter-spacing: 0.08em; color: var(--ink-3); text-align: right; }
+  /* desktop legibility */
+  .cap-name { font-size: 11.5px; letter-spacing: -0.01em; }
+  .cap-size { font-size: 10px; }
+  .hint { font-size: 14px; }
+  .drop-status-lockup { font-size: 13px; }
+  .found { font-size: 14px; }
+  .legend { font-size: 12.5px; }
 </style>
 </head>
 <body class="locked">
@@ -226,29 +233,29 @@ var DROP_LABEL = '第' + DROP.no + '便';
 var ITEMS = [
   { bg: '#EFE3C8', nameJa: '70年代 リンガーTシャツ コンチョ装飾', capJa: 'リンガーTシャツ', nameEn: '1970s Ringer Tee with Concho Trim', size: '着丈 70 · 身幅 54', price: '¥13,200', grade: 'B', gradeNote: 'わずかな色あせ', city: 'TUCSON AZ', date: 'AUG 14', year: '2026',
     meas: [['着丈', '70 cm'], ['身幅', '54 cm'], ['肩幅', '47 cm'], ['袖丈', '21 cm']],
-    views: [{ img: 'assets/tee.png', full: 'assets/tee-full.jpg', ar: 0.99 }] },
+    views: [{ img: 'assets/tee.webp', full: 'assets/tee-full.jpg', ar: 0.99 }] },
   { bg: '#D98C6A', nameJa: '70年代 デニム ニュースペーパーバッグ', capJa: 'ニュースペーパーバッグ', nameEn: '1970s Denim Newspaper Bag', size: '幅 50 · 高さ 30', price: '¥43,780', grade: 'A', gradeNote: '目立つダメージなし', city: 'ASHEVILLE NC', date: 'AUG 22', year: '2026',
     meas: [['幅', '50 cm'], ['高さ', '30 cm'], ['マチ', '12 cm'], ['ショルダー', '62 cm']],
-    views: [{ img: 'assets/bag.png', full: 'assets/bag-full.jpg', ar: 0.905 }] },
+    views: [{ img: 'assets/bag.webp', full: 'assets/bag-full.jpg', ar: 0.905 }] },
   { bg: '#C9B3D6', nameJa: '60年代 USAF MA-1 フライトジャケット', capJa: 'MA-1 フライト', nameEn: '1960s USAF MA-1 Flight Jacket', size: '着丈 66 · 身幅 64', price: '¥87,780', grade: 'B', gradeNote: '袖リブにほつれ', city: 'DAYTON OH', date: 'SEP 3', year: '2026',
     meas: [['着丈', '66 cm'], ['身幅', '64 cm'], ['肩幅', '55 cm'], ['袖丈', '62 cm']],
     views: [
-      { img: 'assets/bomber.png', full: 'assets/bomber-full.jpg', ar: 0.88, label: '表' },
+      { img: 'assets/bomber.webp', full: 'assets/bomber-full.jpg', ar: 0.88, label: '表' },
       { img: 'assets/bomber2-full.jpg', full: 'assets/bomber2-full.jpg', ar: 1.333, bleed: true, label: '裏地ポケット' },
       { img: 'assets/bomber3-full.jpg', full: 'assets/bomber3-full.jpg', ar: 1.333, bleed: true, label: '袖口・裾' }
     ] },
   { bg: '#F2D98A', nameJa: '50年代 キルティング スタジャン', capJa: 'キルティングスタジャン', nameEn: '1950s Quilted Varsity Jacket', size: '着丈 64 · 身幅 66', price: '¥107,800', grade: 'C', gradeNote: '裏地に数か所シミ', city: 'PORTLAND ME', date: 'SEP 6', year: '2026',
     meas: [['着丈', '64 cm'], ['身幅', '66 cm'], ['肩幅', '58 cm'], ['袖丈', '57 cm']],
-    views: [{ img: 'assets/jacket.png', full: 'assets/jacket-full.jpg', ar: 1.07 }] },
+    views: [{ img: 'assets/jacket.webp', full: 'assets/jacket-full.jpg', ar: 1.07 }] },
   { bg: '#9DC3D9', nameJa: '80年代 ハンドニット ウールソックス', capJa: 'ウールソックス', nameEn: '1980s Hand-Knit Wool Socks', size: 'フリー · 23–27 cm', price: '¥43,890', grade: 'A', gradeNote: '使用感少なめ', city: 'SANTA FE NM', date: 'SEP 12', year: '2026',
     meas: [['対応サイズ', '23–27 cm']],
-    views: [{ img: 'assets/socks.png', full: 'assets/socks-full.jpg', ar: 1.57 }] },
+    views: [{ img: 'assets/socks.webp', full: 'assets/socks-full.jpg', ar: 1.57 }] },
   { bg: '#E8B53A', nameJa: '80年代 キャンバス バケットハット', capJa: 'バケットハット', nameEn: '1980s Canvas Bucket Hat', size: '頭囲 58 · つば 6', price: '¥151,800', grade: 'B', gradeNote: '内側に汗じみ', city: 'ATHENS GA', date: 'SEP 19', year: '2026',
     meas: [['頭囲', '58 cm'], ['つば', '6 cm']],
-    views: [{ img: 'assets/hat.png', full: 'assets/hat-full.jpg', ar: 0.792 }] },
+    views: [{ img: 'assets/hat.webp', full: 'assets/hat-full.jpg', ar: 0.792 }] },
   { bg: '#C2412D', ink: '#FFFDF6', nameJa: '70年代 ノルディック柄 ニットネックウォーマー', capJa: 'ネックウォーマー', nameEn: '1970s Nordic-Pattern Knit Neck Warmer', size: '全長 60 · 幅 22', price: '¥87,780', grade: 'B', gradeNote: '小さな毛玉あり', city: 'BOZEMAN MT', date: 'SEP 27', year: '2026',
     meas: [['全長', '60 cm'], ['幅', '22 cm']],
-    views: [{ img: 'assets/neck.png', full: 'assets/neck-full.jpg', ar: 1.455 }] }
+    views: [{ img: 'assets/neck.webp', full: 'assets/neck-full.jpg', ar: 1.455 }] }
 ];
 var SPREAD = 78; // total opening of the fan, in degrees
 var ANG = ITEMS.map(function (d, i) { return ITEMS.length > 1 ? -SPREAD / 2 + i * SPREAD / (ITEMS.length - 1) : 0; });
@@ -490,6 +497,39 @@ document.addEventListener('keydown', function (e) {
 
 // homepage drop line reads from DROP
 (function () { var el = document.querySelector('.drop-status-current'); if (el) el.textContent = DROP_LABEL + ' 公開中'; })();
+// listing addresses: each piece has its own #link
+(function () {
+  function slug(d) {
+    var s = String(d.nameEn || '').toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
+    return (d.drop ? 'no' + d.drop.no + '-' : '') + s;
+  }
+  function indexFor(hash) {
+    var h = decodeURIComponent(String(hash || '').replace(/^#/, ''));
+    for (var i = 0; i < ITEMS.length; i++) if (h && slug(ITEMS[i]) === h) return i;
+    return -1;
+  }
+  var baseOpen = openItem, baseClose = closeItem, pushed = false;
+  openItem = function (i) {
+    baseOpen(i);
+    var h = '#' + slug(ITEMS[i]);
+    if (location.hash !== h) { history.pushState({ sg: 1 }, '', h); pushed = true; }
+  };
+  closeItem = function () {
+    if (pushed) { pushed = false; history.back(); return; }       // Back closes it via popstate
+    baseClose();
+    if (location.hash) history.replaceState(null, '', location.pathname + location.search);
+  };
+  var closeBtn = document.getElementById('closeBtn');
+  closeBtn.removeEventListener('click', baseClose);
+  closeBtn.addEventListener('click', function () { closeItem(); });
+  window.addEventListener('popstate', function () {
+    var i = indexFor(location.hash);
+    if (i >= 0) { if (state.open !== i) baseOpen(i); }
+    else { pushed = false; if (state.open >= 0) baseClose(); }
+  });
+  var first = indexFor(location.hash);
+  if (first >= 0) baseOpen(first);                                    // a shared link opens that piece
+})();
 </script>
 </body>
 </html>
