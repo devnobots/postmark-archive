@@ -1,11 +1,28 @@
-import re, sys
+#!/usr/bin/env python3
+"""Standard Gauge mockup: demo prices taken from real Japanese vintage-shop listings.
+Applied to the items in page order (which price lands on which item does not matter).
+
+Usage
+  python3 tools/set_demo_prices.py index.html
+"""
+import re
+import sys
+
 PRICES = ['¥13,200', '¥43,780', '¥87,780', '¥107,800', '¥43,890', '¥151,800', '¥87,780']
-path = sys.argv[1]
-src = open(path, encoding='utf-8').read()
-found = re.findall(r"price: '¥[0-9,]+'", src)
-if len(found) != len(PRICES):
-    sys.exit('ERROR: expected %d prices, found %d' % (len(PRICES), len(found)))
-it = iter(PRICES)
-src = re.sub(r"price: '¥[0-9,]+'", lambda m: "price: '%s'" % next(it), src)
-open(path, 'w', encoding='utf-8').write(src)
-print('prices updated')
+RX = re.compile(r"price: '¥[0-9,]+'")
+
+
+def main():
+    path = sys.argv[1]
+    src = open(path, encoding='utf-8').read()
+    found = RX.findall(src)
+    if len(found) != len(PRICES):
+        sys.exit('ERROR: nothing changed. Expected %d prices, found %d' % (len(PRICES), len(found)))
+    it = iter(PRICES)
+    src = RX.sub(lambda m: "price: '%s'" % next(it), src)
+    open(path, 'w', encoding='utf-8').write(src)
+    print('prices set: ' + ', '.join(PRICES))
+
+
+if __name__ == '__main__':
+    main()

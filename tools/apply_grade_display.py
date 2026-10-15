@@ -30,6 +30,9 @@ def main():
         sys.exit(2)
     path = sys.argv[1]
     src = open(path, encoding='utf-8').read()
+    if 'id="grade"' in src:
+        print('already applied: grade display')
+        return
     for i, (old, new) in enumerate(EDITS, 1):
         n = src.count(old)
         if n != 1:

@@ -9,16 +9,17 @@
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Old+Standard+TT:ital,wght@0,400;0,700;1,400&family=Shippori+Mincho:wght@400;600;800&display=swap">
 <style>
   :root {
-    --paper: #F4F1EA;
+    --paper: #f5f2eb;
     --card: #FFFDF6;
-    --ink: #1E2A3A;
+    --ink: #1a2433;
     --ink-2: #3A4658;
-    --ink-3: #5A6578;
+    --ink-3: #6b6e72;
     --rule: #E2DCCD;
     --post: #24418A;
     --serif: 'Old Standard TT', 'Shippori Mincho', serif;
   }
   * { box-sizing: border-box; }
+  button { font-family: inherit; }
   html, body { margin: 0; height: 100%; background: var(--paper); }
   body { font-family: var(--serif); color: var(--ink); overflow: hidden; }
 
@@ -41,13 +42,14 @@
   .gate-box.shake { animation: gate-shake 0.35s ease; }
   @keyframes gate-shake { 25% { transform: translateX(-6px); } 75% { transform: translateX(6px); } }
 
-  .topbar { position: absolute; left: 48px; right: 48px; top: 28px; display: flex; justify-content: space-between; font-size: 13px; color: var(--ink-2); }
 
   /* ---------- stamp ---------- */
   .stamp { position: relative; width: 156px; color: var(--ink); font-family: var(--serif); text-align: left; }
-  .stamp-shadow { width: 156px; filter: drop-shadow(0 6px 10px rgba(30,42,58,0.22)); }
+  .stamp-shadow { width: 156px; filter: drop-shadow(0 10px 10px hsla(28, 25%, 20%, 0.07)) drop-shadow(0 2px 3px hsla(28, 25%, 20%, 0.04)); transition: filter 1.25s ease; }
+  .fan-stamp.up .stamp-shadow { filter: drop-shadow(0 20px 16px hsla(28, 25%, 20%, 0.12)) drop-shadow(0 4px 5px hsla(28, 25%, 20%, 0.06)); }
+  #stampBtn .stamp-shadow { filter: drop-shadow(0 20px 16px hsla(28, 25%, 20%, 0.12)) drop-shadow(0 4px 5px hsla(28, 25%, 20%, 0.06)); } /* listing stamp: always the stronger shadow */
   .stamp-paper {
-    width: 156px; padding: 6px; background: var(--card);
+    width: 156px; padding: 6px; background: #faf8f5;
     -webkit-mask: radial-gradient(circle at 6px 6px, transparent 3.4px, #000 3.9px) -6px -6px / 12px 12px, linear-gradient(#000 0 0) content-box;
             mask: radial-gradient(circle at 6px 6px, transparent 3.4px, #000 3.9px) -6px -6px / 12px 12px, linear-gradient(#000 0 0) content-box;
   }
@@ -63,11 +65,11 @@
 
   /* ---------- fan ---------- */
   .fan-stamp {
-    position: absolute; left: 562px; top: 203px; width: 156px; height: 192px; padding: 0; border: 0; background: none;
-    pointer-events: none; transform-origin: 78px 352px; opacity: 0;
+    position: absolute; left: 562px; top: 238px; width: 156px; height: 192px; padding: 0; border: 0; background: none;
+    pointer-events: none; transform-origin: 78px 480px; opacity: 0;
   }
   .fan-stamp:focus-visible { outline: 2px solid var(--post); outline-offset: 4px; }
-  #hit { position: absolute; left: 160px; top: 40px; width: 960px; height: 480px; z-index: 55; }
+  #hit { position: absolute; left: 120px; top: 138px; width: 1040px; height: 470px; z-index: 55; }
 
   #seal {
     position: absolute; left: 572px; top: 452px; width: 136px; height: 136px; border-radius: 50%; border: 0; padding: 0;
@@ -81,7 +83,7 @@
   .seal-name { font-weight: 700; font-size: 16px; line-height: 1.05; letter-spacing: 1px; text-align: center; }
   .seal-kana { font-family: 'Shippori Mincho', serif; font-size: 9px; letter-spacing: 1px; opacity: 0.8; }
 
-  .copy { position: absolute; left: 0; right: 0; top: 640px; display: flex; flex-direction: column; align-items: center; gap: 14px; text-align: center; opacity: 0; transform: translateY(14px); transition: opacity 0.6s ease, transform 0.6s ease; }
+  .copy { position: absolute; left: 0; right: 0; top: 602px; display: flex; flex-direction: column; align-items: center; gap: 14px; text-align: center; opacity: 0; transform: translateY(14px); transition: opacity 0.6s ease, transform 0.6s ease; }
   .copy.in { opacity: 1; transform: none; }
   .copy h1 { margin: 0; font-weight: 800; font-size: 52px; letter-spacing: 1px; line-height: 1.15; }
   .copy p { margin: 0; }
@@ -129,6 +131,8 @@
   #full .icon-btn { top: 20px; right: 20px; color: var(--card); }
   .legend { font-size: 11px; color: var(--ink-3); margin-top: -12px; letter-spacing: 0.3px; }
   .title h2 { word-break: keep-all; } /* long names wrap at their spaces, never mid-word */
+  .site-header { position: absolute; left: 0; right: 0; top: 0; display: flex; justify-content: center; align-items: center; padding: 48px 0 24px; z-index: 70; }
+  .brand-title { font-family: 'Old Standard TT', serif; font-size: 16px; font-weight: 400; letter-spacing: 0.32em; text-indent: 0.32em; text-transform: uppercase; color: #1a2433; margin: 0; }
 </style>
 </head>
 <body class="locked">
@@ -145,26 +149,18 @@
 </div>
 <div id="frame"><div id="stage">
 
-  <div class="topbar"><div>今週の入荷 · 第12便</div><div>全品送料込み</div></div>
+  <header class="site-header"><div class="brand-title">STANDARD GAUGE</div></header>
 
   <div id="fan"></div>
   <div id="hit" aria-hidden="true"></div>
 
-  <button id="seal" aria-label="Standard Gauge: open this week's stamps">
-    <div class="seal-ring">
-      <div class="seal-top">U.S.A. → 日本</div>
-      <div class="seal-name">STANDARD<br>GAUGE</div>
-      <div class="seal-kana">スタンダードゲージ</div>
-    </div>
-  </button>
 
   <div class="copy" id="copy">
     <h1>アメリカから、一点もの。</h1>
     <p class="sub">見つけた町の消印つきで、ひとつずつお届けします。</p>
-    <p class="hint" id="hint">ロゴにカーソルを合わせてください</p>
+    <p class="hint" id="hint">切手にカーソル → 拡大　クリック → 詳細</p>
   </div>
 
-  <div class="note">※ 掲載中の商品写真は、デザイン確認用のサンプルです。</div>
 
   <div id="overlay" role="dialog" aria-modal="true" aria-label="商品詳細">
     <div class="panel">
@@ -232,7 +228,8 @@ var ITEMS = [
     meas: [['全長', '60 cm'], ['幅', '22 cm']],
     views: [{ img: 'assets/neck.png', full: 'assets/neck-full.jpg', ar: 1.455 }] }
 ];
-var ANG = [-39, -26, -13, 0, 13, 26, 39];
+var SPREAD = 78; // total opening of the fan, in degrees
+var ANG = ITEMS.map(function (d, i) { return ITEMS.length > 1 ? -SPREAD / 2 + i * SPREAD / (ITEMS.length - 1) : 0; });
 var MID = (ITEMS.length - 1) / 2;
 
 // ---------------- scale the 1280x880 design to the window ----------------
@@ -289,11 +286,11 @@ function renderFan() {
     var a = ANG[i], dist = Math.abs(i - MID);
     var tf, z = 10 + i, delay = 0, op = 1, dur = 450, ease = 'cubic-bezier(0.2, 0.8, 0.2, 1)';
     if (!state.fanned) {
-      tf = 'rotate(' + (a * 0.1) + 'deg) translateY(256px) scale(0.3)'; // tucked behind the seal
+      tf = 'rotate(' + (a * 0.15) + 'deg) translateY(60px) scale(0.9)'; // stacked at the center before dealing
       op = 0; dur = 380;
       delay = state.mode === 'fan' ? Math.round((MID - dist) * 40) : 0;
     } else if (state.lifted === i) {
-      tf = 'rotate(' + a + 'deg) translateY(-70px) scale(1.24)';
+      tf = 'rotate(' + a + 'deg) translateY(-34px) translateY(-384px) scale(1.15) translateY(384px)';
       z = 50; dur = 1250; // the hover rise
     } else {
       tf = 'rotate(' + a + 'deg) translateY(-14px)';
@@ -301,9 +298,9 @@ function renderFan() {
     }
     b.style.transition = 'transform ' + dur + 'ms ' + ease + ' ' + delay + 'ms, opacity 0.25s ease ' + delay + 'ms';
     b.style.transform = tf; b.style.opacity = op; b.style.zIndex = z;
+    b.classList.toggle('up', state.lifted === i);
   });
-  document.getElementById('hint').textContent = state.fanned ? '切手にカーソル → 拡大　クリック → 詳細' : 'ロゴにカーソルを合わせてください';
-  hit.style.cursor = state.lifted >= 0 ? 'pointer' : 'default';
+    hit.style.cursor = state.lifted >= 0 ? 'pointer' : 'default';
 }
 function setLift(i) { if (i === state.lifted) return; state.lifted = i; state.mode = 'lift'; renderFan(); }
 function setFanned(v) { state.fanned = v; state.mode = 'fan'; state.lifted = -1; renderFan(); }
@@ -312,10 +309,10 @@ function setFanned(v) { state.fanned = v; state.mode = 'fan'; state.lifted = -1;
 var hit = document.getElementById('hit');
 hit.addEventListener('mousemove', function (e) {
   if (!state.fanned || state.open >= 0) return;
-  var r = hit.getBoundingClientRect(), k = 960 / (r.width || 960);
-  var x = 160 + (e.clientX - r.left) * k, y = 40 + (e.clientY - r.top) * k;
-  var dx = x - 640, dy = 555 - y, rad = Math.sqrt(dx * dx + dy * dy), idx = -1;
-  if (rad > 105 && rad < 480 && dy > -20) {
+  var r = hit.getBoundingClientRect(), k = 1040 / (r.width || 1040);
+  var x = 120 + (e.clientX - r.left) * k, y = 138 + (e.clientY - r.top) * k;
+  var dx = x - 640, dy = 718 - y, rad = Math.sqrt(dx * dx + dy * dy), idx = -1;
+  if (rad > 270 && rad < 620 && dy > 0) {
     var ang = Math.atan2(dx, dy) * 180 / Math.PI, half = (ANG[1] - ANG[0]) / 2, cur = state.lifted;
     if (cur >= 0 && Math.abs(ang - ANG[cur]) < half + 4) idx = cur; // hysteresis
     else {
@@ -329,15 +326,11 @@ hit.addEventListener('mousemove', function (e) {
 hit.addEventListener('mouseleave', function () { setLift(-1); });
 hit.addEventListener('click', function () { if (state.fanned && state.lifted >= 0) openItem(state.lifted); });
 
-var seal = document.getElementById('seal');
-seal.addEventListener('mouseenter', function () { if (!state.fanned) setFanned(true); });
-seal.addEventListener('click', function () { setFanned(!state.fanned); });
 
 // ---------------- opening: seal presses in, headline rises, stamps deal out once images are ready ----------------
 renderFan();
 function startOpening() {
-  setTimeout(function () { seal.classList.add('in'); }, 120);
-  setTimeout(function () { document.getElementById('copy').classList.add('in'); }, 380);
+    setTimeout(function () { document.getElementById('copy').classList.add('in'); }, 380);
   var srcs = []; ITEMS.forEach(function (d) { d.views.forEach(function (v) { srcs.push(v.img); }); });
   var left = srcs.length, ready = false, waited = false, done = false;
   function go() { if (!done && ready && waited) { done = true; setFanned(true); } }
