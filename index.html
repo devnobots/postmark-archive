@@ -26,6 +26,21 @@
   #frame { position: absolute; left: 50%; top: 50%; }
   #stage { position: absolute; left: 0; top: 0; width: 1280px; height: 880px; overflow: hidden; background: var(--paper); transform-origin: 0 0; }
 
+  /* ---------- access gate ---------- */
+  body.locked #frame { visibility: hidden; }
+  #gate { position: fixed; inset: 0; z-index: 1000; display: flex; align-items: center; justify-content: center; padding: 16px; background: var(--paper); transition: opacity 0.4s ease; }
+  #gate.out { opacity: 0; pointer-events: none; }
+  .gate-box { display: flex; flex-direction: column; align-items: center; gap: 14px; text-align: center; }
+  .gate-seal { width: 96px; height: 96px; border-radius: 50%; background: var(--ink); color: var(--card); display: flex; align-items: center; justify-content: center; font: 700 13px/1.15 Arial, Helvetica, sans-serif; letter-spacing: 0.5px; box-shadow: 0 8px 20px rgba(30,42,58,0.25); margin-bottom: 6px; }
+  .gate-box label { font-size: 15px; color: var(--ink-2); letter-spacing: 1px; }
+  .gate-row { display: flex; gap: 8px; }
+  .gate-row input { width: 140px; padding: 10px 12px; font: 18px var(--serif); letter-spacing: 4px; text-align: center; color: var(--ink); background: var(--card); border: 1px solid var(--rule); border-radius: 4px; }
+  .gate-row input:focus { outline: 2px solid var(--post); outline-offset: 1px; }
+  .gate-row button { padding: 10px 18px; font: 600 15px var(--serif); color: var(--card); background: var(--ink); border: 0; border-radius: 4px; cursor: pointer; }
+  .gate-err { min-height: 1.4em; font-size: 13px; color: #C2412D; }
+  .gate-box.shake { animation: gate-shake 0.35s ease; }
+  @keyframes gate-shake { 25% { transform: translateX(-6px); } 75% { transform: translateX(6px); } }
+
   .topbar { position: absolute; left: 48px; right: 48px; top: 28px; display: flex; justify-content: space-between; font-size: 13px; color: var(--ink-2); }
 
   /* ---------- stamp ---------- */
@@ -115,7 +130,18 @@
   #full .icon-btn { top: 20px; right: 20px; color: var(--card); }
 </style>
 </head>
-<body>
+<body class="locked">
+<div id="gate">
+  <form class="gate-box" id="gateForm">
+    <div class="gate-seal">STANDARD<br>GAUGE</div>
+    <label for="gateCode">アクセスコード</label>
+    <div class="gate-row">
+      <input id="gateCode" type="password" inputmode="numeric" autocomplete="off" required>
+      <button type="submit">入る</button>
+    </div>
+    <div class="gate-err" id="gateErr" aria-live="polite"></div>
+  </form>
+</div>
 <div id="frame"><div id="stage">
 
   <div class="topbar"><div>今週の入荷 · 第12便</div><div>全品送料込み</div></div>
@@ -174,6 +200,9 @@
 </div></div>
 
 <script>
+// ---------------- access code (change it here; visitors who saved the old code are asked again) ----------------
+var ACCESS_CODE = '1234';
+
 // ---------------- data (names, prices, sizes and towns are samples) ----------------
 var ITEMS = [
   { bg: '#EFE3C8', nameJa: 'コンチョ付きリンガーTシャツ', capJa: 'リンガーTシャツ', nameEn: 'Ringer tee with concho details', size: '着丈 70 · 身幅 54', price: '¥13,200', city: 'TUCSON AZ', date: 'FEB 19', year: '2026',
@@ -305,15 +334,41 @@ seal.addEventListener('click', function () { setFanned(!state.fanned); });
 
 // ---------------- opening: seal presses in, headline rises, stamps deal out once images are ready ----------------
 renderFan();
-setTimeout(function () { seal.classList.add('in'); }, 120);
-setTimeout(function () { document.getElementById('copy').classList.add('in'); }, 380);
-(function () {
+function startOpening() {
+  setTimeout(function () { seal.classList.add('in'); }, 120);
+  setTimeout(function () { document.getElementById('copy').classList.add('in'); }, 380);
   var srcs = []; ITEMS.forEach(function (d) { d.views.forEach(function (v) { srcs.push(v.img); }); });
   var left = srcs.length, ready = false, waited = false, done = false;
   function go() { if (!done && ready && waited) { done = true; setFanned(true); } }
   srcs.forEach(function (u) { var im = new Image(); im.onload = im.onerror = function () { if (--left === 0) { ready = true; go(); } }; im.src = u; });
   setTimeout(function () { waited = true; go(); }, 820);
   setTimeout(function () { ready = true; waited = true; go(); }, 2500); // never wait longer than this
+}
+
+// ---------------- access gate: a gentle client-side lock, not real security ----------------
+(function () {
+  var gate = document.getElementById('gate'), form = document.getElementById('gateForm');
+  var input = document.getElementById('gateCode'), err = document.getElementById('gateErr');
+  function unlock(animate) {
+    document.body.classList.remove('locked');
+    if (animate) { gate.classList.add('out'); setTimeout(function () { gate.remove(); }, 400); } else gate.remove();
+    startOpening();
+  }
+  var saved = null;
+  try { saved = localStorage.getItem('sg-access'); } catch (e) {}
+  if (saved === ACCESS_CODE) { unlock(false); return; }
+  input.focus();
+  form.addEventListener('submit', function (e) {
+    e.preventDefault();
+    if (input.value.trim() === ACCESS_CODE) {
+      try { localStorage.setItem('sg-access', ACCESS_CODE); } catch (e2) {}
+      unlock(true);
+    } else {
+      err.textContent = 'コードが違います';
+      form.classList.remove('shake'); void form.offsetWidth; form.classList.add('shake');
+      input.select();
+    }
+  });
 })();
 
 // ---------------- listing ----------------
