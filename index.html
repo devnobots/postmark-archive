@@ -127,6 +127,8 @@
   .full-box { position: relative; width: 576px; height: 768px; background: #fff; box-shadow: 0 30px 60px rgba(0,0,0,0.35); pointer-events: none; }
   .full-box img { display: block; width: 100%; height: 100%; object-fit: contain; }
   #full .icon-btn { top: 20px; right: 20px; color: var(--card); }
+  .legend { font-size: 11px; color: var(--ink-3); margin-top: -12px; letter-spacing: 0.3px; }
+  .title h2 { word-break: keep-all; } /* long names wrap at their spaces, never mid-word */
 </style>
 </head>
 <body class="locked">
@@ -177,7 +179,8 @@
         <div class="found" id="found"></div>
         <div class="title"><h2 id="nameJa"></h2><div id="nameEn"></div></div>
         <div class="meas" id="meas"></div>
-        <div class="cond"><span>状態ランク</span><b>[S–D]</b><span>[状態メモ]</span></div>
+        <div class="cond"><span>状態ランク</span><b id="grade"></b><span id="gradeNote"></span></div>
+        <div class="legend">S 新品同様 · A 目立つダメージなし · B 使用感あり · C 目立つダメージあり · D 難あり</div>
         <div class="buy-row">
           <div class="buy">
             <div class="price"><b id="price"></b><span>送料込み</span></div>
@@ -203,30 +206,30 @@ var ACCESS_CODE = '1234';
 
 // ---------------- data (names, prices, sizes and towns are samples) ----------------
 var ITEMS = [
-  { bg: '#EFE3C8', nameJa: 'コンチョ付きリンガーTシャツ', capJa: 'リンガーTシャツ', nameEn: 'Ringer tee with concho details', size: '着丈 70 · 身幅 54', price: '¥13,200', city: 'TUCSON AZ', date: 'FEB 19', year: '2026',
+  { bg: '#EFE3C8', nameJa: '70年代 リンガーTシャツ コンチョ装飾', capJa: 'リンガーTシャツ', nameEn: '1970s Ringer Tee with Concho Trim', size: '着丈 70 · 身幅 54', price: '¥13,200', grade: 'B', gradeNote: 'わずかな色あせ', city: 'TUCSON AZ', date: 'FEB 19', year: '2026',
     meas: [['着丈', '70 cm'], ['身幅', '54 cm'], ['肩幅', '47 cm'], ['袖丈', '21 cm']],
     views: [{ img: 'assets/tee.png', full: 'assets/tee-full.jpg', ar: 0.99 }] },
-  { bg: '#D98C6A', nameJa: 'デニムショルダーバッグ', nameEn: 'Denim shoulder bag', size: '幅 50 · 高さ 30 cm', price: '¥43,780', city: 'ASHEVILLE NC', date: 'MAR 21', year: '2026',
-    meas: [['幅', '50 cm'], ['高さ', '30 cm'], ['マチ', '12 cm'], ['ストラップ', '62 cm']],
+  { bg: '#D98C6A', nameJa: '70年代 デニム ニュースペーパーバッグ', capJa: 'ニュースペーパーバッグ', nameEn: '1970s Denim Newspaper Bag', size: '幅 50 · 高さ 30', price: '¥43,780', grade: 'A', gradeNote: '目立つダメージなし', city: 'ASHEVILLE NC', date: 'MAR 21', year: '2026',
+    meas: [['幅', '50 cm'], ['高さ', '30 cm'], ['マチ', '12 cm'], ['ショルダー', '62 cm']],
     views: [{ img: 'assets/bag.png', full: 'assets/bag-full.jpg', ar: 0.905 }] },
-  { bg: '#C9B3D6', nameJa: 'MA-1 フライトジャケット', nameEn: 'MA-1 flight jacket', size: '着丈 66 · 身幅 64', price: '¥87,780', city: 'DAYTON OH', date: 'MAR 12', year: '2026',
+  { bg: '#C9B3D6', nameJa: '60年代 USAF MA-1 フライトジャケット', capJa: 'MA-1 フライト', nameEn: '1960s USAF MA-1 Flight Jacket', size: '着丈 66 · 身幅 64', price: '¥87,780', grade: 'B', gradeNote: '袖リブにほつれ', city: 'DAYTON OH', date: 'MAR 12', year: '2026',
     meas: [['着丈', '66 cm'], ['身幅', '64 cm'], ['肩幅', '55 cm'], ['袖丈', '62 cm']],
     views: [
       { img: 'assets/bomber.png', full: 'assets/bomber-full.jpg', ar: 0.88, label: '表' },
       { img: 'assets/bomber2-full.jpg', full: 'assets/bomber2-full.jpg', ar: 1.333, bleed: true, label: '裏地ポケット' },
       { img: 'assets/bomber3-full.jpg', full: 'assets/bomber3-full.jpg', ar: 1.333, bleed: true, label: '袖口・裾' }
     ] },
-  { bg: '#F2D98A', nameJa: 'キルティングジャケット', nameEn: 'Quilted varsity jacket', size: '着丈 64 · 身幅 66', price: '¥107,800', city: 'PORTLAND ME', date: 'FEB 6', year: '2026',
+  { bg: '#F2D98A', nameJa: '50年代 キルティング スタジャン', capJa: 'キルティングスタジャン', nameEn: '1950s Quilted Varsity Jacket', size: '着丈 64 · 身幅 66', price: '¥107,800', grade: 'C', gradeNote: '裏地に数か所シミ', city: 'PORTLAND ME', date: 'FEB 6', year: '2026',
     meas: [['着丈', '64 cm'], ['身幅', '66 cm'], ['肩幅', '58 cm'], ['袖丈', '57 cm']],
     views: [{ img: 'assets/jacket.png', full: 'assets/jacket-full.jpg', ar: 1.07 }] },
-  { bg: '#9DC3D9', nameJa: 'ジャカードソックス', nameEn: 'Jacquard knit socks', size: 'フリー · 23–27 cm', price: '¥43,890', city: 'SANTA FE NM', date: 'MAR 3', year: '2026',
-    meas: [['サイズ', 'フリー'], ['対応サイズ', '23–27 cm']],
+  { bg: '#9DC3D9', nameJa: '80年代 ハンドニット ウールソックス', capJa: 'ウールソックス', nameEn: '1980s Hand-Knit Wool Socks', size: 'フリー · 23–27 cm', price: '¥43,890', grade: 'A', gradeNote: '使用感少なめ', city: 'SANTA FE NM', date: 'MAR 3', year: '2026',
+    meas: [['対応サイズ', '23–27 cm']],
     views: [{ img: 'assets/socks.png', full: 'assets/socks-full.jpg', ar: 1.57 }] },
-  { bg: '#E8B53A', nameJa: 'デニムバケットハット', nameEn: 'Denim bucket hat', size: 'フリー · 頭囲 58 cm', price: '¥151,800', city: 'ATHENS GA', date: 'MAR 15', year: '2026',
-    meas: [['頭囲', '58 cm'], ['深さ', '9 cm'], ['つば', '6 cm']],
+  { bg: '#E8B53A', nameJa: '80年代 キャンバス バケットハット', capJa: 'バケットハット', nameEn: '1980s Canvas Bucket Hat', size: '頭囲 58 · つば 6', price: '¥151,800', grade: 'B', gradeNote: '内側に汗じみ', city: 'ATHENS GA', date: 'MAR 15', year: '2026',
+    meas: [['頭囲', '58 cm'], ['つば', '6 cm']],
     views: [{ img: 'assets/hat.png', full: 'assets/hat-full.jpg', ar: 0.792 }] },
-  { bg: '#C2412D', ink: '#FFFDF6', nameJa: 'ノルディック柄ニットネックウォーマー', capJa: 'ネックウォーマー', nameEn: 'Nordic knit neck warmer', size: '着丈 38 · 幅 36', price: '¥87,780', city: 'BOZEMAN MT', date: 'FEB 27', year: '2026',
-    meas: [['着丈', '38 cm'], ['幅', '36 cm'], ['首丈', '14 cm'], ['ひも', '40 cm']],
+  { bg: '#C2412D', ink: '#FFFDF6', nameJa: '70年代 ノルディック柄 ニットネックウォーマー', capJa: 'ネックウォーマー', nameEn: '1970s Nordic-Pattern Knit Neck Warmer', size: '全長 60 · 幅 22', price: '¥87,780', grade: 'B', gradeNote: '小さな毛玉あり', city: 'BOZEMAN MT', date: 'FEB 27', year: '2026',
+    meas: [['全長', '60 cm'], ['幅', '22 cm']],
     views: [{ img: 'assets/neck.png', full: 'assets/neck-full.jpg', ar: 1.455 }] }
 ];
 var ANG = [-39, -26, -13, 0, 13, 26, 39];
@@ -382,6 +385,8 @@ function renderListing() {
   document.getElementById('nameJa').textContent = d.nameJa;
   document.getElementById('nameEn').textContent = d.nameEn;
   document.getElementById('price').textContent = d.price;
+  document.getElementById('grade').textContent = d.grade || '';
+  document.getElementById('gradeNote').textContent = d.gradeNote || '';
   document.getElementById('meas').innerHTML = d.meas.map(function (m) { return '<div><span>' + esc(m[0]) + '</span><span>' + esc(m[1]) + '</span></div>'; }).join('');
   var th = document.getElementById('thumbs');
   th.innerHTML = '';
