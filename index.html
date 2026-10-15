@@ -394,6 +394,32 @@ function renderListing() {
     th.appendChild(b);
   });
   loupe.style.backgroundImage = 'url(' + v.img + ')';
+  if (v.bleed) fitPriceInk();
+}
+
+// on a full-bleed photo, print the stamp price in navy or cream, whichever contrasts more with the photo behind it
+function luminance(r, g, b) {
+  function lin(c) { c /= 255; return c <= 0.03928 ? c / 12.92 : Math.pow((c + 0.055) / 1.055, 2.4); }
+  return 0.2126 * lin(r) + 0.7152 * lin(g) + 0.0722 * lin(b);
+}
+function fitPriceInk() {
+  var box = document.getElementById('bigStamp'), img = box.querySelector('img.bleed'), price = box.querySelector('.stamp-price');
+  if (!img || !price) return;
+  function run() {
+    var art = img.parentNode, W = art.offsetWidth, H = art.offsetHeight, nw = img.naturalWidth, nh = img.naturalHeight;
+    if (!W || !nw || !price.isConnected) return;
+    var s = Math.max(W / nw, H / nh), ox = (W - nw * s) / 2, oy = (H - nh * s) / 2; // object-fit: cover, centered
+    var c = document.createElement('canvas'); c.width = 32; c.height = 8;
+    var g = c.getContext('2d'), px;
+    g.drawImage(img, (price.offsetLeft - ox) / s, (price.offsetTop - oy) / s, price.offsetWidth / s, price.offsetHeight / s, 0, 0, 32, 8);
+    try { px = g.getImageData(0, 0, 32, 8).data; } catch (e) { return; }
+    var L = 0;
+    for (var i = 0; i < px.length; i += 4) L += luminance(px[i], px[i + 1], px[i + 2]);
+    L /= px.length / 4;
+    var navy = luminance(0x1E, 0x2A, 0x3A), cream = luminance(0xFF, 0xFD, 0xF6);
+    price.style.color = (L + 0.05) / (navy + 0.05) >= (cream + 0.05) / (L + 0.05) ? '#1E2A3A' : '#FFFDF6';
+  }
+  if (img.complete) requestAnimationFrame(run); else img.addEventListener('load', run);
 }
 function moveLoupe(e) {
   var d = ITEMS[state.open], v = d.views[state.view];
