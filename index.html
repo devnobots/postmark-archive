@@ -99,7 +99,6 @@
   #stampBtn { position: relative; display: block; width: 281px; height: 432px; padding: 0; border: 0; background: none; cursor: none; }
   #stampBtn .scaler { position: absolute; left: 0; top: 0; width: 156px; height: 240px; transform: scale(1.8); transform-origin: 0 0; }
   #loupe { position: absolute; width: 160px; height: 160px; border-radius: 50%; border: 4px solid var(--ink); box-shadow: 0 12px 28px rgba(30,42,58,0.35); pointer-events: none; background-color: #fff; background-repeat: no-repeat; display: none; }
-  .small { font-size: 12px; color: var(--ink-3); }
   .right-col { flex: 1; display: flex; flex-direction: column; gap: 20px; }
   .found { font-size: 13px; color: var(--post); letter-spacing: 0.5px; }
   .title h2 { margin: 0; font-weight: 800; font-size: 40px; line-height: 1.15; }
@@ -173,7 +172,6 @@
           <div class="scaler" id="bigStamp"></div>
           <div id="loupe"></div>
         </button>
-        <div class="small">ルーペで拡大 · クリックで全体表示</div>
       </div>
       <div class="right-col">
         <div class="found" id="found"></div>
@@ -257,7 +255,7 @@ function stampHTML(d, view, opts) {
     '<path d="M0 22 q6 -5 12 0 t12 0 t12 0 t12 0"/><path d="M0 32 q6 -5 12 0 t12 0 t12 0 t12 0"/><path d="M0 42 q6 -5 12 0 t12 0 t12 0 t12 0"/>' +
     '<circle cx="80" cy="32" r="25"/><circle cx="80" cy="32" r="17" stroke-width="0.9"/>' +
     '<g fill="#24418A" stroke="none" font-family="Old Standard TT, serif" text-anchor="middle">' +
-    '<text x="80" y="13.5" font-size="5.6" font-weight="700">' + esc(d.city) + '</text>' +
+    '<text x="80" y="13.5" font-size="5.6" font-weight="700">' + esc(d.city.split(' ').pop().toUpperCase()) + '</text>' +
     '<text x="80" y="32" font-size="8" font-weight="700">' + esc(d.date) + '</text>' +
     '<text x="80" y="41.5" font-size="7" font-weight="700">' + esc(d.year) + '</text>' +
     '<text x="80" y="54" font-size="5.6">U.S.A.</text></g></svg></div>') : '';
