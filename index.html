@@ -320,7 +320,7 @@ function renderFan() {
       op = 0; dur = 380;
       delay = state.mode === 'fan' ? Math.round((MID - dist) * 40) : 0;
     } else if (state.lifted === i) {
-      tf = 'rotate(' + a + 'deg) translateY(-34px) translateY(-384px) scale(1.15) translateY(384px)';
+      tf = 'rotate(' + a + 'deg) translateY(-34px) translateY(-384px) scale(1.25) translateY(384px)';
       z = 50; dur = 1250; // the hover rise
     } else {
       tf = 'rotate(' + a + 'deg) translateY(-14px)';
