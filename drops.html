@@ -1,0 +1,356 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>過去の便 — Standard Gauge</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Old+Standard+TT:ital,wght@0,400;0,700;1,400&family=Shippori+Mincho:wght@400;600;800&display=swap">
+<style>
+  :root {
+    --paper: #f5f2eb;
+    --card: #FFFDF6;
+    --ink: #1a2433;
+    --ink-2: #3A4658;
+    --ink-3: #6b6e72;
+    --rule: #E2DCCD;
+    --post: #24418A;
+    --serif: 'Old Standard TT', 'Shippori Mincho', serif;
+  }
+  * { box-sizing: border-box; }
+  button { font-family: inherit; }
+  html, body { margin: 0; height: 100%; background: var(--paper); }
+  body { font-family: var(--serif); color: var(--ink); overflow: hidden; }
+
+  /* the design is drawn at 1280x880 and scaled to fit the window */
+  #frame { position: absolute; left: 50%; top: 50%; }
+  #stage { position: absolute; left: 0; top: 0; width: 1280px; height: 880px; overflow: hidden; background: var(--paper); transform-origin: 0 0; }
+
+
+  /* ---------- stamp ---------- */
+  .stamp { position: relative; width: 156px; color: var(--ink); font-family: var(--serif); text-align: left; }
+  .stamp-shadow { width: 156px; filter: drop-shadow(0 10px 10px hsla(28, 25%, 20%, 0.07)) drop-shadow(0 2px 3px hsla(28, 25%, 20%, 0.04)); transition: filter 1.25s ease; }
+  .fan-stamp.up .stamp-shadow { filter: drop-shadow(0 20px 16px hsla(28, 25%, 20%, 0.12)) drop-shadow(0 4px 5px hsla(28, 25%, 20%, 0.06)); }
+  #stampBtn .stamp-shadow { filter: drop-shadow(0 20px 16px hsla(28, 25%, 20%, 0.12)) drop-shadow(0 4px 5px hsla(28, 25%, 20%, 0.06)); } /* listing stamp: always the stronger shadow */
+  .stamp-paper {
+    width: 156px; padding: 6px; background: #faf8f5;
+    -webkit-mask: radial-gradient(circle at 6px 6px, transparent 3.4px, #000 3.9px) -6px -6px / 12px 12px, linear-gradient(#000 0 0) content-box;
+            mask: radial-gradient(circle at 6px 6px, transparent 3.4px, #000 3.9px) -6px -6px / 12px 12px, linear-gradient(#000 0 0) content-box;
+  }
+  .stamp-inner { height: 100%; padding: 6px; display: flex; flex-direction: column; gap: 6px; }
+  .stamp-art { position: relative; overflow: hidden; flex: none; }
+  .stamp-art img.cut { position: absolute; left: 10px; width: 112px; object-fit: contain; filter: drop-shadow(0 3px 4px rgba(30,42,58,0.3)); }
+  .stamp-art img.bleed { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
+  .stamp-price { position: absolute; top: 5px; right: 6px; font-weight: 700; font-size: 12px; letter-spacing: -0.2px; }
+  .stamp-cap { display: flex; flex-direction: column; gap: 2px; padding: 0 2px; }
+  .cap-name { font-size: 10.5px; font-weight: 700; line-height: 1.2; white-space: nowrap; overflow: hidden; }
+  .cap-size { font-size: 8.5px; color: var(--ink-2); }
+  .postmark { position: absolute; right: -34px; width: 110px; height: 64px; transform: rotate(-12deg); mix-blend-mode: multiply; opacity: 0.85; pointer-events: none; }
+
+  /* ---------- fan ---------- */
+  .fan-stamp {
+    position: absolute; left: 562px; top: 238px; width: 156px; height: 192px; padding: 0; border: 0; background: none;
+    pointer-events: none; transform-origin: 78px 480px; opacity: 0;
+  }
+  .fan-stamp:focus-visible { outline: 2px solid var(--post); outline-offset: 4px; }
+  #hit { position: absolute; left: 120px; top: 138px; width: 1040px; height: 470px; z-index: 55; }
+
+  #seal {
+    position: absolute; left: 572px; top: 452px; width: 136px; height: 136px; border-radius: 50%; border: 0; padding: 0;
+    background: var(--ink); color: var(--card); cursor: pointer; z-index: 60; display: flex; align-items: center; justify-content: center;
+    transform: scale(1.35); opacity: 0; box-shadow: 0 30px 50px rgba(30,42,58,0);
+    transition: transform 0.6s cubic-bezier(0.34, 1.56, 0.64, 1), opacity 0.3s ease, box-shadow 0.6s ease;
+  }
+  #seal.in { transform: scale(1); opacity: 1; box-shadow: 0 10px 24px rgba(30,42,58,0.28); }
+  .seal-ring { width: 118px; height: 118px; border-radius: 50%; border: 1.5px dashed rgba(255,253,246,0.55); display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 4px; }
+  .seal-top { font-style: italic; font-size: 10px; letter-spacing: 1px; opacity: 0.85; }
+  .seal-name { font-weight: 700; font-size: 16px; line-height: 1.05; letter-spacing: 1px; text-align: center; }
+  .seal-kana { font-family: 'Shippori Mincho', serif; font-size: 9px; letter-spacing: 1px; opacity: 0.8; }
+
+  .copy { position: absolute; left: 0; right: 0; top: 602px; display: flex; flex-direction: column; align-items: center; gap: 14px; text-align: center; opacity: 0; transform: translateY(14px); transition: opacity 0.6s ease, transform 0.6s ease; }
+  .copy.in { opacity: 1; transform: none; }
+  .copy h1 { margin: 0; font-weight: 800; font-size: 52px; letter-spacing: 1px; line-height: 1.15; }
+  .copy p { margin: 0; }
+  .sub { font-size: 17px; color: var(--ink-2); }
+  .hint { font-size: 12px; color: var(--ink-3); }
+  .note { position: absolute; left: 0; right: 0; bottom: 22px; text-align: center; font-size: 12px; color: #6B7586; }
+
+  /* ---------- listing ---------- */
+  #overlay { position: absolute; inset: 0; z-index: 100; background: rgba(244,241,234,0.94); display: none; align-items: center; justify-content: center; }
+  #overlay.open { display: flex; }
+  .panel { position: relative; width: 1040px; height: 640px; background: var(--card); border: 1px solid var(--rule); box-shadow: 0 30px 60px rgba(30,42,58,0.18); padding: 48px 72px; display: flex; gap: 88px; align-items: center; }
+  .icon-btn { position: absolute; width: 44px; height: 44px; border: 0; background: none; cursor: pointer; color: var(--ink); display: flex; align-items: center; justify-content: center; }
+  .panel > .icon-btn { top: 16px; right: 16px; }
+  .left-col { flex: none; align-self: stretch; display: flex; flex-direction: column; justify-content: center; gap: 18px; }
+  #stampBtn { position: relative; display: block; width: 281px; height: 432px; padding: 0; border: 0; background: none; cursor: none; }
+  #stampBtn .scaler { position: absolute; left: 0; top: 0; width: 156px; height: 240px; transform: scale(1.8); transform-origin: 0 0; }
+  #loupe { position: absolute; width: 160px; height: 160px; border-radius: 50%; border: 4px solid var(--ink); box-shadow: 0 12px 28px rgba(30,42,58,0.35); pointer-events: none; background-color: #fff; background-repeat: no-repeat; display: none; }
+  .small { font-size: 12px; color: var(--ink-3); }
+  .right-col { flex: 1; display: flex; flex-direction: column; gap: 20px; }
+  .found { font-size: 13px; color: var(--post); letter-spacing: 0.5px; }
+  .title h2 { margin: 0; font-weight: 800; font-size: 40px; line-height: 1.15; }
+  .title div { font-size: 15px; color: var(--ink-3); margin-top: 6px; }
+  .meas { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px 32px; padding: 16px 0; border-top: 1px solid var(--rule); border-bottom: 1px solid var(--rule); }
+  .meas div { display: flex; justify-content: space-between; font-size: 15px; }
+  .meas span:first-child { color: var(--ink-3); }
+  .meas span:last-child { font-weight: 700; }
+  .cond { display: flex; gap: 14px; font-size: 15px; }
+  .cond span { color: var(--ink-3); }
+  .cond b { font-weight: 700; }
+  .buy-row { display: flex; justify-content: space-between; align-items: flex-end; gap: 24px; }
+  .buy { display: flex; flex-direction: column; gap: 16px; }
+  .price { display: flex; align-items: baseline; gap: 12px; }
+  .price b { font-weight: 700; font-size: 34px; }
+  .price span { font-size: 13px; color: var(--ink-3); }
+  .cart { align-self: flex-start; min-height: 52px; padding: 0 36px; border: 0; background: var(--ink); color: var(--card); font-family: var(--serif); font-weight: 700; font-size: 16px; cursor: pointer; }
+  .thumbs { display: flex; gap: 10px; }
+  .thumbs button { width: 78px; height: 104px; padding: 0; background: #fff; border: 1px solid #D9D2C2; cursor: pointer; overflow: hidden; }
+  .thumbs button.on { border: 3px solid var(--ink); }
+  .thumbs img { display: block; width: 100%; height: 100%; object-fit: cover; }
+
+  #full { position: absolute; inset: 0; z-index: 200; display: none; align-items: center; justify-content: center; }
+  #full.open { display: flex; }
+  #fullBg { position: absolute; inset: 0; border: 0; padding: 0; background: rgba(30,42,58,0.82); cursor: zoom-out; }
+  .full-box { position: relative; width: 576px; height: 768px; background: #fff; box-shadow: 0 30px 60px rgba(0,0,0,0.35); pointer-events: none; }
+  .full-box img { display: block; width: 100%; height: 100%; object-fit: contain; }
+  #full .icon-btn { top: 20px; right: 20px; color: var(--card); }
+  .site-header { position: absolute; left: 0; right: 0; top: 0; display: flex; justify-content: center; align-items: center; padding: 48px 0 24px; z-index: 70; }
+  .brand-title { font-family: 'Old Standard TT', serif; font-size: 16px; font-weight: 400; letter-spacing: 0.32em; text-indent: 0.32em; text-transform: uppercase; color: #1a2433; margin: 0; }
+  .legend { font-size: 11px; color: var(--ink-3); margin-top: -12px; letter-spacing: 0.3px; }
+  .title h2 { word-break: keep-all; } /* long names wrap at their spaces, never mid-word */
+  .drop-status-lockup { display: flex; justify-content: center; align-items: center; gap: 12px; font-size: 11px; letter-spacing: 0.16em; color: #6b6e72; }
+  .drop-status-lockup.at-top { position: absolute; left: 0; right: 0; top: 82px; z-index: 70; }
+  .drop-status-lockup.at-bottom { margin-top: 2px; }
+  .drop-status-current { color: #1a2433; font-weight: 500; }
+  .drop-status-link { color: #6b6e72; text-decoration: none; border-bottom: 1px solid rgba(107, 110, 114, 0.35); padding-bottom: 2px; transition: color 150ms ease, border-color 150ms ease; }
+  .drop-status-link:hover { color: #1a2433; border-bottom-color: #1a2433; }
+  .cap-issue { margin-top: auto; padding: 0 2px 1px; font-size: 6.5px; letter-spacing: 0.08em; color: var(--ink-3); text-align: right; }
+</style>
+<style>
+  /* past-drops page: a normal scrolling page (the homepage stage rules are overridden here) */
+  html, body { height: auto; }
+  body { overflow: auto; }
+  .archive { max-width: 1120px; margin: 0 auto; padding: 0 40px 120px; }
+  .arch-masthead { text-align: center; padding: 48px 0 0; }
+  .arch-masthead a { font-family: 'Old Standard TT', serif; font-size: 16px; letter-spacing: 0.32em; text-indent: 0.32em; color: #1a2433; text-decoration: none; display: inline-block; }
+  .arch-back { text-align: center; margin-top: 14px; font-size: 11px; letter-spacing: 0.16em; }
+  .arch-back a { color: #6b6e72; text-decoration: none; border-bottom: 1px solid rgba(107,110,114,0.35); padding-bottom: 2px; transition: color 150ms ease, border-color 150ms ease; }
+  .arch-back a:hover { color: #1a2433; border-bottom-color: #1a2433; }
+  .arch-title { text-align: center; margin: 72px 0 8px; font-family: 'Shippori Mincho', serif; font-weight: 800; font-size: 32px; letter-spacing: 0.1em; }
+  .arch-sub { text-align: center; font-size: 13px; color: #6b6e72; letter-spacing: 0.08em; margin: 0 0 40px; }
+  .drop { padding: 44px 0 52px; border-top: 1px solid #E2DCCD; }
+  .drop-head { display: flex; justify-content: center; gap: 14px; font-size: 12px; letter-spacing: 0.16em; color: #6b6e72; margin-bottom: 30px; }
+  .drop-head b { color: #1a2433; font-weight: 500; }
+  .drop-row { display: flex; justify-content: center; flex-wrap: wrap; gap: 30px 44px; }
+  .past-stamp { width: 156px; height: 192px; padding: 0; border: 0; background: none; cursor: pointer; transition: transform 300ms cubic-bezier(0.16, 1, 0.3, 1); }
+  .past-stamp:hover, .past-stamp:focus-visible { transform: translateY(-6px); }
+  .past-stamp:focus-visible { outline: 2px solid #24418A; outline-offset: 6px; }
+  /* the listing opens over the scrolling page and scales to fit the window */
+  #overlay, #full { position: fixed; }
+  #overlay .panel, #full .full-box { flex: none; transform-origin: center center; }
+  .cart.sold { background: none; color: #6b6e72; border: 1px solid rgba(107,110,114,0.5); cursor: default; letter-spacing: 0.2em; }
+</style>
+</head>
+<body>
+<div class="archive">
+  <div class="arch-masthead"><a href="index.html">STANDARD GAUGE</a></div>
+  <div class="arch-back"><a href="index.html" id="backLink">← 第12便 公開中</a></div>
+  <h1 class="arch-title">過去の便</h1>
+  <p class="arch-sub">すべて売約済。</p>
+  <div id="drops"></div>
+</div>
+
+  <div id="overlay" role="dialog" aria-modal="true" aria-label="商品詳細">
+    <div class="panel">
+      <button class="icon-btn" id="closeBtn" aria-label="閉じる"><svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M5 5 L19 19 M19 5 L5 19"/></svg></button>
+      <div class="left-col">
+        <button id="stampBtn" aria-label="写真を大きく表示">
+          <div class="scaler" id="bigStamp"></div>
+          <div id="loupe"></div>
+        </button>
+
+      </div>
+      <div class="right-col">
+        <div class="found" id="found"></div>
+        <div class="title"><h2 id="nameJa"></h2><div id="nameEn"></div></div>
+        <div class="meas" id="meas"></div>
+        <div class="cond"><span>状態ランク</span><b id="grade"></b><span id="gradeNote"></span></div>
+        <div class="legend">S 新品同様 · A 目立つダメージなし · B 使用感あり · C 目立つダメージあり · D 難あり</div>
+        <div class="buy-row">
+          <div class="buy">
+            <div class="price"><b id="price"></b><span>送料込み</span></div>
+            <button class="cart sold" disabled>売約済</button>
+          </div>
+          <div class="thumbs" id="thumbs"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div id="full" role="dialog" aria-modal="true" aria-label="写真">
+    <button id="fullBg" aria-label="閉じる"></button>
+    <div class="full-box"><img id="fullImg" alt=""></div>
+    <button class="icon-btn" id="fullClose" aria-label="閉じる"><svg viewBox="0 0 24 24" width="24" height="24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M5 5 L19 19 M19 5 L5 19"/></svg></button>
+  </div>
+
+
+<script>
+function esc(s) { return String(s).replace(/[&<>"]/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]; }); }
+var ITEMS = [
+  { bg: '#EFE3C8', nameJa: '70年代 リンガーTシャツ コンチョ装飾', capJa: 'リンガーTシャツ', nameEn: '1970s Ringer Tee with Concho Trim', size: '着丈 70 · 身幅 54', price: '¥13,200', grade: 'B', gradeNote: 'わずかな色あせ', city: 'TUCSON AZ', date: 'AUG 14', year: '2026',
+    meas: [['着丈', '70 cm'], ['身幅', '54 cm'], ['肩幅', '47 cm'], ['袖丈', '21 cm']],
+    views: [{ img: 'assets/tee.png', full: 'assets/tee-full.jpg', ar: 0.99 }] },
+  { bg: '#C2412D', ink: '#FFFDF6', nameJa: '70年代 デニム ニュースペーパーバッグ', capJa: 'ニュースペーパーバッグ', nameEn: '1970s Denim Newspaper Bag', size: '幅 50 · 高さ 30', price: '¥43,780', grade: 'A', gradeNote: '目立つダメージなし', city: 'ASHEVILLE NC', date: 'AUG 22', year: '2026',
+    meas: [['幅', '50 cm'], ['高さ', '30 cm'], ['マチ', '12 cm'], ['ショルダー', '62 cm']],
+    views: [{ img: 'assets/bag.png', full: 'assets/bag-full.jpg', ar: 0.905 }] },
+  { bg: '#D98C6A', nameJa: '60年代 USAF MA-1 フライトジャケット', capJa: 'MA-1 フライト', nameEn: '1960s USAF MA-1 Flight Jacket', size: '着丈 66 · 身幅 64', price: '¥87,780', grade: 'B', gradeNote: '袖リブにほつれ', city: 'DAYTON OH', date: 'SEP 3', year: '2026',
+    meas: [['着丈', '66 cm'], ['身幅', '64 cm'], ['肩幅', '55 cm'], ['袖丈', '62 cm']],
+    views: [
+      { img: 'assets/bomber.png', full: 'assets/bomber-full.jpg', ar: 0.88, label: '表' },
+      { img: 'assets/bomber2-full.jpg', full: 'assets/bomber2-full.jpg', ar: 1.333, bleed: true, label: '裏地ポケット' },
+      { img: 'assets/bomber3-full.jpg', full: 'assets/bomber3-full.jpg', ar: 1.333, bleed: true, label: '袖口・裾' }
+    ] },
+  { bg: '#E8B53A', nameJa: '50年代 キルティング スタジャン', capJa: 'キルティングスタジャン', nameEn: '1950s Quilted Varsity Jacket', size: '着丈 64 · 身幅 66', price: '¥107,800', grade: 'C', gradeNote: '裏地に数か所シミ', city: 'PORTLAND ME', date: 'SEP 6', year: '2026',
+    meas: [['着丈', '64 cm'], ['身幅', '66 cm'], ['肩幅', '58 cm'], ['袖丈', '57 cm']],
+    views: [{ img: 'assets/jacket.png', full: 'assets/jacket-full.jpg', ar: 1.07 }] },
+  { bg: '#9DC3D9', nameJa: '80年代 ハンドニット ウールソックス', capJa: 'ウールソックス', nameEn: '1980s Hand-Knit Wool Socks', size: 'フリー · 23–27 cm', price: '¥43,890', grade: 'A', gradeNote: '使用感少なめ', city: 'SANTA FE NM', date: 'SEP 12', year: '2026',
+    meas: [['対応サイズ', '23–27 cm']],
+    views: [{ img: 'assets/socks.png', full: 'assets/socks-full.jpg', ar: 1.57 }] },
+  { bg: '#F2D98A', nameJa: '80年代 キャンバス バケットハット', capJa: 'バケットハット', nameEn: '1980s Canvas Bucket Hat', size: '頭囲 58 · つば 6', price: '¥151,800', grade: 'B', gradeNote: '内側に汗じみ', city: 'TAOS NM', date: 'SEP 19', year: '2026',
+    meas: [['頭囲', '58 cm'], ['つば', '6 cm']],
+    views: [{ img: 'assets/tee.png', full: 'assets/tee-full.jpg', ar: 1 }] },
+  { bg: '#C9B3D6', nameJa: '70年代 ノルディック柄 ニットネックウォーマー', capJa: 'ネックウォーマー', nameEn: '1970s Nordic-Pattern Knit Neck Warmer', size: '全長 60 · 幅 22', price: '¥87,780', grade: 'B', gradeNote: '小さな毛玉あり', city: 'BEND OR', date: 'SEP 27', year: '2026',
+    meas: [['全長', '60 cm'], ['幅', '22 cm']],
+    views: [{ img: 'assets/socks.png', full: 'assets/socks-full.jpg', ar: 1 }] }
+];
+var DROP, DROP_LABEL;
+var CURRENT_DROP_NO = 12;
+function stampHTML(d, view, opts) {
+  var tall = opts && opts.tall, postmark = !(opts && opts.postmark === false);
+  var sz = tall ? { h: 240, art: 176, img: 124, imgTop: 26, pm: 48 } : { h: 192, art: 122, img: 94, imgTop: 22, pm: 46 };
+  var pic = view.bleed
+    ? '<img class="bleed" src="' + view.img + '" alt="' + esc(d.nameJa) + '">'
+    : '<img class="cut" src="' + view.img + '" alt="' + esc(d.nameJa) + '" style="top:' + sz.imgTop + 'px;height:' + sz.img + 'px">';
+  var pm = postmark ? (
+    '<div class="postmark" style="bottom:' + sz.pm + 'px"><svg viewBox="0 0 110 64" width="110" height="64" aria-hidden="true" fill="none" stroke="#24418A" stroke-width="1.6">' +
+    '<path d="M0 22 q6 -5 12 0 t12 0 t12 0 t12 0"/><path d="M0 32 q6 -5 12 0 t12 0 t12 0 t12 0"/><path d="M0 42 q6 -5 12 0 t12 0 t12 0 t12 0"/>' +
+    '<circle cx="80" cy="32" r="25"/><circle cx="80" cy="32" r="17" stroke-width="0.9"/>' +
+    '<g fill="#24418A" stroke="none" font-family="Old Standard TT, serif" text-anchor="middle">' +
+    '<text x="80" y="13.5" font-size="5.6" font-weight="700">' + esc(d.city) + '</text>' +
+    '<text x="80" y="32" font-size="8" font-weight="700">' + esc(d.date) + '</text>' +
+    '<text x="80" y="41.5" font-size="7" font-weight="700">' + esc(d.year) + '</text>' +
+    '<text x="80" y="54" font-size="5.6">U.S.A.</text></g></svg></div>') : '';
+  return '<div class="stamp" style="height:' + sz.h + 'px"><div class="stamp-shadow" style="height:' + sz.h + 'px"><div class="stamp-paper" style="height:' + sz.h + 'px"><div class="stamp-inner">' +
+    '<div class="stamp-art" style="height:' + sz.art + 'px;background:' + d.bg + '">' + pic +
+    '<div class="stamp-price" style="color:' + (d.ink || '#1E2A3A') + '">' + esc(d.price) + '</div></div>' +
+    '<div class="stamp-cap"><div class="cap-name">' + esc(d.capJa || d.nameJa) + '</div><div class="cap-size">' + esc(d.size) + '</div></div>' +
+    (tall ? '' : '<div class="cap-issue">' + DROP_LABEL + ' · ' + DROP.date + '</div>') +
+    '</div></div></div>' + pm + '</div>';
+}
+
+// ---------------- past drops (newest first) ----------------
+// base = index into ITEMS above (photos, names, measurements); the rest is this sold piece's own record.
+var PAST = [
+  { no: 11, date: '2026.09.25', pieces: [
+    { base: 2, price: '¥87,780',  grade: 'B', gradeNote: '袖リブにほつれ',     city: 'DAYTON OH',    date: 'AUG 21' },
+    { base: 0, price: '¥13,200',  grade: 'A', gradeNote: '目立つダメージなし', city: 'TUCSON AZ',    date: 'AUG 9' },
+    { base: 4, price: '¥43,780',  grade: 'A', gradeNote: '使用感少なめ',       city: 'SANTA FE NM',  date: 'AUG 30' },
+    { base: 1, price: '¥43,890',  grade: 'B', gradeNote: 'わずかな色あせ',     city: 'ASHEVILLE NC', date: 'SEP 4' } ] },
+  { no: 10, date: '2026.09.11', pieces: [
+    { base: 3, price: '¥107,800', grade: 'C', gradeNote: '裏地に数か所シミ',   city: 'PORTLAND ME',  date: 'JUL 26' },
+    { base: 0, price: '¥43,780',  grade: 'B', gradeNote: '首まわりに伸び',     city: 'BEND OR',      date: 'AUG 2' },
+    { base: 1, price: '¥151,800', grade: 'A', gradeNote: '目立つダメージなし', city: 'MACON GA',     date: 'AUG 17' } ] },
+  { no: 9, date: '2026.08.28', pieces: [
+    { base: 2, price: '¥87,780',  grade: 'B', gradeNote: 'ジップに小傷',       city: 'DULUTH MN',    date: 'JUL 11' },
+    { base: 3, price: '¥43,890',  grade: 'C', gradeNote: '袖口に擦れ',         city: 'SPOKANE WA',   date: 'JUL 19' },
+    { base: 4, price: '¥13,200',  grade: 'B', gradeNote: '小さな毛玉あり',     city: 'LUBBOCK TX',   date: 'AUG 8' } ] }
+];
+var PIECES = [];
+var html = '';
+PAST.forEach(function (drop) {
+  DROP = { no: drop.no, date: drop.date }; DROP_LABEL = '第' + drop.no + '便';
+  html += '<section class="drop"><div class="drop-head"><b>' + DROP_LABEL + '</b><span>·</span><span>' + drop.date + ' 公開</span><span>·</span><span>' +
+          drop.pieces.length + '点 完売</span></div><div class="drop-row">';
+  drop.pieces.forEach(function (p) {
+    var d = Object.assign({}, ITEMS[p.base], { price: p.price, grade: p.grade, gradeNote: p.gradeNote, city: p.city, date: p.date, year: '2026', drop: { no: drop.no, date: drop.date } });
+    var n = PIECES.push(d) - 1;
+    html += '<button class="past-stamp" data-piece="' + n + '" aria-label="' + esc(d.nameJa + ' ' + d.price + ' 売約済') + '">' + stampHTML(d, d.views[0], { postmark: false }) + '</button>';
+  });
+  html += '</div></section>';
+});
+document.getElementById('drops').innerHTML = html;
+document.getElementById('backLink').textContent = '← 第' + CURRENT_DROP_NO + '便 公開中';
+
+// ---------------- listing (same panel as the homepage, sold state) ----------------
+ITEMS = PIECES;
+var state = { open: -1, view: 0 };
+var overlay = document.getElementById('overlay');
+var stampBtn = document.getElementById('stampBtn'), loupe = document.getElementById('loupe');
+var full = document.getElementById('full');
+function fitPanels() {
+  var k = Math.min(1, (window.innerWidth - 32) / 1040, (window.innerHeight - 32) / 640);
+  document.querySelector('#overlay .panel').style.transform = 'scale(' + k + ')';
+  var kf = Math.min(1, (window.innerWidth - 32) / 576, (window.innerHeight - 32) / 768);
+  document.querySelector('#full .full-box').style.transform = 'scale(' + kf + ')';
+}
+window.addEventListener('resize', fitPanels); fitPanels();
+function renderListing() {
+  var d = ITEMS[state.open], v = d.views[state.view];
+  document.getElementById('bigStamp').innerHTML = stampHTML(d, v, { tall: true, postmark: false });
+  document.getElementById('found').textContent = DROP_LABEL + '  ·  FOUND: ' +
+    d.city.replace(/ ([A-Z]{2})$/, ', $1') + ' (' + d.date.split(' ')[0] + ' ' + d.year + ')';
+  document.getElementById('nameJa').textContent = d.nameJa;
+  document.getElementById('nameEn').textContent = d.nameEn;
+  document.getElementById('price').textContent = d.price;
+  document.getElementById('grade').textContent = d.grade || '';
+  document.getElementById('gradeNote').textContent = d.gradeNote || '';
+  document.getElementById('meas').innerHTML = d.meas.map(function (m) { return '<div><span>' + esc(m[0]) + '</span><span>' + esc(m[1]) + '</span></div>'; }).join('');
+  var th = document.getElementById('thumbs');
+  th.innerHTML = '';
+  if (d.views.length > 1) d.views.forEach(function (vv, j) {
+    var b = document.createElement('button');
+    b.className = j === state.view ? 'on' : '';
+    b.setAttribute('aria-label', vv.label || ('表示 ' + (j + 1)));
+    b.innerHTML = '<img src="' + vv.full + '" alt="">';
+    b.addEventListener('click', function () { state.view = j; loupe.style.display = 'none'; renderListing(); });
+    th.appendChild(b);
+  });
+  loupe.style.backgroundImage = 'url(' + v.img + ')';
+}
+function moveLoupe(e) {
+  var d = ITEMS[state.open], v = d.views[state.view];
+  var r = stampBtn.getBoundingClientRect(), k = 281 / (r.width || 281);
+  var lx = (e.clientX - r.left) * k, ly = (e.clientY - r.top) * k;
+  var bgW = 900, bgH = bgW * (v.ar || 1);
+  var fx = Math.min(1, Math.max(0, (lx - 22) / 238)), fy = Math.min(1, Math.max(0, (ly - 22) / 316));
+  loupe.style.display = 'block';
+  loupe.style.left = Math.round(lx - 80) + 'px'; loupe.style.top = Math.round(ly - 80) + 'px';
+  loupe.style.backgroundSize = bgW + 'px auto';
+  loupe.style.backgroundPosition = Math.round(80 - fx * bgW) + 'px ' + Math.round(80 - fy * bgH) + 'px';
+}
+function openItem(i) {
+  state.open = i; state.view = 0;
+  DROP = ITEMS[i].drop; DROP_LABEL = '第' + DROP.no + '便';
+  renderListing(); overlay.classList.add('open'); document.getElementById('closeBtn').focus();
+}
+function closeItem() { overlay.classList.remove('open'); state.open = -1; closeFull(); }
+function openFull() { var d = ITEMS[state.open], v = d.views[state.view]; loupe.style.display = 'none'; document.getElementById('fullImg').src = v.full; document.getElementById('fullImg').alt = d.nameEn; full.classList.add('open'); }
+function closeFull() { full.classList.remove('open'); }
+document.getElementById('drops').addEventListener('click', function (e) {
+  var b = e.target.closest('.past-stamp'); if (b) openItem(+b.getAttribute('data-piece'));
+});
+stampBtn.addEventListener('mousemove', moveLoupe);
+stampBtn.addEventListener('mouseleave', function () { loupe.style.display = 'none'; });
+stampBtn.addEventListener('click', openFull);
+document.getElementById('closeBtn').addEventListener('click', closeItem);
+overlay.addEventListener('click', function (e) { if (e.target === overlay) closeItem(); });
+document.getElementById('fullBg').addEventListener('click', closeFull);
+document.getElementById('fullClose').addEventListener('click', closeFull);
+document.addEventListener('keydown', function (e) {
+  if (e.key !== 'Escape') return;
+  if (full.classList.contains('open')) closeFull(); else if (state.open >= 0) closeItem();
+});
+</script>
+</body>
+</html>
