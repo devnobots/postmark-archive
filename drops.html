@@ -112,7 +112,17 @@
   #full { position: absolute; inset: 0; z-index: 200; display: none; align-items: center; justify-content: center; }
   #full.open { display: flex; }
   #fullBg { position: absolute; inset: 0; border: 0; padding: 0; background: rgba(30,42,58,0.82); cursor: zoom-out; }
-  .full-box { position: relative; width: 576px; height: 768px; background: #fff; box-shadow: 0 30px 60px rgba(0,0,0,0.35); pointer-events: none; }
+  .full-box { position: relative; width: 576px; height: 768px; background: #fff; box-shadow: 0 30px 60px rgba(0,0,0,0.35); }
+  /* full-view loupe: 30% larger than the listing loupe, fine edge, hairline crosshair; centered on the pointer */
+  #fullLoupe { position: absolute; width: 208px; height: 208px; border-radius: 50%; border: 1px solid rgba(26,36,51,0.45);
+    box-shadow: 0 12px 28px -4px hsla(28, 25%, 20%, 0.18), inset 0 0 0 1px rgba(255,255,255,0.5);
+    background-color: #fff; background-repeat: no-repeat; pointer-events: none; z-index: 5;
+    opacity: 0; transform: translate(-50%, -50%) scale(0.9); transition: opacity 160ms ease, transform 160ms ease; }
+  #fullLoupe.active { opacity: 1; transform: translate(-50%, -50%) scale(1); }
+  #fullLoupe::before, #fullLoupe::after { content: ''; position: absolute; background-color: rgba(26,36,51,0.35); }
+  #fullLoupe::before { top: 0; left: 50%; width: 1px; height: 100%; transform: translateX(-50%); }
+  #fullLoupe::after { top: 50%; left: 0; width: 100%; height: 1px; transform: translateY(-50%); }
+  .full-box.zooming { cursor: none; }
   .full-box img { display: block; width: 100%; height: 100%; object-fit: contain; }
   #full .icon-btn { top: 20px; right: 20px; color: var(--card); }
   .site-header { position: absolute; left: 0; right: 0; top: 0; display: flex; justify-content: center; align-items: center; padding: 48px 0 24px; z-index: 70; }
@@ -190,7 +200,7 @@
 
   <div id="full" role="dialog" aria-modal="true" aria-label="写真">
     <button id="fullBg" aria-label="閉じる"></button>
-    <div class="full-box"><img id="fullImg" alt=""></div>
+    <div class="full-box"><img id="fullImg" alt=""><div id="fullLoupe"></div></div>
     <button class="icon-btn" id="fullClose" aria-label="閉じる"><svg viewBox="0 0 24 24" width="24" height="24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M5 5 L19 19 M19 5 L5 19"/></svg></button>
   </div>
 
@@ -335,8 +345,26 @@ function openItem(i) {
   renderListing(); overlay.classList.add('open'); document.getElementById('closeBtn').focus();
 }
 function closeItem() { overlay.classList.remove('open'); state.open = -1; closeFull(); }
-function openFull() { var d = ITEMS[state.open], v = d.views[state.view]; loupe.style.display = 'none'; document.getElementById('fullImg').src = v.full; document.getElementById('fullImg').alt = d.nameEn; full.classList.add('open'); }
+function openFull() { var d = ITEMS[state.open], v = d.views[state.view]; loupe.style.display = 'none'; showFullLoupe(false); fullLoupe.style.backgroundImage = 'url(' + v.full + ')'; document.getElementById('fullImg').src = v.full; document.getElementById('fullImg').alt = d.nameEn; full.classList.add('open'); }
 function closeFull() { full.classList.remove('open'); }
+
+// full view: a larger loupe over the full-resolution photo (hover only; clicking the photo does nothing)
+var fullBox = document.querySelector('.full-box'), fullImg = document.getElementById('fullImg'), fullLoupe = document.getElementById('fullLoupe');
+var FULL_ZOOM = 3, FULL_C = (208 - 2) / 2; // lens center inside its 1px border
+function showFullLoupe(on) { fullLoupe.classList.toggle('active', on); fullBox.classList.toggle('zooming', on); }
+fullBox.addEventListener('mousemove', function (e) {
+  var nw = fullImg.naturalWidth, nh = fullImg.naturalHeight;
+  if (!nw) return;
+  var r = fullBox.getBoundingClientRect(), k = 576 / (r.width || 576);
+  var x = (e.clientX - r.left) * k, y = (e.clientY - r.top) * k;
+  var s = Math.min(576 / nw, 768 / nh), w = nw * s, h = nh * s, ox = (576 - w) / 2, oy = (768 - h) / 2; // object-fit: contain
+  if (x < ox || x > ox + w || y < oy || y > oy + h) { showFullLoupe(false); return; }
+  showFullLoupe(true);
+  fullLoupe.style.left = Math.round(x) + 'px'; fullLoupe.style.top = Math.round(y) + 'px';
+  fullLoupe.style.backgroundSize = Math.round(w * FULL_ZOOM) + 'px ' + Math.round(h * FULL_ZOOM) + 'px';
+  fullLoupe.style.backgroundPosition = Math.round(FULL_C - (x - ox) * FULL_ZOOM) + 'px ' + Math.round(FULL_C - (y - oy) * FULL_ZOOM) + 'px';
+});
+fullBox.addEventListener('mouseleave', function () { showFullLoupe(false); });
 document.getElementById('drops').addEventListener('click', function (e) {
   var b = e.target.closest('.past-stamp'); if (b) openItem(+b.getAttribute('data-piece'));
 });
