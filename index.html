@@ -377,7 +377,7 @@ function openItem(i) { state.open = i; state.view = 0; setLift(-1); renderListin
 function closeItem() { overlay.classList.remove('open'); state.open = -1; closeFull(); }
 function renderListing() {
   var d = ITEMS[state.open], v = d.views[state.view];
-  document.getElementById('bigStamp').innerHTML = stampHTML(d, v, { tall: true });
+  document.getElementById('bigStamp').innerHTML = stampHTML(d, v, { tall: true, postmark: false });
   document.getElementById('found').textContent = 'FOUND · ' + d.city + ' · ' + d.date + ', ' + d.year;
   document.getElementById('nameJa').textContent = d.nameJa;
   document.getElementById('nameEn').textContent = d.nameEn;
