@@ -48,7 +48,7 @@
 
   /* ---------- fan ---------- */
   .fan-stamp {
-    position: absolute; left: 562px; top: 168px; width: 156px; height: 192px; padding: 0; border: 0; background: none;
+    position: absolute; left: 562px; top: 203px; width: 156px; height: 192px; padding: 0; border: 0; background: none;
     pointer-events: none; transform-origin: 78px 352px; opacity: 0;
   }
   .fan-stamp:focus-visible { outline: 2px solid var(--post); outline-offset: 4px; }
@@ -278,7 +278,7 @@ hit.addEventListener('mousemove', function (e) {
   if (!state.fanned || state.open >= 0) return;
   var r = hit.getBoundingClientRect(), k = 960 / (r.width || 960);
   var x = 160 + (e.clientX - r.left) * k, y = 40 + (e.clientY - r.top) * k;
-  var dx = x - 640, dy = 520 - y, rad = Math.sqrt(dx * dx + dy * dy), idx = -1;
+  var dx = x - 640, dy = 555 - y, rad = Math.sqrt(dx * dx + dy * dy), idx = -1;
   if (rad > 105 && rad < 480 && dy > -20) {
     var ang = Math.atan2(dx, dy) * 180 / Math.PI, half = (ANG[1] - ANG[0]) / 2, cur = state.lifted;
     if (cur >= 0 && Math.abs(ang - ANG[cur]) < half + 4) idx = cur; // hysteresis
