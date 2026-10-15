@@ -21,6 +21,7 @@ TEMPLATES = {
     'neckwear': ['全長', '幅'],
     'hat':      ['頭囲', 'つば'],
     'socks':    ['対応サイズ'],
+    'bottoms':  ['ウエスト', '股下'],
 }
 
 # key: a word that appears (case-insensitive) in the item's CURRENT nameEn; must match exactly one item
@@ -34,9 +35,9 @@ ITEMS = [
     {'key': 'flight', 'category': 'tops', 'values': ['66 cm', '64 cm', '55 cm', '62 cm'],
      'nameEn': '1960s USAF MA-1 Flight Jacket', 'nameJa': '60年代 USAF MA-1 フライトジャケット',
      'capJa': 'MA-1 フライト', 'size': '着丈 66 · 身幅 64', 'grade': 'B', 'gradeNote': '袖リブにほつれ'},
-    {'key': 'varsity', 'category': 'tops', 'values': ['64 cm', '66 cm', '58 cm', '57 cm'],
-     'nameEn': '1950s Quilted Varsity Jacket', 'nameJa': '50年代 キルティング スタジャン',
-     'capJa': 'キルティングスタジャン', 'size': '着丈 64 · 身幅 66', 'grade': 'C', 'gradeNote': '裏地に数か所シミ'},
+    {'key': 'levi', 'category': 'bottoms', 'values': ['66 cm', '77.5 cm'],
+     'nameEn': '1990s Levi’s 611 Faded Black Denim', 'nameJa': '90年代 リーバイス 611 ブラックデニム',
+     'capJa': 'リーバイス 611', 'size': 'ウエスト 66 · 股下 77.5', 'grade': 'B', 'gradeNote': 'ポケット下に小穴'},
     {'key': 'sock', 'category': 'socks', 'values': ['23–27 cm'],
      'nameEn': '1980s Hand-Knit Wool Socks', 'nameJa': '80年代 ハンドニット ウールソックス',
      'capJa': 'ウールソックス', 'size': 'フリー · 23–27 cm', 'grade': 'A', 'gradeNote': '使用感少なめ'},
