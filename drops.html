@@ -165,6 +165,11 @@
   .stamp.is-sold .stamp-price { font-family: 'Shippori Mincho', serif; font-weight: 600; font-size: 11px; letter-spacing: 0.18em; }
   .past-stamp:hover .stamp.is-sold .stamp-art, .past-stamp:focus-visible .stamp.is-sold .stamp-art { filter: none; }
   .past-stamp { cursor: default; }
+  /* sold pages: open again, custodian on the top line */
+  .past-stamp { cursor: pointer; }
+  .found .custodian-handle { color: inherit; text-decoration: none; border-bottom: none; font-weight: normal; transition: opacity 120ms ease; }
+  a.custodian-handle { cursor: pointer; }
+  a.custodian-handle:hover { opacity: 0.55; }
 </style>
 </head>
 <body>
@@ -256,9 +261,9 @@ function stampHTML(d, view, opts) {
     '<text x="80" y="32" font-size="8" font-weight="700">' + esc(d.date) + '</text>' +
     '<text x="80" y="41.5" font-size="7" font-weight="700">' + esc(d.year) + '</text>' +
     '<text x="80" y="54" font-size="5.6">U.S.A.</text></g></svg></div>') : '';
-  return '<div class="stamp' + (d.sold ? ' is-sold' : '') + '" style="height:' + sz.h + 'px"><div class="stamp-shadow" style="height:' + sz.h + 'px"><div class="stamp-paper" style="height:' + sz.h + 'px"><div class="stamp-inner">' +
+  return '<div class="stamp' + (d.sold && !tall ? ' is-sold' : '') + '" style="height:' + sz.h + 'px"><div class="stamp-shadow" style="height:' + sz.h + 'px"><div class="stamp-paper" style="height:' + sz.h + 'px"><div class="stamp-inner">' +
     '<div class="stamp-art" style="height:' + sz.art + 'px;background:' + d.bg + '">' + pic +
-    '<div class="stamp-price" style="color:' + (d.ink || '#1E2A3A') + '">' + esc(d.sold ? '売約済' : d.price) + '</div></div>' +
+    '<div class="stamp-price" style="color:' + (d.ink || '#1E2A3A') + '">' + esc(d.sold && !tall ? '売約済' : d.price) + '</div></div>' +
     '<div class="stamp-cap"><div class="cap-name">' + esc(d.capJa || d.nameJa) + '</div><div class="cap-size">' + esc(d.size) + '</div></div>' +
     (tall ? '' : '<div class="cap-issue">' + DROP_LABEL + '</div>') +
     '</div></div></div>' + pm + '</div>';
@@ -268,18 +273,18 @@ function stampHTML(d, view, opts) {
 // base = index into ITEMS above (photos, names, measurements); the rest is this sold piece's own record.
 var PAST = [
   { no: 11, date: '2026.09.25', pieces: [
-    { base: 2, price: '¥87,780',  grade: 'B', gradeNote: '袖リブにほつれ',     city: 'DAYTON OH',    date: 'AUG 21' },
+    { base: 2, price: '¥87,780',  grade: 'B', gradeNote: '袖リブにほつれ',     city: 'DAYTON OH',    date: 'AUG 21', owner: 'kenji_wears', demo: true },
     { base: 0, price: '¥13,200',  grade: 'A', gradeNote: '目立つダメージなし', city: 'TUCSON AZ',    date: 'AUG 9' },
-    { base: 4, price: '¥43,780',  grade: 'A', gradeNote: '使用感少なめ',       city: 'SANTA FE NM',  date: 'AUG 30' },
+    { base: 4, price: '¥43,780',  grade: 'A', gradeNote: '使用感少なめ',       city: 'SANTA FE NM',  date: 'AUG 30', owner: 'mio.furugi', demo: true },
     { base: 1, price: '¥43,890',  grade: 'B', gradeNote: 'わずかな色あせ',     city: 'ASHEVILLE NC', date: 'SEP 4' } ] },
   { no: 10, date: '2026.09.11', pieces: [
     { base: 3, price: '¥107,800', grade: 'C', gradeNote: '裏地に数か所シミ',   city: 'PORTLAND ME',  date: 'JUL 26' },
     { base: 0, price: '¥43,780',  grade: 'B', gradeNote: '首まわりに伸び',     city: 'BEND OR',      date: 'AUG 2' },
-    { base: 1, price: '¥151,800', grade: 'A', gradeNote: '目立つダメージなし', city: 'MACON GA',     date: 'AUG 17' } ] },
+    { base: 1, price: '¥151,800', grade: 'A', gradeNote: '目立つダメージなし', city: 'MACON GA',     date: 'AUG 17', owner: 'haru_and_denim', demo: true } ] },
   { no: 9, date: '2026.08.28', pieces: [
-    { base: 2, price: '¥87,780',  grade: 'B', gradeNote: 'ジップに小傷',       city: 'DULUTH MN',    date: 'JUL 11' },
-    { base: 3, price: '¥43,890',  grade: 'C', gradeNote: '袖口に擦れ',         city: 'SPOKANE WA',   date: 'JUL 19' },
-    { base: 4, price: '¥13,200',  grade: 'B', gradeNote: '小さな毛玉あり',     city: 'LUBBOCK TX',   date: 'AUG 8' } ] }
+    { base: 2, price: '¥87,780',  grade: 'B', gradeNote: 'ジップに小傷',       city: 'DULUTH MN',    date: 'JUL 11', owner: 'tsubasa.1987', demo: true },
+    { base: 3, price: '¥43,890',  grade: 'C', gradeNote: '袖口に擦れ',         city: 'SPOKANE WA',   date: 'JUL 19', owner: 'nao_ameka', demo: true },
+    { base: 4, price: '¥13,200',  grade: 'B', gradeNote: '小さな毛玉あり',     city: 'LUBBOCK TX',   date: 'AUG 8', owner: 'yuki.closet', demo: true } ] }
 ];
 var PIECES = [];
 var html = '';
@@ -288,7 +293,7 @@ PAST.forEach(function (drop) {
   html += '<section class="drop"><div class="drop-head"><b>' + DROP_LABEL + '</b><span>·</span><span>' + drop.date + ' 公開</span><span>·</span><span>' +
           drop.pieces.length + '点 完売</span></div><div class="drop-row">';
   drop.pieces.forEach(function (p) {
-    var d = Object.assign({}, ITEMS[p.base], { price: p.price, grade: p.grade, gradeNote: p.gradeNote, city: p.city, date: p.date, year: '2026', sold: true, drop: { no: drop.no, date: drop.date } });
+    var d = Object.assign({}, ITEMS[p.base], { price: p.price, grade: p.grade, gradeNote: p.gradeNote, city: p.city, date: p.date, year: '2026', sold: true, owner: p.owner || '', demo: !!p.demo, drop: { no: drop.no, date: drop.date } });
     var n = PIECES.push(d) - 1;
     html += '<button class="past-stamp" data-piece="' + n + '" aria-label="' + esc(d.nameJa + ' ' + d.price + ' 売約済') + '">' + stampHTML(d, d.views[0], { postmark: false }) + '</button>';
   });
@@ -315,6 +320,18 @@ function renderListing() {
   document.getElementById('bigStamp').innerHTML = stampHTML(d, v, { tall: true, postmark: false });
   document.getElementById('found').textContent = DROP_LABEL + '  ·  FOUND: ' +
     d.city.replace(/ ([A-Z]{2})$/, ', $1') + ' (' + d.date.split(' ')[0] + ' ' + d.year + ')';
+  // sold piece: no cart; the top line ends with who has it now
+  var cartBtn = document.querySelector('.buy .cart');
+  if (cartBtn && d.sold) { cartBtn.className = 'cart sold'; cartBtn.disabled = true; cartBtn.textContent = '売約済'; }
+  else if (cartBtn) { cartBtn.className = 'cart'; cartBtn.disabled = false; cartBtn.textContent = 'カートに入れる'; }
+  if (d.sold) {
+    var foundEl = document.getElementById('found');
+    foundEl.textContent = foundEl.textContent.replace(/ \([A-Z]{3} \d{4}\)$/, '');
+    var who = !d.owner ? 'PRIVATE ARCHIVE'
+      : d.demo ? '<span class="custodian-handle">@' + esc(d.owner) + '</span>'
+      : '<a class="custodian-handle" href="https://www.instagram.com/' + encodeURIComponent(d.owner) + '/" target="_blank" rel="noopener">@' + esc(d.owner) + '</a>';
+    foundEl.insertAdjacentHTML('beforeend', '\u00a0 · \u00a0CUSTODIAN: ' + who);
+  }
   document.getElementById('nameJa').textContent = d.nameJa;
   document.getElementById('nameEn').textContent = d.nameEn;
   document.getElementById('price').textContent = d.price;
@@ -344,7 +361,7 @@ function moveLoupe(e) {
   loupe.style.backgroundSize = bgW + 'px auto';
   loupe.style.backgroundPosition = Math.round(80 - fx * bgW) + 'px ' + Math.round(80 - fy * bgH) + 'px';
 }
-function openItem(i) { if (ITEMS[i] && ITEMS[i].sold) return; /* sold pieces never open */
+function openItem(i) {
   state.open = i; state.view = 0;
   DROP = ITEMS[i].drop; DROP_LABEL = '第' + DROP.no + '便';
   renderListing(); overlay.classList.add('open'); document.getElementById('closeBtn').focus();
@@ -397,7 +414,6 @@ document.addEventListener('keydown', function (e) {
   }
   var baseOpen = openItem, baseClose = closeItem, pushed = false;
   openItem = function (i) {
-    if (ITEMS[i] && ITEMS[i].sold) return;                          // sold: no listing, no address
     baseOpen(i);
     var h = '#' + slug(ITEMS[i]);
     if (location.hash !== h) { history.pushState({ sg: 1 }, '', h); pushed = true; }
