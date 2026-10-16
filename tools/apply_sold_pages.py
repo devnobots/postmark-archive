@@ -5,8 +5,8 @@
 - Clicking a sold stamp now opens its page again (with its own #link).
 - On the sold page:
     big stamp      full color, original price in the corner
-    top line       第9便  ·  FOUND: DULUTH, MN  ·  CUSTODIAN: @tsubasa.1987
-                   第11便  ·  FOUND: TUCSON, AZ  ·  CUSTODIAN: PRIVATE ARCHIVE   (buyer did not share)
+    top line       第9便  ·  FOUND: DULUTH, MN  ·  CONSIGNEE: @tsubasa.1987
+                   第11便  ·  FOUND: TUCSON, AZ  ·  CONSIGNEE: PRIVATE ARCHIVE   (buyer did not share)
                    (the found month/year is dropped on sold pages; the handle is the same color and
                    size as the line, no underline, fades to 0.55 on mouse over)
     purchase area  price stays; the cart button becomes the outlined 売約済 box
@@ -21,20 +21,20 @@ Usage
 import re
 import sys
 
-MARK = '/* sold pages: open again, custodian on the top line */'
+MARK = '/* sold pages: open again, consignee on the top line */'
 CSS = {
     'index.html': (
         "  " + MARK + "\n"
         "  .cart.sold { background: none; color: #6b6e72; border: 1px solid rgba(107, 110, 114, 0.5); cursor: default; letter-spacing: 0.2em; }\n"
-        "  .found .custodian-handle { color: inherit; text-decoration: none; border-bottom: none; font-weight: normal; transition: opacity 120ms ease; }\n"
-        "  a.custodian-handle { cursor: pointer; }\n"
-        "  a.custodian-handle:hover { opacity: 0.55; }\n"),
+        "  .found .consignee-handle { color: inherit; text-decoration: none; border-bottom: none; font-weight: normal; transition: opacity 120ms ease; }\n"
+        "  a.consignee-handle { cursor: pointer; }\n"
+        "  a.consignee-handle:hover { opacity: 0.55; }\n"),
     'drops.html': (
         "  " + MARK + "\n"
         "  .past-stamp { cursor: pointer; }\n"
-        "  .found .custodian-handle { color: inherit; text-decoration: none; border-bottom: none; font-weight: normal; transition: opacity 120ms ease; }\n"
-        "  a.custodian-handle { cursor: pointer; }\n"
-        "  a.custodian-handle:hover { opacity: 0.55; }\n"),
+        "  .found .consignee-handle { color: inherit; text-decoration: none; border-bottom: none; font-weight: normal; transition: opacity 120ms ease; }\n"
+        "  a.consignee-handle { cursor: pointer; }\n"
+        "  a.consignee-handle:hover { opacity: 0.55; }\n"),
 }
 SOLD_JS = """  // sold piece: no cart; the top line ends with who has it now
   var cartBtn = document.querySelector('.buy .cart');
@@ -44,9 +44,9 @@ SOLD_JS = """  // sold piece: no cart; the top line ends with who has it now
     var foundEl = document.getElementById('found');
     foundEl.textContent = foundEl.textContent.replace(/ \\([A-Z]{3} \\d{4}\\)$/, '');
     var who = !d.owner ? 'PRIVATE ARCHIVE'
-      : d.demo ? '<span class="custodian-handle">@' + esc(d.owner) + '</span>'
-      : '<a class="custodian-handle" href="https://www.instagram.com/' + encodeURIComponent(d.owner) + '/" target="_blank" rel="noopener">@' + esc(d.owner) + '</a>';
-    foundEl.insertAdjacentHTML('beforeend', '\\u00a0 · \\u00a0CUSTODIAN: ' + who);
+      : d.demo ? '<span class="consignee-handle">@' + esc(d.owner) + '</span>'
+      : '<a class="consignee-handle" href="https://www.instagram.com/' + encodeURIComponent(d.owner) + '/" target="_blank" rel="noopener">@' + esc(d.owner) + '</a>';
+    foundEl.insertAdjacentHTML('beforeend', '\\u00a0 · \\u00a0CONSIGNEE: ' + who);
   }
 """
 JS_ANCHOR = "  document.getElementById('nameJa').textContent = d.nameJa;"

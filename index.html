@@ -161,11 +161,11 @@
   .stamp.is-sold .stamp-art { filter: grayscale(1) contrast(1.25) brightness(1.04); transition: filter 0.5s ease; }
   .stamp.is-sold .stamp-price { font-family: 'Shippori Mincho', serif; font-weight: 600; font-size: 11px; letter-spacing: 0.18em; }
   .fan-stamp.up .stamp.is-sold .stamp-art { filter: none; }
-  /* sold pages: open again, custodian on the top line */
+  /* sold pages: open again, consignee on the top line */
   .cart.sold { background: none; color: #6b6e72; border: 1px solid rgba(107, 110, 114, 0.5); cursor: default; letter-spacing: 0.2em; }
-  .found .custodian-handle { color: inherit; text-decoration: none; border-bottom: none; font-weight: normal; transition: opacity 120ms ease; }
-  a.custodian-handle { cursor: pointer; }
-  a.custodian-handle:hover { opacity: 0.55; }
+  .found .consignee-handle { color: inherit; text-decoration: none; border-bottom: none; font-weight: normal; transition: opacity 120ms ease; }
+  a.consignee-handle { cursor: pointer; }
+  a.consignee-handle:hover { opacity: 0.55; }
 </style>
 </head>
 <body class="locked">
@@ -246,7 +246,7 @@ var ITEMS = [
   { bg: '#E8B53A', nameJa: '70年代 デニム ニュースペーパーバッグ', capJa: 'ニュースペーパーバッグ', nameEn: '1970s Denim Newspaper Bag', size: '幅 50 · 高さ 30', price: '¥43,780', grade: 'A', gradeNote: '目立つダメージなし', city: 'ASHEVILLE NC', date: 'AUG 22', year: '2026',
     meas: [['幅', '50 cm'], ['高さ', '30 cm'], ['マチ', '12 cm'], ['ショルダー', '62 cm']],
     views: [{ img: 'assets/bag.webp', full: 'assets/bag-full.jpg', ar: 0.905 }] },
-  { bg: '#C9B3D6', nameJa: '60年代 USAF MA-1 フライトジャケット', capJa: 'MA-1 フライト', nameEn: '1960s USAF MA-1 Flight Jacket', size: '着丈 66 · 身幅 64', price: '¥87,780', grade: 'B', gradeNote: '袖リブにほつれ', city: 'DAYTON OH', date: 'SEP 3', year: '2026',
+  { bg: '#C9B3D6', nameJa: '60年代 USAF MA-1 フライトジャケット', capJa: 'MA-1', nameEn: '1960s USAF MA-1 Flight Jacket', size: '着丈 66 · 身幅 64', price: '¥87,780', grade: 'B', gradeNote: '袖リブにほつれ', city: 'DAYTON OH', date: 'SEP 3', year: '2026',
     meas: [['着丈', '66 cm'], ['身幅', '64 cm'], ['肩幅', '55 cm'], ['袖丈', '62 cm']],
     views: [
       { img: 'assets/bomber.webp', full: 'assets/bomber-full.jpg', ar: 0.88, label: '表' },
@@ -423,9 +423,9 @@ function renderListing() {
     var foundEl = document.getElementById('found');
     foundEl.textContent = foundEl.textContent.replace(/ \([A-Z]{3} \d{4}\)$/, '');
     var who = !d.owner ? 'PRIVATE ARCHIVE'
-      : d.demo ? '<span class="custodian-handle">@' + esc(d.owner) + '</span>'
-      : '<a class="custodian-handle" href="https://www.instagram.com/' + encodeURIComponent(d.owner) + '/" target="_blank" rel="noopener">@' + esc(d.owner) + '</a>';
-    foundEl.insertAdjacentHTML('beforeend', '\u00a0 · \u00a0CUSTODIAN: ' + who);
+      : d.demo ? '<span class="consignee-handle">@' + esc(d.owner) + '</span>'
+      : '<a class="consignee-handle" href="https://www.instagram.com/' + encodeURIComponent(d.owner) + '/" target="_blank" rel="noopener">@' + esc(d.owner) + '</a>';
+    foundEl.insertAdjacentHTML('beforeend', '\u00a0 · \u00a0CONSIGNEE: ' + who);
   }
   document.getElementById('nameJa').textContent = d.nameJa;
   document.getElementById('nameEn').textContent = d.nameEn;
