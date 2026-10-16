@@ -26,13 +26,13 @@ CSS = {
     'index.html': (
         "  " + MARK + "\n"
         "  .cart.sold { background: none; color: #6b6e72; border: 1px solid rgba(107, 110, 114, 0.5); cursor: default; letter-spacing: 0.2em; }\n"
-        "  .found .consignee-handle { color: inherit; text-decoration: none; border-bottom: none; font-weight: normal; transition: opacity 120ms ease; }\n"
+        "  .found .consignee-handle { color: inherit; text-decoration: none; border-bottom: none; font-weight: normal; font-size: calc(1em + 1px); transition: opacity 120ms ease; }\n"
         "  a.consignee-handle { cursor: pointer; }\n"
         "  a.consignee-handle:hover { opacity: 0.55; }\n"),
     'drops.html': (
         "  " + MARK + "\n"
         "  .past-stamp { cursor: pointer; }\n"
-        "  .found .consignee-handle { color: inherit; text-decoration: none; border-bottom: none; font-weight: normal; transition: opacity 120ms ease; }\n"
+        "  .found .consignee-handle { color: inherit; text-decoration: none; border-bottom: none; font-weight: normal; font-size: calc(1em + 1px); transition: opacity 120ms ease; }\n"
         "  a.consignee-handle { cursor: pointer; }\n"
         "  a.consignee-handle:hover { opacity: 0.55; }\n"),
 }
