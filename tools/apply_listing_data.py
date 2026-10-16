@@ -34,7 +34,7 @@ ITEMS = [
      'capJa': 'ニュースペーパーバッグ', 'size': '幅 50 · 高さ 30', 'grade': 'A', 'gradeNote': '目立つダメージなし'},
     {'key': 'flight', 'category': 'tops', 'values': ['66 cm', '64 cm', '55 cm', '62 cm'],
      'nameEn': '1960s USAF MA-1 Flight Jacket', 'nameJa': '60年代 USAF MA-1 フライトジャケット',
-     'capJa': 'MA-1 フライト', 'size': '着丈 66 · 身幅 64', 'grade': 'B', 'gradeNote': '袖リブにほつれ'},
+     'capJa': 'MA-1', 'size': '着丈 66 · 身幅 64', 'grade': 'B', 'gradeNote': '袖リブにほつれ'},
     {'key': 'levi', 'category': 'bottoms', 'values': ['66 cm', '77.5 cm'],
      'nameEn': '1990s Levi’s 611 Faded Black Denim', 'nameJa': '90年代 リーバイス 611 ブラックデニム',
      'capJa': 'リーバイス 611', 'size': 'ウエスト 66 · 股下 77.5', 'grade': 'B', 'gradeNote': 'ポケット下に小穴'},
