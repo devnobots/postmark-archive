@@ -13,10 +13,12 @@ Rule
    total score (Hungarian assignment).
 5. On dark inks (brick), the price is printed in cream (`ink: '#FFFDF6'`) so it stays readable.
 
-Usage
-  python3 tools/stamp_colors.py index.html --dry-run   # print the table, change nothing
-  python3 tools/stamp_colors.py index.html             # rewrite bg/ink values in index.html
+Usage (the homepage pieces live in data/current.js)
+  python3 tools/stamp_colors.py data/current.js --dry-run   # print the table, change nothing
+  python3 tools/stamp_colors.py data/current.js             # rewrite bg/ink values in data/current.js
+Reads both forms of data/current.js: the hand-written JS list, and the JSON the back office publishes.
 """
+import json
 import os
 import re
 import sys
@@ -83,6 +85,34 @@ def scores_for(pixels):
 ITEM_RE = re.compile(r"bg: '(#[0-9A-Fa-f]{6})'(, ink: '#[0-9A-Fa-f]{6}')?")
 IMG_RE = re.compile(r"img: '([^']+)'")
 NAME_RE = re.compile(r"nameEn: '([^']*)'")
+DATA_RE = re.compile(r"window\.SG_DATA = (\{.*\});\s*$", re.S)
+
+
+def site_root(path):
+    """The folder that holds assets/ (data/current.js lives one level below it)."""
+    d = os.path.dirname(os.path.abspath(path))
+    return d if os.path.isdir(os.path.join(d, 'assets')) else os.path.dirname(d)
+
+
+def read_items(src, base):
+    """Pieces in the file, in page order: (name, img, old bg). Two formats are read:
+    JSON, as the back office publishes data/current.js, and the hand-written JS list
+    (data/current.js today, or an older index.html)."""
+    m = DATA_RE.search(src)
+    if m:
+        try:
+            data = json.loads(m.group(1))
+            return 'json', data, [(d.get('nameEn', '?'), (d.get('views') or [{}])[0].get('img'), d.get('bg')) for d in data['items']]
+        except ValueError:
+            pass                                   # not JSON: the hand-written JS list
+    matches = list(ITEM_RE.finditer(src))
+    out = []
+    for i, mt in enumerate(matches):
+        end = matches[i + 1].start() if i + 1 < len(matches) else len(src)
+        chunk = src[mt.start():end]
+        img, name = IMG_RE.search(chunk), NAME_RE.search(chunk)
+        out.append((name.group(1) if name else '?', img.group(1) if img else None, mt.group(1)))
+    return 'js', matches, out
 
 
 def main():
@@ -91,27 +121,23 @@ def main():
         sys.exit(2)
     html_path = sys.argv[1]
     dry = '--dry-run' in sys.argv
-    base = os.path.dirname(os.path.abspath(html_path))
+    base = site_root(html_path)
     src = open(html_path, encoding='utf-8').read()
 
-    matches = list(ITEM_RE.finditer(src))
-    if not matches:
-        print('ERROR: no "bg: \'#xxxxxx\'" entries found')
+    kind, raw, found = read_items(src, base)
+    if not found:
+        print('ERROR: no pieces found in ' + html_path)
         sys.exit(1)
     items = []
-    for i, m in enumerate(matches):
-        end = matches[i + 1].start() if i + 1 < len(matches) else len(src)
-        chunk = src[m.start():end]
-        img = IMG_RE.search(chunk)
-        name = NAME_RE.search(chunk)
+    for i, (name, img, old) in enumerate(found):
         if not img:
             print('ERROR: item %d has no img' % (i + 1))
             sys.exit(1)
-        path = os.path.join(base, img.group(1))
+        path = os.path.join(base, img)
         if not os.path.exists(path):
             print('ERROR: image not found: %s' % path)
             sys.exit(1)
-        items.append({'m': m, 'img': img.group(1), 'path': path, 'name': name.group(1) if name else '?', 'old': m.group(1)})
+        items.append({'img': img, 'path': path, 'name': name, 'old': old})
 
     if len(items) > len(PALETTE):
         print('ERROR: %d items but only %d inks; add inks to PALETTE' % (len(items), len(PALETTE)))
@@ -132,18 +158,30 @@ def main():
     print('distinct colors: %d of %d items' % (len({it['new'] for it in items}), len(items)))
 
     if dry:
-        print('dry run: index.html not changed')
+        print('dry run: %s not changed' % os.path.basename(html_path))
         return
-    out, last = [], 0
-    for it in items:
-        m = it['m']
-        rep = "bg: '%s'" % it['new'] + (", ink: '%s'" % CREAM_TEXT if it['ink_name'] in DARK_INKS else '')
-        out.append(src[last:m.start()])
-        out.append(rep)
-        last = m.end()
-    out.append(src[last:])
-    open(html_path, 'w', encoding='utf-8').write(''.join(out))
-    print('index.html updated')
+    if kind == 'json':
+        data = raw
+        for d, it in zip(data['items'], items):
+            rest = {k: v for k, v in d.items() if k not in ('bg', 'ink')}
+            d.clear()
+            d['bg'] = it['new']                      # bg first, then ink, as the back office writes it
+            if it['ink_name'] in DARK_INKS:
+                d['ink'] = CREAM_TEXT
+            d.update(rest)
+        m = DATA_RE.search(src)
+        out = src[:m.start(1)] + json.dumps(data, indent=1, ensure_ascii=False) + src[m.end(1):]
+    else:
+        parts, last = [], 0
+        for mt, it in zip(raw, items):
+            rep = "bg: '%s'" % it['new'] + (", ink: '%s'" % CREAM_TEXT if it['ink_name'] in DARK_INKS else '')
+            parts.append(src[last:mt.start()])
+            parts.append(rep)
+            last = mt.end()
+        parts.append(src[last:])
+        out = ''.join(parts)
+    open(html_path, 'w', encoding='utf-8').write(out)
+    print('%s updated' % os.path.basename(html_path))
 
 
 if __name__ == '__main__':

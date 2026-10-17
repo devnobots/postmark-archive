@@ -140,3 +140,7 @@ In `admin/tests/screenshots/` (retake with `cd admin && node tests/take-screensh
 ## Update 2026-10-17: the back office is in English
 
 The person running the back office reads English, so all of the back office's own text is now English (buttons, labels, status chips Draft / Ready / Sold, "Drop 12", messages, the fit line and its problems, sign-in). What shoppers see stays Japanese: the public site, and the content typed into the back office (Japanese title, stamp label, measurement names, condition notes). Category names show in English; each measurement name shows its English meaning beside it (着丈 · length). This also changed the problem messages in the tested `admin/src/lib/measure.mjs` (wording only) and the `<html lang>`/title of `admin/index.html`. All 13 Playwright tests, the three checks and the self-check pass; screenshots in `admin/tests/screenshots/` were retaken.
+
+## Update 2026-10-17: stamp color tool works again
+
+`tools/stamp_colors.py` now reads `data/current.js` (run `.venv-tools/bin/python tools/stamp_colors.py data/current.js --dry-run`, then without `--dry-run`). It reads both forms of the file: the hand-written JS list it has today and the JSON the back office publishes, and it finds photos from the site folder. The color rule itself is unchanged; a dry run gives all 7 pieces the colors they already have.
