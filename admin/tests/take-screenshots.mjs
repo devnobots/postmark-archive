@@ -38,5 +38,35 @@ for (const [w, h, s] of [[375, 812, '375'], [1280, 880, '1280']]) {
   }
   await p.close();
 }
+// phases 2-3: the drops page, the cutout check and a sold piece, at phone size
+{
+  const p = await page(375, 812);
+  await p.goto(BASE + '/admin/drops');
+  await p.getByRole('button', { name: '+ New drop' }).click();
+  await p.waitForSelector('[data-testid="drop-13"]');
+  await shot(p, 'drops-375');
+  await p.goto(BASE + '/admin/pieces/local-3');
+  await p.waitForSelector('[data-testid="photo-input"]', { state: 'attached' });
+  await p.getByTestId('photo-input').setInputFiles(path.join(path.dirname(fileURLToPath(import.meta.url)), '../../assets/jacket-full.jpg'));
+  await p.getByRole('dialog').getByAltText('The cutout').waitFor();
+  await p.waitForTimeout(500);
+  await shot(p, 'cutout-check-375');
+  await p.getByRole('dialog').getByRole('button', { name: 'Cancel' }).click();
+  await p.getByRole('group', { name: 'Status' }).getByRole('button', { name: 'Sold' }).click();
+  await p.getByLabel('The buyer shared their Instagram').check();
+  await p.getByLabel("Buyer's Instagram handle").fill('tsubasa.1987');
+  await p.locator('.sold-box').scrollIntoViewIfNeeded();
+  await shot(p, 'editor-sold-375');
+  await p.close();
+}
+{
+  const p = await page(1280, 880);
+  await p.goto(BASE + '/admin/drops');
+  await p.getByTestId('drop-12').getByRole('button', { name: 'Preview the drop' }).click();
+  await p.waitForSelector('[data-testid="drop-preview"] iframe');
+  await p.waitForTimeout(4000);
+  await shot(p, 'drops-preview-1280');
+  await p.close();
+}
 await b.close();
 console.log('screenshots saved to ' + OUT);

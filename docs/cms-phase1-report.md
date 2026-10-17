@@ -144,3 +144,75 @@ The person running the back office reads English, so all of the back office's ow
 ## Update 2026-10-17: stamp color tool works again
 
 `tools/stamp_colors.py` now reads `data/current.js` (run `.venv-tools/bin/python tools/stamp_colors.py data/current.js --dry-run`, then without `--dry-run`). It reads both forms of the file: the hand-written JS list it has today and the JSON the back office publishes, and it finds photos from the site folder. The color rule itself is unchanged; a dry run gives all 7 pieces the colors they already have.
+
+# Phases 2 and 3 (2026-10-17)
+
+Everything below happens in the back office or on the hosting. Nothing needs a terminal while the store runs.
+
+## What the back office does now
+
+**Photos (phase 2)**
+- **Add photo:** opens the phone's camera or photo library. The background is removed in the browser:
+  - **How:** the backdrop's colors come from the photo's border. Texture stops the removal at white fabric, so white cuffs and white patches stay. A pair (socks) is kept whole. Soft shadows are removed.
+  - **Tested:** on all 8 original photos, every result matches the site's existing cutout in shape.
+- **Check the cutout:** shows the cutout on the stamp color, a checkerboard or dark. Tap to zoom in on the edges. A "Background removal" slider adjusts how much is removed. Rotate left or right.
+- **Choosing:** "Use cutout", or "Use whole photo", which fills the stamp.
+- **Web sizes are made automatically:**
+  - stamp photo: at most 640px, transparent WebP (PNG where the browser can't write WebP),
+  - large photo: at most 2400px, JPEG, enough for the 3× loupe.
+
+  24MP phone photos are scaled down while reading, so phones don't run out of memory.
+- **Managing photos:** reorder with ↑↓, remove, or add a photo already on the site. The first photo is the stamp photo.
+
+**Stamp colors (phase 2)**
+- **Set by the rule only, never by eye:** the same 9 inks and scoring as `tools/stamp_colors.py`, running in the browser (`admin/src/lib/colors.mjs`).
+  - **When:** the editor shows the rule's ink as soon as there's a stamp photo. Saving also updates any other piece in the drop the rule changes, and Publish applies the rule to the whole live drop.
+  - **Too many pieces:** a drop with more pieces than inks is refused, with a message.
+- **Stable results:** the browser version clusters colors from 8 starting points and keeps the best fit, so the same photos always give the same colors.
+  - **The one difference:** for today's pieces it agrees with the Python tool on 5 of 7. The bag and the bucket hat are a near-tie (143.8 vs 142.2 points), and at the next publish they will swap mustard and peach. Python's own first run on these photos made the same choice the browser makes.
+
+**Drops and archive (phase 3)**
+- **Drops page:**
+  - **New drop:** the number is filled in. Set the release date, add pieces to it, and preview the whole drop as the homepage and the phone list.
+  - **"Make this the live drop":** the current drop becomes a past drop in the same step, and its unsold pieces move into the new drop and stay for sale.
+- **Ordering:** drag pieces by the ⠿ handle (finger or mouse), or use ↑↓.
+- **Sold:** with the buyer's Instagram handle, or as a private archive (個人蔵). The handle is shown as `CONSIGNEE: @handle` on desktop and in the 収蔵先 row on the phone.
+- **History:** every save keeps the version before it, and "Restore" puts one back; a restore can itself be undone. Deleted pieces appear under "Recently deleted" and can be restored as a draft.
+- **The past-drops page reads `data/past.js`.** It was tested pixel-identical on desktop, on phone, and on two sold piece pages. Publish writes both `data/current.js` and `data/past.js`.
+
+**Hosting**
+- **Data files:** the build writes both data files from the database.
+- **Photos:** uploaded photos are copied into the site (`assets/u/`), so visitors only load the site's own files.
+
+## Tests
+
+- **Playwright:** `npm --prefix admin test` runs **29 tests, all passing**, including:
+  - **Photos:** upload and the cutout check, a 24MP photo becoming 2400×1600 plus a 640px stamp photo, and using a whole photo.
+  - **Colors:** the color rule in the editor and on save.
+  - **Drops:** a full drop cycle (build, preview, make live, publish both files, then the homepage and past-drops page with those files).
+  - **Pieces:** sold with a handle and with 個人蔵, history restore, delete and restore, drag to reorder.
+  - **Phone fit:** no sideways scroll and 44px controls on the list, drops page and cutout check.
+  - **Site unchanged:** the pixel checks of the homepage and the past-drops page still pass.
+- **Check scripts, all passing:**
+  - `node tools/tests/check_data.mjs`, `check_local.mjs`, `check_api.mjs`
+  - `check_past.mjs`: past drops convert both ways
+  - `check_build.mjs`: a build against a stand-in database writes both files and copies the uploaded photos
+- **Other:** `python3 tools/check_titles.py data/current.js data/past.js` passes, and `npm run build` passes.
+
+## Decisions I made
+
+- **Cutouts run in the browser:** the phase 2 plan named rembg and BiRefNet running on a computer, which would mean running commands. The browser cutout needs nothing installed and works on a phone.
+  - **Best with:** a plain backdrop (white paper, a wall, a sheet).
+  - **Busy backgrounds:** "Use whole photo" is always available.
+  - **Later:** a hosted AI cutout could be added if busy backgrounds become common.
+- **No manual color override:** the phase 2 plan mentioned one, but you said colors must never be chosen by eye.
+- **Releasing a drop:** unsold pieces move into the new live drop and stay for sale, so the past-drops page (「すべて売約済」) only shows sold pieces.
+- **Restoring a deleted piece:** it comes back as a draft (sold pieces stay sold), so nothing reappears on the site by surprise.
+- **Undo:** the change history is written by the back office for every save and delete, except reordering alone. Undo is "Restore" on any earlier version.
+
+## Not done, or only testable at part D
+
+- **Part D:** run `supabase/migrations/0002_photos_history.sql` after `0001_init.sql`, and use the new `supabase/seed.sql`, which now includes the 3 past drops and their 10 pieces. Photo storage is the public `photos` bucket that 0002 creates; only admins can add or remove photos.
+- **Needs a real project to test:** uploads to storage, the history table and the publish button in Supabase mode. Their local-mode versions are tested.
+- **Local mode:** photos uploaded in local mode stay in that browser and can't be published until the database is connected. Publish says so.
+- **The jeans:** the title still says ブラックデニム / "Faded Black Denim" although the photo is blue jeans. This is content for whoever writes the Japanese titles.
