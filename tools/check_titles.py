@@ -6,7 +6,7 @@ words. This fails if any title has an unbroken run longer than 12 characters (th
 today, ニュースペーパーバッグ, is 11). Run before a drop goes live.
 
 Usage
-  python3 tools/check_titles.py index.html drops.html
+  python3 tools/check_titles.py data/current.js drops.html
 """
 import re
 import sys
@@ -15,19 +15,23 @@ LIMIT = 12
 
 
 def main():
-    bad = []
+    bad, found = [], 0
     for path in sys.argv[1:]:
         src = open(path, encoding='utf-8').read()
-        for t in re.findall(r"nameJa: '([^']*)'", src):
+        titles = re.findall(r"nameJa: '([^']*)'", src) + re.findall(r'"nameJa": "([^"]*)"', src)
+        if not titles:
+            bad.append('%s: no titles found (the homepage titles are in data/current.js)' % path)
+        found += len(titles)
+        for t in titles:
             for w in t.split(' '):
                 if len(w) > LIMIT:
                     bad.append('%s: "%s" has an unbroken run of %d characters: %s' % (path, t, len(w), w))
     if bad:
-        print('TITLES NEED A SPACE BETWEEN WORDS:')
+        print('TITLE CHECK FAILED:')
         for b in bad:
             print('  - ' + b)
         sys.exit(1)
-    print('titles ok')
+    print('titles ok (%d checked)' % found)
 
 
 if __name__ == '__main__':
