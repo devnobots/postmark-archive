@@ -41,6 +41,15 @@ export async function loadSiteData() {
   return w.SG_DATA;
 }
 
+// the site's data/past.js (the past drops), or none
+export async function loadPastData() {
+  try {
+    const w = {};
+    new Function('window', await (await fetch('/data/past.js', { cache: 'no-store' })).text())(w);
+    return w.SG_PAST || null;
+  } catch (e) { return null; }
+}
+
 // what a 完成 piece still needs (the fit check is separate); empty list = complete
 export function missingFields(p) {
   const miss = [];

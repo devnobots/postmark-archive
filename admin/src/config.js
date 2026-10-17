@@ -4,7 +4,7 @@
 import { createClient } from '@supabase/supabase-js';
 import { dataProvider as supabaseDataProvider } from '@refinedev/supabase';
 import { localDataProvider, seedFromSite } from './lib/local-provider.mjs';
-import { loadSiteData, safeStorage } from './util.js';
+import { loadSiteData, loadPastData, safeStorage } from './util.js';
 
 const URL_ = import.meta.env.VITE_SUPABASE_URL;
 const KEY = import.meta.env.VITE_SUPABASE_ANON_KEY;
@@ -39,8 +39,30 @@ export const authProvider = supabase && {
 
 // the data provider for the screens; local mode starts from today's homepage pieces
 export async function makeDataProvider() {
-  if (MODE === 'supabase') return { provider: supabaseDataProvider(supabase), persistent: true };
+  if (MODE === 'supabase') return { provider: withHistory(supabaseDataProvider(supabase)), persistent: true };
   const { storage, persistent } = safeStorage();
-  const site = await loadSiteData();
-  return { provider: localDataProvider(storage, await seedFromSite(site)), persistent };
+  const [site, past] = await Promise.all([loadSiteData(), loadPastData()]);
+  return { provider: withHistory(localDataProvider(storage, await seedFromSite(site, past))), persistent };
+}
+
+// change history: before a piece is changed or deleted, the version before is kept in piece_history,
+// so it can be put back (undo). Reordering alone (position only) is not recorded.
+export function withHistory(p) {
+  const keep = async (id, action) => {
+    try {
+      const { data } = await p.getOne({ resource: 'pieces', id });
+      await p.create({ resource: 'piece_history', variables: { piece_id: id, action, snapshot: data } });
+    } catch (e) { /* history must never stop a save */ }
+  };
+  return {
+    ...p,
+    async update(args) {
+      if (args.resource === 'pieces' && Object.keys(args.variables || {}).some(k => k !== 'position')) await keep(args.id, 'update');
+      return p.update(args);
+    },
+    async deleteOne(args) {
+      if (args.resource === 'pieces') await keep(args.id, 'delete');
+      return p.deleteOne(args);
+    },
+  };
 }
