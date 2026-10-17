@@ -6,7 +6,7 @@ words. This fails if any title has an unbroken run longer than 12 characters (th
 today, ニュースペーパーバッグ, is 11). Run before a drop goes live.
 
 Usage
-  python3 tools/check_titles.py data/current.js drops.html
+  python3 tools/check_titles.py data/current.js data/past.js
 """
 import re
 import sys
