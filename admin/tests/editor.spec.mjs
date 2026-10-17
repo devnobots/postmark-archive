@@ -5,7 +5,7 @@ const LONG = '1960年代 アメリカ空軍 USAF MA-1 フライトジャケッ�
 
 async function openFirst(page) {
   await page.goto('/admin/');
-  await page.getByTestId('piece-row').first().locator('a.piece-main').click();
+  await page.getByTestId('group-live').getByTestId('piece-row').first().locator('a.piece-main').click();
   await expect(page.locator('#f-price')).toHaveValue('13200');
 }
 

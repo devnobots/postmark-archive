@@ -5,6 +5,7 @@ import { siteDrop } from './meter.js';
 
 const FRAMES = [
   { key: 'desk', label: 'Desktop', w: 1280, h: 880, piece: true },
+  { key: 'home', label: 'Homepage', w: 1280, h: 880, piece: false },
   { key: 'phone', label: 'Phone', w: 375, h: 812, piece: true },
   { key: 'sheet', label: 'Phone list', w: 375, h: 812, piece: false },
 ];
@@ -14,8 +15,10 @@ function urlFor(f, slug, n) {
   return '/index.html?preview=edit' + (n ? '&r=' + n : '') + (f.piece && slug ? '#' + slug : '');
 }
 
-export default function Preview({ items, drop, slug, ready, visible, placeholderPhoto }) {
-  const [big, setBig] = useState('phone');
+// only: which frames to show (a whole-drop preview shows the homepage and the phone list)
+export default function Preview({ items, drop, slug, ready, visible, placeholderPhoto, only }) {
+  const SHOWN = FRAMES.filter(f => (only ? only.includes(f.key) : f.key !== 'home'));
+  const [big, setBig] = useState(SHOWN.some(f => f.key === 'phone') ? 'phone' : SHOWN[0].key);
   const [width, setWidth] = useState(0);
   const box = useRef(null);
   const frames = useRef({});
@@ -37,7 +40,7 @@ export default function Preview({ items, drop, slug, ready, visible, placeholder
     const t = setTimeout(() => {
       try { localStorage.setItem(KEY, data); } catch (e) { /* private mode: the frames show the site as it is */ }
       count.current += 1;
-      for (const f of FRAMES) {
+      for (const f of SHOWN) {
         const fr = frames.current[f.key];
         if (fr && fr.contentWindow) fr.contentWindow.location.replace(urlFor(f, slug, count.current));
       }
@@ -63,8 +66,8 @@ export default function Preview({ items, drop, slug, ready, visible, placeholder
   // phones have no scrollbar gutter; hide it so the phone frames are exactly 375px wide
   const onLoad = e => { try { e.target.contentDocument.documentElement.style.scrollbarWidth = 'none'; } catch (err) { /* ignore */ } };
 
-  const main = FRAMES.find(f => f.key === big);
-  const thumbs = FRAMES.filter(f => f.key !== big);
+  const main = SHOWN.find(f => f.key === big);
+  const thumbs = SHOWN.filter(f => f.key !== big);
   // the big frame fits the pane width, but never taller than the window
   const maxH = Math.max(300, (typeof window !== 'undefined' ? window.innerHeight : 800) - 170);
   const bigScale = width ? Math.min(width / main.w, maxH / main.h) : 0;
@@ -85,10 +88,10 @@ export default function Preview({ items, drop, slug, ready, visible, placeholder
   return (
     <section className="preview" aria-label="Preview">
       <div className="seg" role="group" aria-label="Which screen to show large">
-        {FRAMES.map(f => <button type="button" key={f.key} className={big === f.key ? 'on' : ''} aria-pressed={big === f.key} onClick={() => setBig(f.key)}>{f.label}</button>)}
+        {SHOWN.map(f => <button type="button" key={f.key} className={big === f.key ? 'on' : ''} aria-pressed={big === f.key} onClick={() => setBig(f.key)}>{f.label}</button>)}
       </div>
       <div ref={box} style={{ display: 'flex', flexWrap: 'wrap', gap: 10, justifyContent: 'center' }}>
-        {FRAMES.map(f => {
+        {SHOWN.map(f => {
           const p = placed[f.key];
           const isBig = f.key === big;
           return (

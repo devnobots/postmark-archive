@@ -9,7 +9,7 @@ const ITEMS = sb.window.SG_DATA.items;
 
 test('list shows today\'s pieces in order with prices and chips', async ({ page }) => {
   await page.goto('/admin/');
-  const rows = page.getByTestId('piece-row');
+  const rows = page.getByTestId('group-live').getByTestId('piece-row');
   await expect(rows).toHaveCount(ITEMS.length);
   for (let i = 0; i < ITEMS.length; i++) {
     const d = ITEMS[i], r = rows.nth(i);
@@ -23,7 +23,7 @@ test('list shows today\'s pieces in order with prices and chips', async ({ page 
 
 test('arrows reorder pieces within the drop', async ({ page }) => {
   await page.goto('/admin/');
-  const rows = page.getByTestId('piece-row');
+  const rows = page.getByTestId('group-live').getByTestId('piece-row');
   await expect(rows).toHaveCount(ITEMS.length);
   await rows.nth(0).getByRole('button', { name: 'Move down' }).click();
   await expect(rows.nth(0).locator('.title')).toHaveText(ITEMS[1].nameJa);

@@ -17,7 +17,7 @@ test('5: a new sock piece with 自動 off previews its own size line on the stam
 
 test('6: local-mode 公開 downloads a current.js that makes the site show the edited price', async ({ page }) => {
   await page.goto('/admin/');
-  await page.getByTestId('piece-row').first().locator('a.piece-main').click();
+  await page.getByTestId('group-live').getByTestId('piece-row').first().locator('a.piece-main').click();
   await page.locator('#f-price').fill('15400');
   await page.getByRole('button', { name: 'Save' }).click();
   await expect(page.getByTestId('save-state')).toContainText('Saved');

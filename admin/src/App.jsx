@@ -2,14 +2,16 @@
 import { useEffect, useState } from 'react';
 import { Refine } from '@refinedev/core';
 import routerProvider from '@refinedev/react-router';
-import { BrowserRouter, Routes, Route, Link } from 'react-router';
+import { BrowserRouter, Routes, Route, Link, NavLink } from 'react-router';
 import { MODE, supabase, authProvider } from './config.js';
 import PieceList from './PieceList.jsx';
 import PieceEditor from './PieceEditor.jsx';
+import DropsPage from './DropsPage.jsx';
 
 const RESOURCES = [
   { name: 'pieces', list: '/', create: '/pieces/new', edit: '/pieces/:id' },
-  { name: 'drops' },
+  { name: 'drops', list: '/drops' },
+  { name: 'piece_history' },
   { name: 'categories', meta: { idColumnName: 'code' } },
 ];
 
@@ -25,6 +27,7 @@ export default function App({ provider, persistent }) {
             <Route path="/" element={<PieceList />} />
             <Route path="/pieces/new" element={<PieceEditor key="new" />} />
             <Route path="/pieces/:id" element={<PieceEditor />} />
+            <Route path="/drops" element={<DropsPage />} />
             <Route path="*" element={<p className="empty">Page not found. <Link to="/">Back to the list</Link></p>} />
           </Routes>
         </Gate>
@@ -37,6 +40,10 @@ function Header() {
   return (
     <header className="topbar">
       <Link to="/" className="brand">STANDARD GAUGE <span>admin</span></Link>
+      <nav className="nav" aria-label="Sections">
+        <NavLink to="/" end className={({ isActive }) => (isActive ? 'on' : '')}>Pieces</NavLink>
+        <NavLink to="/drops" className={({ isActive }) => (isActive ? 'on' : '')}>Drops</NavLink>
+      </nav>
       {MODE === 'supabase' && <button className="link" onClick={() => supabase.auth.signOut()}>Sign out</button>}
     </header>
   );

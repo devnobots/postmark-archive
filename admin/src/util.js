@@ -32,6 +32,12 @@ export function today() {
   return d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0');
 }
 
+// a drop's name in the back office: Drop 12 (live) / Drop 13 (upcoming) / Drop 9 (past)
+export function dropName(d) {
+  if (!d) return 'No drop';
+  return 'Drop ' + d.no + ' (' + ({ live: 'live', draft: 'upcoming', past: 'past' }[d.status] || d.status) + ')';
+}
+
 export function yenText(n) { return n ? '¥' + Number(n).toLocaleString('en-US') : ''; }
 
 // the site's data/current.js, evaluated the same way as selfcheck.html

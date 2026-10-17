@@ -187,7 +187,7 @@ export async function cutoutBlob(img, m) {
 }
 
 // the full photo for the large view and the loupe: at most 2400px on its long side
-export async function fullBlob(img) {
-  const c = scaled(img, FULL_SIDE);
+export async function fullBlob(img, maxSide = FULL_SIDE) {
+  const c = scaled(img, maxSide);
   return { blob: await toBlob(c, 'image/jpeg', 0.86), ar: c.height / c.width, canvas: c };
 }
