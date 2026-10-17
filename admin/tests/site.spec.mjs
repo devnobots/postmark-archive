@@ -24,3 +24,20 @@ for (const s of SIZES) {
     await expect(page).toHaveScreenshot(`site-${s.name}.png`, { animations: 'disabled', maxDiffPixels: 0 });
   });
 }
+
+// the past-drops page (phase 3 moves its data to data/past.js; it must look exactly the same)
+const DROPS = [
+  { name: 'drops-desktop', width: 1280, height: 880, hash: '' },
+  { name: 'drops-phone', width: 375, height: 812, hash: '' },
+  { name: 'drops-sold-desktop', width: 1280, height: 880, hash: '#no9-1960s-usaf-ma-1-flight-jacket' },
+  { name: 'drops-sold-phone', width: 375, height: 812, hash: '#no11-1970s-ringer-tee-with-concho-trim' },
+];
+for (const s of DROPS) {
+  test(`past drops ${s.name} looks the same`, async ({ page }) => {
+    await page.setViewportSize({ width: s.width, height: s.height });
+    await page.goto('/drops.html' + s.hash);
+    await page.evaluate(() => document.fonts.ready);
+    await page.waitForTimeout(1500);
+    await expect(page).toHaveScreenshot(`${s.name}.png`, { animations: 'disabled', fullPage: !s.hash, maxDiffPixels: 0 });
+  });
+}
