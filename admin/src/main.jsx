@@ -19,4 +19,4 @@ for (const [rel, href, cross] of [
 const root = createRoot(document.getElementById('root'));
 makeDataProvider()
   .then(({ provider, persistent }) => root.render(<App provider={provider} persistent={persistent} />))
-  .catch(e => root.render(<p className="fatal">読み込めませんでした：{String(e && e.message || e)}</p>));
+  .catch(e => root.render(<p className="fatal">Could not load: {String(e && e.message || e)}</p>));

@@ -17,7 +17,14 @@ export const INKS = [
   { name: 'sage', hex: '#A9B79A' }, { name: 'lilac', hex: '#C9B3D6' }, { name: 'cream', hex: '#EFE3C8' },
 ];
 
-export const STATUS_LABEL = { draft: '下書き', ready: '完成', sold: '売約済' };
+export const STATUS_LABEL = { draft: 'Draft', ready: 'Ready', sold: 'Sold' };
+
+// the back office is run in English; categories and measurement names keep their Japanese (shown to shoppers)
+export const CATEGORY_EN = { top: 'Tops / T-shirts', jacket: 'Jacket', knit: 'Knitwear', pants: 'Pants', bag: 'Bag', hat: 'Hat',
+  socks: 'Socks', scarf: 'Scarf / neckwear', other: 'Other' };
+export const MEAS_EN = { 着丈: 'length', 身幅: 'chest width', 肩幅: 'shoulder', 袖丈: 'sleeve', ウエスト: 'waist', 股下: 'inseam',
+  総丈: 'total length', わたり: 'thigh', 裾幅: 'hem', 幅: 'width', 高さ: 'height', マチ: 'depth', ショルダー: 'strap',
+  頭囲: 'head', つば: 'brim', 対応サイズ: 'fits sizes', 全長: 'total length' };
 
 // today in the browser's time zone, YYYY-MM-DD
 export function today() {
@@ -37,15 +44,15 @@ export async function loadSiteData() {
 // what a 完成 piece still needs (the fit check is separate); empty list = complete
 export function missingFields(p) {
   const miss = [];
-  if (!String(p.name_ja || '').trim()) miss.push('日本語タイトル');
-  if (!String(p.name_en || '').trim()) miss.push('英語タイトル');
-  if (!p.category) miss.push('カテゴリ');
-  if (!(p.measurements || []).some(r => String(r[1] || '').trim())) miss.push('寸法');
-  if (!p.price_jpy) miss.push('価格');
-  if (!p.grade) miss.push('状態ランク');
-  if (!String(p.found_city || '').trim()) miss.push('発見地（町）');
-  if (!p.found_state) miss.push('発見地（州）');
-  if (!p.found_on) miss.push('発見日');
+  if (!String(p.name_ja || '').trim()) miss.push('Japanese title');
+  if (!String(p.name_en || '').trim()) miss.push('English title');
+  if (!p.category) miss.push('category');
+  if (!(p.measurements || []).some(r => String(r[1] || '').trim())) miss.push('measurements');
+  if (!p.price_jpy) miss.push('price');
+  if (!p.grade) miss.push('condition grade');
+  if (!String(p.found_city || '').trim()) miss.push('city');
+  if (!p.found_state) miss.push('state');
+  if (!p.found_on) miss.push('date found');
   return miss;
 }
 

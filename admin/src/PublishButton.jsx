@@ -12,14 +12,14 @@ export default function PublishButton({ live, pieces, meter }) {
   const [busy, setBusy] = useState(false);
   const onSite = pieces.filter(p => p.status === 'ready' || p.status === 'sold');
   if (!live || !onSite.length) {
-    return <><button className="btn" disabled>サイトに公開</button><span className="note">完成したピースがありません</span></>;
+    return <><button className="btn" disabled>Publish to site</button><span className="note">No Ready pieces yet</span></>;
   }
 
   const publish = async () => {
     setMsg(null);
-    if (!meter) return setMsg({ text: 'タイトルを測っています。少し待ってからもう一度押してください' });
+    if (!meter) return setMsg({ text: 'Still measuring the titles. Wait a moment, then press again.' });
     const bad = onSite.map(p => {
-      const problems = [...missingFields(p).map(f => f + 'がありません'), ...checkCached(meter, titlesOf(p)).problems];
+      const problems = [...missingFields(p).map(f => f + ' missing'), ...checkCached(meter, titlesOf(p)).problems];
       return problems.length ? { p, problems } : null;
     }).filter(Boolean);
     if (bad.length) return setMsg({ bad });
@@ -32,26 +32,26 @@ export default function PublishButton({ live, pieces, meter }) {
         a.download = 'current.js';
         document.body.appendChild(a); a.click(); a.remove();
         setTimeout(() => URL.revokeObjectURL(a.href), 1000);
-        return setMsg({ text: 'この current.js で data/current.js を置き換えてコミットすると公開されます' });
+        return setMsg({ text: 'Replace data/current.js with this current.js and commit it to publish' });
       }
       const r = await fetch('/api/publish', { method: 'POST', headers: { ...(await authHeader()) } });
       const body = await r.json().catch(() => ({}));
-      if (r.ok && body.ok) setMsg({ text: '公開しました。約1分でサイトに反映されます' });
-      else if (body.error === 'no-hook') setMsg({ text: '公開の設定がまだです（最後の手順）' });
-      else if (body.error === 'sign-in') setMsg({ text: 'もう一度ログインしてください' });
-      else setMsg({ text: '公開できませんでした' });
+      if (r.ok && body.ok) setMsg({ text: 'Published. The site updates in about a minute.' });
+      else if (body.error === 'no-hook') setMsg({ text: 'Publishing is not set up yet (the last setup step)' });
+      else if (body.error === 'sign-in') setMsg({ text: 'Please sign in again' });
+      else setMsg({ text: 'Could not publish' });
     } finally { setBusy(false); }
   };
 
   return (
     <>
-      <button className="btn" onClick={publish} disabled={busy}>サイトに公開</button>
+      <button className="btn" onClick={publish} disabled={busy}>Publish to site</button>
       {msg && (
         <div className="publish-msg" data-testid="publish-msg" style={{ flexBasis: '100%' }}>
           {msg.text}
           {msg.bad && <>
-            <span className="err">公開できません。次のピースを直してください：</span>
-            <ul>{msg.bad.map(({ p, problems }) => <li key={p.id}><Link to={'/pieces/' + p.id}>{p.cap_ja || p.name_ja || '（無題）'}</Link>：{problems.join('・')}</li>)}</ul>
+            <span className="err">Not published. Fix these pieces first:</span>
+            <ul>{msg.bad.map(({ p, problems }) => <li key={p.id}><Link to={'/pieces/' + p.id}>{p.cap_ja || p.name_ja || '(untitled)'}</Link>: {problems.join('; ')}</li>)}</ul>
           </>}
         </div>
       )}

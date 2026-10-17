@@ -7,7 +7,7 @@ test('5: a new sock piece with 自動 off previews its own size line on the stam
   await page.locator('#f-cat').selectOption('socks');
   await page.locator('#f-ja').fill('80年代 テスト ソックス');
   await page.locator('#f-en').fill('1980s Test Socks');
-  await page.getByRole('button', { name: '自動' }).click();               // 自動 off
+  await page.getByRole('button', { name: 'Auto' }).click();               // 自動 off
   await page.locator('#f-size').fill('フリー · 23–27 cm');
   const phone = page.frameLocator('iframe[data-frame="phone"]');
   await expect(phone.locator('.m-view .cap-size').first()).toHaveText('フリー · 23–27 cm', { timeout: 15000 });
@@ -19,13 +19,13 @@ test('6: local-mode 公開 downloads a current.js that makes the site show the e
   await page.goto('/admin/');
   await page.getByTestId('piece-row').first().locator('a.piece-main').click();
   await page.locator('#f-price').fill('15400');
-  await page.getByRole('button', { name: '保存' }).click();
-  await expect(page.getByTestId('save-state')).toContainText('保存しました');
-  await page.getByRole('link', { name: '一覧' }).click();
+  await page.getByRole('button', { name: 'Save' }).click();
+  await expect(page.getByTestId('save-state')).toContainText('Saved');
+  await page.getByRole('link', { name: 'List', exact: true }).click();
   await expect(page.locator('main.list')).toHaveAttribute('data-meter', 'ready', { timeout: 15000 });
-  const [dl] = await Promise.all([page.waitForEvent('download'), page.getByRole('button', { name: 'サイトに公開' }).click()]);
+  const [dl] = await Promise.all([page.waitForEvent('download'), page.getByRole('button', { name: 'Publish to site' }).click()]);
   expect(dl.suggestedFilename()).toBe('current.js');
-  await expect(page.getByTestId('publish-msg')).toContainText('data/current.js を置き換えて');
+  await expect(page.getByTestId('publish-msg')).toContainText('Replace data/current.js');
   const js = fs.readFileSync(await dl.path(), 'utf8');
   expect(js).toContain('window.SG_DATA');
   await page.route('**/data/current.js', r => r.fulfill({ status: 200, contentType: 'text/javascript', body: js }));
@@ -41,7 +41,7 @@ test('7: at 375x812 the editor has no sideways scroll and every control is at le
     await expect(page.locator('#f-ja')).toBeVisible();
     await page.locator('#f-cat').selectOption('jacket');
     await page.waitForTimeout(800);
-    for (const tab of ['入力', 'プレビュー']) {
+    for (const tab of ['Edit', 'Preview']) {
       await page.getByRole('tab', { name: tab }).click();
       await page.waitForTimeout(600);
       const wide = await page.evaluate(() => document.documentElement.scrollWidth);

@@ -136,3 +136,7 @@ In `admin/tests/screenshots/` (retake with `cd admin && node tests/take-screensh
 - `editor-375-input.png`, `editor-375-preview.png`, `editor-1280.png`
 - `editor-long-title.png`: the long test title from test 3, with its problems
 - `editor-title-ideas.png`: the stubbed title ideas from test 4 (only the ones that fit)
+
+## Update 2026-10-17: the back office is in English
+
+The person running the back office reads English, so all of the back office's own text is now English (buttons, labels, status chips Draft / Ready / Sold, "Drop 12", messages, the fit line and its problems, sign-in). What shoppers see stays Japanese: the public site, and the content typed into the back office (Japanese title, stamp label, measurement names, condition notes). Category names show in English; each measurement name shows its English meaning beside it (着丈 · length). This also changed the problem messages in the tested `admin/src/lib/measure.mjs` (wording only) and the `<html lang>`/title of `admin/index.html`. All 13 Playwright tests, the three checks and the self-check pass; screenshots in `admin/tests/screenshots/` were retaken.

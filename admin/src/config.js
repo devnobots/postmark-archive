@@ -23,7 +23,7 @@ export async function authHeader() {
 export const authProvider = supabase && {
   login: async ({ email, password }) => {
     const { error } = await supabase.auth.signInWithPassword({ email, password });
-    return error ? { success: false, error: { name: 'ログインできませんでした', message: error.message } } : { success: true, redirectTo: '/' };
+    return error ? { success: false, error: { name: 'Sign-in failed', message: error.message } } : { success: true, redirectTo: '/' };
   },
   logout: async () => { await supabase.auth.signOut(); return { success: true, redirectTo: '/' }; },
   check: async () => {

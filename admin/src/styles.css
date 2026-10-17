@@ -130,3 +130,4 @@ label { display: block; font-size: 13px; color: var(--muted); }
   .editor.wide .form { border-right: 1px solid var(--rule); }
   .editor.wide .preview { position: sticky; top: 0; padding-top: 14px; }
 }
+.meas-row .lbl small { color: var(--muted); font-size: 12px; }

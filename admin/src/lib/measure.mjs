@@ -80,12 +80,12 @@ export class TitleMeter {
     // the stamp label is the same 156px stamp on the desktop fan and the phone sheet
     const longest = String(nameJa).split(' ').reduce((m, w) => Math.max(m, [...w].length), 0);
     detail.longestRun = longest;
-    if (longest > LIMITS.maxRun) problems.push('言葉の間にスペースを入れてください（' + longest + '文字続いています）');
-    if (detail.p320TitleLines > LIMITS.phoneTitleLines) problems.push('スマホ(320px)でタイトルが' + detail.p320TitleLines + '行になります');
-    else if (detail.p375TitleLines > LIMITS.phoneTitleLines) problems.push('スマホ(375px)でタイトルが' + detail.p375TitleLines + '行になります');
-    if (detail.deskTitleLines > LIMITS.desktopTitleLines) problems.push('デスクトップでタイトルが' + detail.deskTitleLines + '行になります');
-    if (detail.p375EnLines > LIMITS.phoneEnLines) problems.push('英語タイトルがスマホで' + detail.p375EnLines + '行になります');
-    if (detail.labelCut) problems.push('切手ラベルが入りきりません（…で切れます）');
+    if (longest > LIMITS.maxRun) problems.push('Add a space between Japanese words (' + longest + ' characters in a row)');
+    if (detail.p320TitleLines > LIMITS.phoneTitleLines) problems.push('Japanese title takes ' + detail.p320TitleLines + ' lines on a small phone (320px)');
+    else if (detail.p375TitleLines > LIMITS.phoneTitleLines) problems.push('Japanese title takes ' + detail.p375TitleLines + ' lines on a phone (375px)');
+    if (detail.deskTitleLines > LIMITS.desktopTitleLines) problems.push('Japanese title takes ' + detail.deskTitleLines + ' lines on desktop');
+    if (detail.p375EnLines > LIMITS.phoneEnLines) problems.push('English title takes ' + detail.p375EnLines + ' lines on a phone');
+    if (detail.labelCut) problems.push('Stamp label does not fit (it gets cut off with …)');
     const parts = {
       ja: longest <= LIMITS.maxRun && detail.p320TitleLines <= LIMITS.phoneTitleLines &&
           detail.p375TitleLines <= LIMITS.phoneTitleLines && detail.deskTitleLines <= LIMITS.desktopTitleLines,

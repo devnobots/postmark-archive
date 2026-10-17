@@ -21,7 +21,7 @@ for (const [w, h, s] of [[375, 812, '375'], [1280, 880, '1280']]) {
   await p.waitForTimeout(2500);
   if (s === '375') {
     await shot(p, 'editor-375-input');
-    await p.getByRole('tab', { name: 'プレビュー' }).click();
+    await p.getByRole('tab', { name: 'Preview' }).click();
     await p.waitForTimeout(2500);
     await shot(p, 'editor-375-preview');
   } else {
@@ -32,7 +32,7 @@ for (const [w, h, s] of [[375, 812, '375'], [1280, 880, '1280']]) {
     await shot(p, 'editor-long-title');
     await p.route('**/api/suggest-titles', r => r.fulfill({ status: 200, contentType: 'application/json',
       body: JSON.stringify({ ja: [LONG, '60年代 MA-1 フライトジャケット', '60年代 USAF MA-1 フライトジャケット'], en: ['1960s MA-1 Flight Jacket'], cap: ['MA-1'] }) }));
-    await p.getByRole('button', { name: '短い案を出す' }).click();
+    await p.getByRole('button', { name: 'Suggest shorter titles' }).click();
     await p.waitForSelector('[data-testid="ideas"]');
     await shot(p, 'editor-title-ideas');
   }

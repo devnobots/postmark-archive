@@ -40,23 +40,23 @@ export default function Fit({ meter, values, category, onResult, setField }) {
         body: JSON.stringify({ nameJa, nameEn, capJa, problems: res ? res.problems : [], facts: { category, era } }),
       });
       const body = await r.json().catch(() => ({}));
-      if (body.error === 'no-key') return setIdeas({ message: 'タイトル案は Anthropic のキー設定後に使えます（最後の手順）' });
-      if (body.error === 'sign-in') return setIdeas({ message: 'もう一度ログインしてください' });
-      if (!r.ok || body.error) return setIdeas({ message: 'タイトル案を取得できませんでした' });
+      if (body.error === 'no-key') return setIdeas({ message: 'Title ideas work once the Anthropic key is set up (the last setup step)' });
+      if (body.error === 'sign-in') return setIdeas({ message: 'Please sign in again' });
+      if (!r.ok || body.error) return setIdeas({ message: 'Could not get title ideas' });
       // measure every idea in the real site; each kind is judged only by its own part of the result
       const byLen = (a, b) => [...a].length - [...b].length;
       const ja = (body.ja || []).filter(t => meter.check({ nameJa: t, nameEn, capJa }).parts.ja).sort(byLen);
       const en = (body.en || []).filter(t => meter.check({ nameJa, nameEn: t, capJa }).parts.en).sort(byLen);
       const cap = (body.cap || []).filter(t => meter.check({ nameJa, nameEn, capJa: t }).parts.cap).sort(byLen);
       meter.check({ nameJa, nameEn, capJa });     // put the current texts back in the meter
-      if (!ja.length && !en.length && !cap.length) return setIdeas({ message: '収まる案がありませんでした。もう一度試すか、手で短くしてください' });
+      if (!ja.length && !en.length && !cap.length) return setIdeas({ message: 'None of the ideas fit. Try again, or shorten the title by hand.' });
       setIdeas({ ja, en, cap });
     } catch (e) {
-      setIdeas({ message: 'タイトル案を取得できませんでした' });
+      setIdeas({ message: 'Could not get title ideas' });
     } finally { setAsking(false); }
   };
 
-  if (!ready) return meter === 'none' ? null : <div className="fit">測っています…</div>;
+  if (!ready) return meter === 'none' ? null : <div className="fit">Measuring…</div>;
   if (!res) return null;
   const d = res.detail;
   const phone = Math.max(d.p320TitleLines || 0, d.p375TitleLines || 0);
@@ -64,29 +64,29 @@ export default function Fit({ meter, values, category, onResult, setField }) {
   return (
     <div className="fit" data-testid="fit">
       <div data-testid="fit-line">
-        <span className={phone > LIMITS.phoneTitleLines ? 'bad' : ''}>スマホ {phone}行{mark(phone <= LIMITS.phoneTitleLines)}</span>{' · '}
-        <span className={d.deskTitleLines > LIMITS.desktopTitleLines ? 'bad' : ''}>デスクトップ {d.deskTitleLines}行{mark(d.deskTitleLines <= LIMITS.desktopTitleLines)}</span>{' · '}
-        <span className={d.p375EnLines > LIMITS.phoneEnLines ? 'bad' : ''}>英語 {d.p375EnLines}行{mark(d.p375EnLines <= LIMITS.phoneEnLines)}</span>{' · '}
-        <span className={d.labelCut ? 'bad' : ''}>ラベル{mark(!d.labelCut)}</span>
+        <span className={phone > LIMITS.phoneTitleLines ? 'bad' : ''}>Phone {phone} {phone === 1 ? 'line' : 'lines'}{mark(phone <= LIMITS.phoneTitleLines)}</span>{' · '}
+        <span className={d.deskTitleLines > LIMITS.desktopTitleLines ? 'bad' : ''}>Desktop {d.deskTitleLines} {d.deskTitleLines === 1 ? 'line' : 'lines'}{mark(d.deskTitleLines <= LIMITS.desktopTitleLines)}</span>{' · '}
+        <span className={d.p375EnLines > LIMITS.phoneEnLines ? 'bad' : ''}>English {d.p375EnLines} {d.p375EnLines === 1 ? 'line' : 'lines'}{mark(d.p375EnLines <= LIMITS.phoneEnLines)}</span>{' · '}
+        <span className={d.labelCut ? 'bad' : ''}>Label{mark(!d.labelCut)}</span>
       </div>
       {res.problems.length > 0 && <ul data-testid="fit-problems">{res.problems.map(p => <li key={p}>{p}</li>)}</ul>}
       {labelIdea.current && (
-        <div className="idea"><span>ラベル案：{labelIdea.current}</span>
-          <button type="button" className="btn small" onClick={() => use('cap_ja', labelIdea.current)}>使う</button></div>
+        <div className="idea"><span>Label idea: {labelIdea.current}</span>
+          <button type="button" className="btn small" onClick={() => use('cap_ja', labelIdea.current)}>Use</button></div>
       )}
       {res.problems.length > 0
-        ? <button type="button" className="btn small" style={{ marginTop: 6 }} onClick={ask} disabled={asking}>{asking ? '考えています…' : '短い案を出す'}</button>
-        : <button type="button" className="link" onClick={ask} disabled={asking}>{asking ? '考えています…' : '短い案を出す'}</button>}
+        ? <button type="button" className="btn small" style={{ marginTop: 6 }} onClick={ask} disabled={asking}>{asking ? 'Thinking…' : 'Suggest shorter titles'}</button>
+        : <button type="button" className="link" onClick={ask} disabled={asking}>{asking ? 'Thinking…' : 'Suggest shorter titles'}</button>}
       {ideas && ideas.message && <p className="note" data-testid="ideas-message">{ideas.message}</p>}
       {ideas && !ideas.message && (
         <div className="ideas" data-testid="ideas">
-          {[['ja', 'name_ja', '日本語タイトル'], ['en', 'name_en', '英語タイトル'], ['cap', 'cap_ja', '切手ラベル']].map(([k, field, head]) =>
+          {[['ja', 'name_ja', 'Japanese title'], ['en', 'name_en', 'English title'], ['cap', 'cap_ja', 'Stamp label']].map(([k, field, head]) =>
             ideas[k].length > 0 && (
               <div key={k}>
                 <div className="idea-head">{head}</div>
                 {ideas[k].map(t => (
                   <div className="idea" key={t} data-testid={'idea-' + k}><span>{t}</span>
-                    <button type="button" className="btn small" onClick={() => use(field, t)}>使う</button></div>
+                    <button type="button" className="btn small" onClick={() => use(field, t)}>Use</button></div>
                 ))}
               </div>
             ))}

@@ -25,7 +25,7 @@ export default function App({ provider, persistent }) {
             <Route path="/" element={<PieceList />} />
             <Route path="/pieces/new" element={<PieceEditor key="new" />} />
             <Route path="/pieces/:id" element={<PieceEditor />} />
-            <Route path="*" element={<p className="empty">ページがありません。<Link to="/">一覧へ</Link></p>} />
+            <Route path="*" element={<p className="empty">Page not found. <Link to="/">Back to the list</Link></p>} />
           </Routes>
         </Gate>
       </Refine>
@@ -36,20 +36,20 @@ export default function App({ provider, persistent }) {
 function Header() {
   return (
     <header className="topbar">
-      <Link to="/" className="brand">STANDARD GAUGE <span>管理</span></Link>
-      {MODE === 'supabase' && <button className="link" onClick={() => supabase.auth.signOut()}>ログアウト</button>}
+      <Link to="/" className="brand">STANDARD GAUGE <span>admin</span></Link>
+      {MODE === 'supabase' && <button className="link" onClick={() => supabase.auth.signOut()}>Sign out</button>}
     </header>
   );
 }
 
 function LocalBanner({ provider, persistent }) {
-  if (!persistent) return <div className="banner warn">このブラウザでは保存できません（ページを閉じると消えます）</div>;
+  if (!persistent) return <div className="banner warn">This browser cannot save (changes are lost when you close the page)</div>;
   return (
     <div className="banner">
-      ローカルモード：このブラウザにだけ保存されます
+      Local mode: saved in this browser only
       <button className="link" onClick={() => {
-        if (window.confirm('このブラウザの変更をすべて消して、サイトの今の内容に戻しますか？')) { provider.reset(); window.location.reload(); }
-      }}>最初に戻す</button>
+        if (window.confirm('Discard every change in this browser and start again from what is on the site now?')) { provider.reset(); window.location.reload(); }
+      }}>Start over</button>
     </div>
   );
 }
@@ -70,11 +70,11 @@ function Gate({ children }) {
     return () => sub.subscription.unsubscribe();
   }, []);
   if (state === 'ok') return children;
-  if (state === 'checking') return <p className="empty">確認しています…</p>;
+  if (state === 'checking') return <p className="empty">Checking…</p>;
   if (state === 'denied') return (
     <div className="signin">
-      <p>このアカウントには編集権限がありません</p>
-      <button className="btn" onClick={() => supabase.auth.signOut()}>ログアウト</button>
+      <p>This account cannot edit the shop.</p>
+      <button className="btn" onClick={() => supabase.auth.signOut()}>Sign out</button>
     </div>
   );
   return <SignIn />;
@@ -90,15 +90,15 @@ function SignIn() {
     setBusy(true); setError('');
     const r = await authProvider.login({ email, password });
     setBusy(false);
-    if (!r.success) setError('メールアドレスかパスワードが違います');
+    if (!r.success) setError('Wrong email or password');
   };
   return (
     <form className="signin" onSubmit={submit}>
-      <div className="brand">STANDARD GAUGE <span>管理</span></div>
-      <label>メールアドレス<input type="email" autoComplete="username" value={email} onChange={e => setEmail(e.target.value)} required /></label>
-      <label>パスワード<input type="password" autoComplete="current-password" value={password} onChange={e => setPassword(e.target.value)} required /></label>
+      <div className="brand">STANDARD GAUGE <span>admin</span></div>
+      <label>Email<input type="email" autoComplete="username" value={email} onChange={e => setEmail(e.target.value)} required /></label>
+      <label>Password<input type="password" autoComplete="current-password" value={password} onChange={e => setPassword(e.target.value)} required /></label>
       {error && <p className="err">{error}</p>}
-      <button className="btn primary" disabled={busy}>ログイン</button>
+      <button className="btn primary" disabled={busy}>Sign in</button>
     </form>
   );
 }

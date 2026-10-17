@@ -5,7 +5,7 @@ import { useList, useOne, useCreate, useUpdate, useInvalidate } from '@refinedev
 import { useForm, useWatch, useFieldArray } from 'react-hook-form';
 import { useNavigate, useParams, Link } from 'react-router';
 import { sizeLine, toSiteItem } from './lib/site-data.mjs';
-import { STATES, INKS, STATUS_LABEL, today, yenText, missingFields, slug, loadSiteData } from './util.js';
+import { STATES, INKS, STATUS_LABEL, CATEGORY_EN, MEAS_EN, today, yenText, missingFields, slug, loadSiteData } from './util.js';
 import { openMeter } from './meter.js';
 import Preview from './Preview.jsx';
 import Fit from './Fit.jsx';
@@ -23,8 +23,8 @@ export default function PieceEditor() {
   useEffect(() => { loadSiteData().then(setSite).catch(() => setSite({ items: [] })); }, []);
 
   const loading = pieces.query.isLoading || drops.query.isLoading || cats.query.isLoading || (!isNew && one.query.isLoading) || !site;
-  if (loading) return <p className="empty">読み込んでいます…</p>;
-  if (!isNew && !one.result) return <p className="empty">このピースは見つかりません。<Link to="/">一覧へ</Link></p>;
+  if (loading) return <p className="empty">Loading…</p>;
+  if (!isNew && !one.result) return <p className="empty">This piece was not found. <Link to="/">Back to the list</Link></p>;
   const live = (drops.result.data || []).find(d => d.status === 'live');
   return <EditorForm key={id || 'new'} piece={isNew ? null : one.result} pieces={pieces.result.data || []}
     live={live} categories={cats.result.data || []} site={site} />;
@@ -118,10 +118,10 @@ function EditorForm({ piece, pieces, live, categories, site }) {
   const onSave = useCallback(async values => {
     const data = toRow(values);
     if (data.status === 'ready' && !(missingFields(data).length === 0 && fitOk)) {
-      setMsg({ bad: true, text: '完成にするには、足りない項目を入れてください' });
+      setMsg({ bad: true, text: 'To mark it Ready, fill in what is missing' });
       return;
     }
-    if (String(values.price || '').trim() && !data.price_jpy) { setMsg({ bad: true, text: '価格は1円以上の数字で入れてください' }); return; }
+    if (String(values.price || '').trim() && !data.price_jpy) { setMsg({ bad: true, text: 'Enter the price as a whole number of yen (1 or more)' }); return; }
     setSaving(true); setMsg(null);
     try {
       if (piece) {
@@ -135,9 +135,9 @@ function EditorForm({ piece, pieces, live, categories, site }) {
         navigate('/pieces/' + r.data.id, { replace: true });
       }
       await invalidate({ resource: 'pieces', invalidates: ['list', 'detail'] });
-      setMsg({ text: '保存しました' });
+      setMsg({ text: 'Saved' });
     } catch (e) {
-      setMsg({ bad: true, text: '保存できませんでした：' + (e && e.message || e) });
+      setMsg({ bad: true, text: 'Could not save: ' + (e && e.message || e) });
     } finally { setSaving(false); }
   }, [piece, pieces, live, fitOk]);   // eslint-disable-line react-hooks/exhaustive-deps
   const submit = handleSubmit(onSave);
@@ -150,7 +150,7 @@ function EditorForm({ piece, pieces, live, categories, site }) {
     const click = e => {
       const a = e.target.closest && e.target.closest('a[href]');
       if (!dirty || !a || a.target === '_blank' || a.closest('.preview')) return;
-      if (!window.confirm('保存していない変更があります。このページを離れますか？')) { e.preventDefault(); e.stopPropagation(); }
+      if (!window.confirm('You have unsaved changes. Leave this page anyway?')) { e.preventDefault(); e.stopPropagation(); }
     };
     window.addEventListener('keydown', key);
     window.addEventListener('beforeunload', leave);
@@ -189,60 +189,60 @@ function EditorForm({ piece, pieces, live, categories, site }) {
   const formPane = (
     <form className="form" onSubmit={e => { e.preventDefault(); submit(); }} noValidate>
       <div className="field">
-        <label htmlFor="f-cat">カテゴリ</label>
+        <label htmlFor="f-cat">Category</label>
         <select id="f-cat" {...register('category')}>
-          <option value="">選んでください</option>
-          {categories.map(c => <option key={c.code} value={c.code}>{c.label_ja}</option>)}
+          <option value="">Choose…</option>
+          {categories.map(c => <option key={c.code} value={c.code}>{CATEGORY_EN[c.code] || c.label_ja}</option>)}
         </select>
       </div>
 
       <div className="field">
-        <label htmlFor="f-ja">日本語タイトル</label>
+        <label htmlFor="f-ja">Japanese title (shown to shoppers)</label>
         <input id="f-ja" {...register('name_ja')} autoComplete="off" />
         <Fit meter={meter} values={{ nameJa: v.name_ja, nameEn: v.name_en, capJa: v.cap_ja }} category={v.category}
           onResult={setFit} setField={(name, val) => setValue(name, val, { shouldDirty: true })} />
       </div>
 
       <div className="field">
-        <label htmlFor="f-en">英語タイトル</label>
+        <label htmlFor="f-en">English title (also makes the page address)</label>
         <input id="f-en" {...register('name_en')} autoComplete="off" />
-        <div className="slug">{mySlug ? 'サイトのアドレス：#' + mySlug : 'アドレスは英語タイトルから作られます'}</div>
-        {dupe && <p className="err">同じアドレスのピースがあります</p>}
+        <div className="slug">{mySlug ? 'Address on the site: #' + mySlug : 'The address is made from the English title'}</div>
+        {dupe && <p className="err">Another piece already has this address</p>}
       </div>
 
       <div className="field">
-        <label htmlFor="f-cap">切手ラベル（空なら日本語タイトル）</label>
+        <label htmlFor="f-cap">Stamp label, Japanese (empty = the Japanese title)</label>
         <input id="f-cap" {...register('cap_ja')} placeholder={lastWord} autoComplete="off" />
       </div>
 
       <div className="field">
-        <h3>寸法</h3>
+        <h3>Measurements</h3>
         {meas.fields.map((f, i) => (
           <div className="meas-row" key={f.id}>
-            {f.custom ? <input aria-label="寸法の名前" {...register(`meas.${i}.label`)} placeholder="名前" />
-              : <span className="lbl">{f.label}</span>}
+            {f.custom ? <input aria-label="Measurement name (Japanese)" {...register(`meas.${i}.label`)} placeholder="Name (Japanese)" />
+              : <span className="lbl">{f.label}{MEAS_EN[f.label] && <small> · {MEAS_EN[f.label]}</small>}</span>}
             <span className="unit">
-              <input aria-label={(v.meas && v.meas[i] && v.meas[i].label) || '寸法'} {...register(`meas.${i}.value`)}
+              <input aria-label={(v.meas && v.meas[i] && v.meas[i].label) || 'Measurement'} {...register(`meas.${i}.value`)}
                 inputMode={FREE_TEXT.includes(f.label) ? 'text' : 'decimal'} autoComplete="off" />
               {!FREE_TEXT.includes(f.label) && <span>cm</span>}
             </span>
-            <button type="button" className="x" aria-label="この寸法を消す" onClick={() => meas.remove(i)}>×</button>
+            <button type="button" className="x" aria-label="Remove this measurement" onClick={() => meas.remove(i)}>×</button>
           </div>
         ))}
-        <button type="button" className="btn small" onClick={() => meas.append({ label: '', value: '', custom: true })}>＋ 寸法を追加</button>
+        <button type="button" className="btn small" onClick={() => meas.append({ label: '', value: '', custom: true })}>+ Add a measurement</button>
       </div>
 
       <div className="field">
-        <label htmlFor="f-size">サイズ表記</label>
+        <label htmlFor="f-size">Size line on the stamp</label>
         <div className="inline">
           <input id="f-size" {...register('size_line')} readOnly={v.size_auto} />
           <button type="button" className={'btn small auto' + (v.size_auto ? ' on' : '')} aria-pressed={!!v.size_auto}
-            onClick={() => setValue('size_auto', !v.size_auto, { shouldDirty: true })}>自動</button>
+            onClick={() => setValue('size_auto', !v.size_auto, { shouldDirty: true })}>Auto</button>
         </div>
       </div>
 
       <div className="field">
-        <label htmlFor="f-price">価格（円）</label>
+        <label htmlFor="f-price">Price (yen)</label>
         <div className="inline">
           <input id="f-price" {...register('price', { onChange: e => setValue('price', e.target.value.replace(/[^0-9]/g, '')) })}
             inputMode="numeric" autoComplete="off" />
@@ -251,28 +251,28 @@ function EditorForm({ piece, pieces, live, categories, site }) {
       </div>
 
       <div className="field">
-        <h3>状態ランク</h3>
-        <div className="grades" role="group" aria-label="状態ランク">
+        <h3>Condition grade</h3>
+        <div className="grades" role="group" aria-label="Condition grade">
           {['A', 'B', 'C'].map(g => <button type="button" key={g} className={v.grade === g ? 'on' : ''} aria-pressed={v.grade === g}
             onClick={() => setValue('grade', g, { shouldDirty: true })}>{g}</button>)}
         </div>
-        <input aria-label="状態メモ" {...register('grade_note')} placeholder="例：袖リブにほつれ" autoComplete="off" />
+        <input aria-label="Condition note (Japanese)" {...register('grade_note')} placeholder="Condition note in Japanese, e.g. 袖リブにほつれ" autoComplete="off" />
       </div>
 
       <div className="field">
-        <h3>発見地</h3>
+        <h3>Where and when it was found</h3>
         <div className="row3">
-          <input aria-label="町" {...register('found_city')} placeholder="TUCSON" style={{ textTransform: 'uppercase' }} autoComplete="off" />
-          <select aria-label="州" {...register('found_state')}>
-            <option value="">州</option>
+          <input aria-label="City" {...register('found_city')} placeholder="TUCSON" style={{ textTransform: 'uppercase' }} autoComplete="off" />
+          <select aria-label="State" {...register('found_state')}>
+            <option value="">State</option>
             {STATES.map(s => <option key={s} value={s}>{s}</option>)}
           </select>
         </div>
-        <input aria-label="発見日" type="date" {...register('found_on')} style={{ marginTop: 8 }} />
+        <input aria-label="Date found" type="date" {...register('found_on')} style={{ marginTop: 8 }} />
       </div>
 
       <div className="field">
-        <h3>切手の色</h3>
+        <h3>Stamp color</h3>
         <div className="inks">
           {INKS.map(k => <button type="button" key={k.hex} title={k.name} aria-label={k.name} className={v.bg === k.hex ? 'on' : ''}
             style={{ background: k.hex }} onClick={() => { setValue('bg', k.hex, { shouldDirty: true }); setValue('ink', k.ink || null, { shouldDirty: true }); }} />)}
@@ -280,7 +280,7 @@ function EditorForm({ piece, pieces, live, categories, site }) {
       </div>
 
       <div className="field">
-        <h3>写真（今サイトにある写真から選ぶ）</h3>
+        <h3>Photos (pick from the photos already on the site, in order)</h3>
         <div className="photos">
           {photoChoices.map(vw => {
             const n = (v.views || []).findIndex(x => x.img === vw.img);
@@ -288,13 +288,13 @@ function EditorForm({ piece, pieces, live, categories, site }) {
               <img src={'/' + vw.img} alt="" loading="lazy" />{n >= 0 && <b>{n + 1}</b>}</button>;
           })}
         </div>
-        {placeholderViews && <p className="note">写真が未選択です（プレビューでは仮の写真を使います）</p>}
+        {placeholderViews && <p className="note">No photo picked yet (the preview uses a stand-in photo)</p>}
       </div>
 
       <div className="field">
-        <h3>状態</h3>
-        {sold ? <p>売約済（売約は第3段階で設定します）</p> : (
-          <div className="status-seg" role="group" aria-label="状態">
+        <h3>Status</h3>
+        {sold ? <p>Sold (marking pieces sold comes in phase 3)</p> : (
+          <div className="status-seg" role="group" aria-label="Status">
             {['draft', 'ready'].map(s => <button type="button" key={s} className={v.status === s ? 'on' : ''} aria-pressed={v.status === s}
               onClick={() => setValue('status', s, { shouldDirty: true })}>{STATUS_LABEL[s]}</button>)}
           </div>
@@ -311,20 +311,20 @@ function EditorForm({ piece, pieces, live, categories, site }) {
   return (
     <main className={'editor' + (wide ? ' wide' : '')}>
       <div className="tabs" role="tablist">
-        <button role="tab" type="button" className={tab === 'form' ? 'on' : ''} aria-selected={tab === 'form'} onClick={() => setTab('form')}>入力</button>
-        <button role="tab" type="button" className={tab === 'preview' ? 'on' : ''} aria-selected={tab === 'preview'} onClick={() => setTab('preview')}>プレビュー</button>
+        <button role="tab" type="button" className={tab === 'form' ? 'on' : ''} aria-selected={tab === 'form'} onClick={() => setTab('form')}>Edit</button>
+        <button role="tab" type="button" className={tab === 'preview' ? 'on' : ''} aria-selected={tab === 'preview'} onClick={() => setTab('preview')}>Preview</button>
       </div>
       <div style={{ display: wide || tab === 'form' ? 'block' : 'none', minWidth: 0 }}>{formPane}</div>
       <div style={{ display: wide || tab === 'preview' ? 'block' : 'none', minWidth: 0 }}>{previewPane}</div>
       <div className="savebar">
         <div className="state" data-testid="save-state">
-          {msg ? <span className={msg.bad ? 'bad' : ''}>{msg.text}</span> : dirty ? '未保存の変更があります' : piece ? '保存済み' : '新しいピース'}
+          {msg ? <span className={msg.bad ? 'bad' : ''}>{msg.text}</span> : dirty ? 'Unsaved changes' : piece ? 'Saved' : 'New piece'}
           {v.status === 'ready' && !canBeReady && (
-            <div className="bad">完成に必要：{[...missing, ...(fitOk ? [] : ['タイトルを短く'])].join('・')}</div>
+            <div className="bad">Needed for Ready: {[...missing, ...(fitOk ? [] : ['shorter titles'])].join(', ')}</div>
           )}
         </div>
-        <Link className="btn small" to="/" style={{ display: 'inline-flex', alignItems: 'center', textDecoration: 'none' }}>一覧</Link>
-        <button type="button" className="btn primary" onClick={submit} disabled={saving}>保存</button>
+        <Link className="btn small" to="/" style={{ display: 'inline-flex', alignItems: 'center', textDecoration: 'none' }}>List</Link>
+        <button type="button" className="btn primary" onClick={submit} disabled={saving}>Save</button>
       </div>
     </main>
   );

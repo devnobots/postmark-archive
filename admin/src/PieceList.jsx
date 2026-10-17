@@ -17,29 +17,29 @@ export default function PieceList() {
   const groups = useMemo(() => {
     const byDrop = id => rows.filter(p => String(p.drop_id) === String(id)).sort((a, b) => a.position - b.position);
     const out = [];
-    if (live) out.push({ key: 'live', title: '第' + live.no + '便', sub: live.release_date ? live.release_date.replace(/-/g, '.') + ' 公開' : '公開日未定', pieces: byDrop(live.id) });
+    if (live) out.push({ key: 'live', title: 'Drop ' + live.no, sub: live.release_date ? 'released ' + live.release_date.replace(/-/g, '.') : 'release date not set', pieces: byDrop(live.id) });
     for (const d of dropRows.filter(d => d.status === 'draft').sort((a, b) => b.no - a.no))
-      out.push({ key: 'd' + d.id, title: '第' + d.no + '便', sub: '準備中', pieces: byDrop(d.id) });
+      out.push({ key: 'd' + d.id, title: 'Drop ' + d.no, sub: 'in preparation', pieces: byDrop(d.id) });
     const loose = rows.filter(p => !dropRows.some(d => String(d.id) === String(p.drop_id)));
-    if (loose.length) out.push({ key: 'loose', title: '便なし', sub: '', pieces: loose });
+    if (loose.length) out.push({ key: 'loose', title: 'Not in a drop', sub: '', pieces: loose });
     for (const d of dropRows.filter(d => d.status === 'past').sort((a, b) => b.no - a.no))
-      out.push({ key: 'p' + d.id, title: '第' + d.no + '便', sub: '過去の便', pieces: byDrop(d.id), past: true });
+      out.push({ key: 'p' + d.id, title: 'Drop ' + d.no, sub: 'past drop', pieces: byDrop(d.id), past: true });
     return out;
   }, [rows, dropRows, live]);
 
-  if (pieces.query.isLoading || drops.query.isLoading) return <p className="empty">読み込んでいます…</p>;
-  if (pieces.query.isError) return <p className="empty">読み込めませんでした</p>;
+  if (pieces.query.isLoading || drops.query.isLoading) return <p className="empty">Loading…</p>;
+  if (pieces.query.isError) return <p className="empty">Could not load the pieces</p>;
 
   return (
     <main className="list" data-meter={meter ? 'ready' : 'loading'}>
       <div className="list-actions">
-        <Link className="btn primary" to="/pieces/new" style={{ display: 'inline-flex', alignItems: 'center', textDecoration: 'none' }}>＋ 新しいピース</Link>
+        <Link className="btn primary" to="/pieces/new" style={{ display: 'inline-flex', alignItems: 'center', textDecoration: 'none' }}>+ New piece</Link>
         <PublishButton live={live} pieces={live ? rows.filter(p => String(p.drop_id) === String(live.id)) : []} meter={meter} />
       </div>
       {groups.map(g => g.past
         ? <details key={g.key} className="drop-group"><summary>{g.title}<small>{g.sub}</small></summary><Rows pieces={g.pieces} meter={meter} /></details>
         : <section key={g.key} className="drop-group"><h2>{g.title}<small>{g.sub}</small></h2><Rows pieces={g.pieces} meter={meter} /></section>)}
-      {!groups.length && <p className="empty">ピースがありません</p>}
+      {!groups.length && <p className="empty">No pieces yet</p>}
     </main>
   );
 }
@@ -62,7 +62,7 @@ function Rows({ pieces, meter }) {
   const { mutateAsync: update } = useUpdate();
   const invalidate = useInvalidate();
   const [busy, setBusy] = useState(false);
-  if (!pieces.length) return <p className="note">ピースがありません</p>;
+  if (!pieces.length) return <p className="note">No pieces</p>;
   // swap with the neighbor; positions are renumbered 1..n so gaps and ties never stick
   const move = async (i, dir) => {
     const j = i + dir;
@@ -86,17 +86,17 @@ function Rows({ pieces, meter }) {
       <div className="piece-row" key={p.id} data-testid="piece-row">
         <span className="swatch" style={{ background: p.bg }} />
         <Link className="piece-main" to={'/pieces/' + p.id}>
-          <div className="cap">{p.cap_ja || p.name_ja || '（無題）'}</div>
+          <div className="cap">{p.cap_ja || p.name_ja || '(untitled)'}</div>
           <div className="title">{p.name_ja}</div>
           <div className="meta">
-            <span className="price">{yenText(p.price_jpy) || '価格未定'}</span>
+            <span className="price">{yenText(p.price_jpy) || 'no price yet'}</span>
             <span className={'chip ' + p.status}>{STATUS_LABEL[p.status] || p.status}</span>
-            {long && <span className="chip long">長すぎ</span>}
+            {long && <span className="chip long">Too long</span>}
           </div>
         </Link>
         <div className="move">
-          <button aria-label="上へ" disabled={i === 0 || busy} onClick={() => move(i, -1)}>↑</button>
-          <button aria-label="下へ" disabled={i === pieces.length - 1 || busy} onClick={() => move(i, 1)}>↓</button>
+          <button aria-label="Move up" disabled={i === 0 || busy} onClick={() => move(i, -1)}>↑</button>
+          <button aria-label="Move down" disabled={i === pieces.length - 1 || busy} onClick={() => move(i, 1)}>↓</button>
         </div>
       </div>
     );
