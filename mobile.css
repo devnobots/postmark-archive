@@ -1,0 +1,93 @@
+/* Standard Gauge: phone layout (screens narrower than 760px). Desktop never loads these rules:
+   every rule is scoped to html.m, which mobile-head sets only on phones. */
+
+html.m, html.m body { height: auto; overflow: auto; background: #f5f2eb; }
+html.m #frame, html.m #overlay, html.m #full, html.m .archive { display: none !important; }
+html.m body.locked #m-root { visibility: hidden; }
+
+#m-root { display: none; }
+html.m #m-root { display: block; color: #1a2433; font-family: 'Old Standard TT', 'Shippori Mincho', serif;
+  padding-bottom: env(safe-area-inset-bottom); }
+.m-jp { font-family: 'Shippori Mincho', serif; }
+.m-mast { display: block; text-align: center; font-family: 'Old Standard TT', serif; font-size: 15px; letter-spacing: .32em;
+  text-indent: .32em; color: #1a2433; text-decoration: none; padding: 28px 0 0; }
+
+/* ---------- the sheet ---------- */
+.m-head { text-align: center; padding: 0 16px; }
+.m-head h1 { margin: 22px 0 0; font-family: 'Shippori Mincho', serif; font-weight: 800; font-size: 25px; letter-spacing: 1px; line-height: 1.3;
+  word-break: keep-all; overflow-wrap: anywhere; text-wrap: balance; }
+.m-dropline { margin-top: 14px; font-family: 'Shippori Mincho', serif; font-size: 13px; letter-spacing: .16em; color: #6b6e72; }
+.m-dropline b { color: #1a2433; font-weight: 600; }
+.m-dropline a { color: #6b6e72; text-decoration: none; border-bottom: 1px solid rgba(107,110,114,.4); padding-bottom: 2px;
+  display: inline-block; line-height: 2; }
+.m-count { margin-top: 18px; font-family: 'Shippori Mincho', serif; font-size: 12px; letter-spacing: .2em; color: #6b6e72; }
+.m-sheet { display: grid; grid-template-columns: 1fr 1fr; gap: 16px 14px; padding: 20px 16px 8px; }
+.m-cell { position: relative; display: block; width: 100%; aspect-ratio: 156 / 192; padding: 0; border: 0; background: none;
+  cursor: pointer; -webkit-tap-highlight-color: transparent; }
+.m-cell .m-scale { position: absolute; left: 0; top: 0; width: 156px; height: 192px; transform-origin: 0 0; }
+.m-cell .cap-issue { display: none; }                         /* the tiny 第N便 in the corner: unreadable at phone size */
+.m-cell .cap-name { text-overflow: ellipsis; }               /* labels never wrap; a too-long one ends in … */
+.m-cell:focus-visible { outline: 2px solid #24418A; outline-offset: 4px; }
+.m-foot { text-align: center; padding: 36px 16px 48px; }
+.m-foot a { font-family: 'Shippori Mincho', serif; font-size: 13px; letter-spacing: .16em; color: #6b6e72; text-decoration: none;
+  border-bottom: 1px solid rgba(107,110,114,.4); padding-bottom: 2px; display: inline-block; line-height: 2; }
+.m-foot .m-brand { margin-top: 26px; font-size: 11px; letter-spacing: .24em; text-indent: .24em; color: #6b6e72; }
+.m-arch-back { text-align: center; margin-top: 12px; }
+.m-arch-back a { font-size: 12px; letter-spacing: .16em; color: #6b6e72; text-decoration: none; border-bottom: 1px solid rgba(107,110,114,.35);
+  display: inline-block; line-height: 2.2; }
+.m-arch-title { text-align: center; margin: 40px 0 4px; font-family: 'Shippori Mincho', serif; font-weight: 800; font-size: 26px; letter-spacing: .1em; }
+.m-arch-sub { text-align: center; font-family: 'Shippori Mincho', serif; font-size: 13px; color: #6b6e72; letter-spacing: .08em; }
+.m-drop { border-top: 1px solid #E2DCCD; margin-top: 30px; padding-top: 24px; }
+.m-drop-head { text-align: center; font-size: 12px; letter-spacing: .14em; color: #6b6e72; }
+.m-drop-head b { color: #1a2433; font-weight: 500; }
+
+/* ---------- the listing (its own page) ---------- */
+.m-bar { position: sticky; top: 0; z-index: 5; display: flex; align-items: center; justify-content: space-between; height: 52px;
+  padding: 0 6px; background: #f5f2eb; }
+.m-bar button { width: 44px; height: 44px; border: 0; background: none; font-size: 22px; color: #1a2433; cursor: pointer; }
+.m-bar .m-mast { padding: 0; font-size: 12px; }
+.m-views { display: flex; overflow-x: auto; scroll-snap-type: x mandatory; scrollbar-width: none; padding: 6px 0 0; }
+.m-views::-webkit-scrollbar { display: none; }
+.m-view { flex: none; width: 100%; scroll-snap-align: center; display: flex; justify-content: center; padding: 8px 0 12px;
+  border: 0; background: none; cursor: zoom-in; }
+.m-view .m-scale { width: 156px; height: 240px; transform-origin: 0 0; }
+.m-view .m-box { position: relative; width: 203px; height: 312px; }   /* 156 x 240 at 1.3 */
+.m-dots { display: flex; justify-content: center; gap: 8px; height: 6px; margin: 2px 0 0; }
+.m-dots i { width: 6px; height: 6px; border-radius: 50%; background: #c9c3b6; }
+.m-dots i.on { background: #1a2433; }
+.m-info { padding: 18px 22px 130px; }
+.m-found { font-size: 12px; letter-spacing: .04em; color: #24418A; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.m-title { margin: 8px 0 0; font-family: 'Shippori Mincho', serif; font-weight: 800; font-size: 24px; line-height: 1.25;
+  word-break: keep-all; overflow-wrap: anywhere; text-wrap: balance; }
+.m-title .nb { white-space: nowrap; }                                  /* MA-1, Hand-Knit: a hyphen is not a break point */
+.m-en { margin: 4px 0 12px; font-size: 13px; line-height: 1.35; color: #6b6e72; text-wrap: balance; }
+.m-row { display: flex; justify-content: space-between; align-items: baseline; gap: 16px; padding: 8px 0; border-bottom: 1px solid #ece6d9; }
+.m-row .k { flex: none; font-family: 'Shippori Mincho', serif; font-size: 14px; color: #6b6e72; }
+.m-row .v { font-size: 14px; text-align: right; font-variant-numeric: tabular-nums lining-nums; }
+.m-row .v b { font-family: 'Old Standard TT', serif; margin-right: 8px; }
+.m-row .spec-value-consignee { flex: 1; min-width: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.m-row .spec-value-consignee .tag { color: #6b6e72; }
+.m-row .spec-value-consignee a { color: inherit; text-decoration: none; }
+.m-buy { position: fixed; left: 0; right: 0; bottom: 0; z-index: 6; display: flex; align-items: flex-start; justify-content: space-between;
+  padding: 14px 20px calc(14px + env(safe-area-inset-bottom)); background: #fffdf6; border-top: 1px solid #e2dccd; }
+.m-buy .p { font-weight: 700; font-size: 24px; line-height: 1.1; }
+.m-buy .s { font-family: 'Shippori Mincho', serif; font-size: 11px; color: #6b6e72; margin-top: 2px; }
+.m-buy button { min-height: 50px; padding: 0 34px; border: 0; background: #1a2433; color: #fffdf6; font-family: 'Shippori Mincho', serif;
+  font-weight: 700; font-size: 16px; letter-spacing: .1em; cursor: pointer; }
+.m-buy button.sold { min-height: 48px; background: none; color: #6b6e72; border: 1px solid rgba(107,110,114,.5); font-weight: 600;
+  letter-spacing: .2em; cursor: default; }
+
+/* ---------- full-screen photos ---------- */
+.m-photo { position: fixed; inset: 0; z-index: 20; background: #fffdf6; display: none; }
+.m-photo.open { display: block; }
+.m-photo .m-close { position: absolute; top: calc(6px + env(safe-area-inset-top)); right: 8px; z-index: 2; width: 44px; height: 44px;
+  border: 0; background: none; font-size: 26px; color: #1a2433; cursor: pointer; }
+.m-photo .m-strip { position: absolute; left: 0; right: 0; top: 60px; bottom: 90px; display: flex; overflow-x: auto;
+  scroll-snap-type: x mandatory; scrollbar-width: none; }
+.m-photo .m-strip::-webkit-scrollbar { display: none; }
+.m-photo .m-pane { flex: none; width: 100%; height: 100%; scroll-snap-align: center; overflow: hidden; display: flex; align-items: center; justify-content: center; }
+.m-photo img { max-width: 100%; max-height: 100%; object-fit: contain; transition: transform .25s ease; touch-action: pinch-zoom; }
+.m-photo img.zoom { transform: scale(2.5); }
+.m-photo .m-dots { position: absolute; left: 0; right: 0; bottom: 58px; }
+.m-photo .m-help { position: absolute; left: 0; right: 0; bottom: 26px; text-align: center; font-family: 'Shippori Mincho', serif;
+  font-size: 12px; letter-spacing: .1em; color: #6b6e72; }
