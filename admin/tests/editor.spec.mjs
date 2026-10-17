@@ -19,3 +19,39 @@ test('2: edit the price, save, reload: kept, and the phone preview shows it', as
   const phone = page.frameLocator('iframe[data-frame="phone"]');
   await expect(phone.locator('.m-buy .p')).toHaveText('¥15,400', { timeout: 15000 });
 });
+
+test('3: a long title is flagged within a second; 完成 is refused, 下書き saves', async ({ page }) => {
+  await openFirst(page);
+  await expect(page.getByTestId('fit-line')).toBeVisible();
+  const t0 = Date.now();
+  await page.locator('#f-ja').fill(LONG);
+  await expect(page.getByTestId('fit-problems')).toBeVisible({ timeout: 1000 });
+  expect(Date.now() - t0).toBeLessThan(1000);
+  await expect(page.getByTestId('fit-problems')).toContainText('タイトルが');
+  await page.getByRole('button', { name: '保存' }).click();             // the piece is 完成
+  await expect(page.getByTestId('save-state')).toContainText('完成にするには');
+  await page.reload();
+  await expect(page.locator('#f-ja')).not.toHaveValue(LONG);              // nothing was saved
+  await page.locator('#f-ja').fill(LONG);
+  await page.getByRole('group', { name: '状態' }).getByRole('button', { name: '下書き' }).click();
+  await page.getByRole('button', { name: '保存' }).click();
+  await expect(page.getByTestId('save-state')).toContainText('保存しました');
+  await page.reload();
+  await expect(page.locator('#f-ja')).toHaveValue(LONG);
+});
+
+test('4: only title ideas that fit are shown, and 使う puts one in the field', async ({ page }) => {
+  const FITS = '60年代 MA-1 フライトジャケット';
+  await page.route('**/api/suggest-titles', route => route.fulfill({
+    status: 200, contentType: 'application/json', body: JSON.stringify({ ja: [LONG, FITS], en: [], cap: [] }),
+  }));
+  await openFirst(page);
+  await page.locator('#f-ja').fill(LONG);
+  await expect(page.getByTestId('fit-problems')).toBeVisible();
+  await page.getByRole('button', { name: '短い案を出す' }).click();
+  await expect(page.getByTestId('idea-ja')).toHaveCount(1);
+  await expect(page.getByTestId('idea-ja')).toContainText(FITS);
+  await page.getByTestId('idea-ja').getByRole('button', { name: '使う' }).click();
+  await expect(page.locator('#f-ja')).toHaveValue(FITS);
+  await expect(page.getByTestId('fit-problems')).toHaveCount(0);
+});
