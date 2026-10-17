@@ -1,0 +1,20 @@
+<!doctype html><html lang="ja"><head><meta charset="utf-8"><title>selfcheck</title></head><body>
+<pre id="out">checking…</pre>
+<script type="module">
+// Dev-only check that the back office can see and measure the real site (open /admin/selfcheck.html).
+import { TitleMeter } from './src/lib/measure.mjs';
+const out = document.getElementById('out');
+try {
+  const w = {}; new Function('window', await (await fetch('/data/current.js')).text())(w);
+  const { drop, items } = w.SG_DATA;
+  const m = await new TitleMeter('/').open(items[0], drop);
+  const rows = items.map(d => [d.nameJa, m.check(d)]);
+  const long = m.check({ nameJa: '1960年代 アメリカ空軍 USAF MA-1 フライトジャケット セージグリーン 前期型', nameEn: items[0].nameEn, capJa: 'MA-1 フライトジャケット 前期型' });
+  m.close();
+  const api = await (await fetch('/api/suggest-titles', { method: 'POST', headers: { 'content-type': 'application/json' }, body: '{"nameJa":"x"}' })).json();
+  const ok = rows.every(r => r[1].ok) && !long.ok && !long.parts.ja && long.parts.en && !long.parts.cap;
+  out.textContent = (ok ? 'SELFCHECK OK' : 'SELFCHECK FAILED') + '\n' + rows.map(r => (r[1].ok ? 'fits  ' : 'LONG  ') + r[0]).join('\n') +
+    '\nlong test title flagged: ' + long.problems.join(' / ') + '\ntitle ideas: ' + (api.error === 'no-key' ? 'waiting for the Anthropic key (step D)' : JSON.stringify(api));
+  document.title = ok ? 'SELFCHECK OK' : 'SELFCHECK FAILED';
+} catch (e) { out.textContent = 'SELFCHECK FAILED\n' + e; document.title = 'SELFCHECK FAILED'; }
+</script></body></html>

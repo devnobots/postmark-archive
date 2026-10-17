@@ -1,0 +1,9 @@
+{
+  "name": "standard-gauge",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "build": "node tools/build_site.mjs && npm --prefix admin ci && npm --prefix admin run build",
+    "dev": "npm --prefix admin run dev"
+  }
+}
