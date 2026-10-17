@@ -8,14 +8,21 @@ const KEY = 'sg-local-db';
 
 function load(storage) { try { return JSON.parse(storage.getItem(KEY) || 'null'); } catch (e) { return null; } }
 
-export async function seedFromSite(siteData) {
+export async function seedFromSite(siteData, pastData) {
   const { drop, items } = siteData;
   const now = new Date().toISOString();
-  return {
+  const db = {
     drops: [{ id: 1, no: drop.no, release_date: drop.date.replace(/\./g, '-'), status: 'live', created_at: now, updated_at: now }],
     categories: CATEGORIES.map(c => ({ ...c, id: c.code })),
     pieces: items.map((d, i) => ({ id: 'local-' + (i + 1), drop_id: 1, ...fromSiteItem(d, i + 1), created_at: now, updated_at: now })),
   };
+  // the past drops (data/past.js), when given: each becomes a past drop with its sold pieces
+  ((pastData && pastData.drops) || []).forEach((pd, k) => {
+    const id = 2 + k;
+    db.drops.push({ id, no: pd.no, release_date: String(pd.date).replace(/\./g, '-'), status: 'past', created_at: now, updated_at: now });
+    pd.pieces.forEach((d, i) => db.pieces.push({ id: 'local-p' + pd.no + '-' + (i + 1), drop_id: id, ...fromSiteItem(d, i + 1), created_at: now, updated_at: now }));
+  });
+  return db;
 }
 
 function matches(row, f) {

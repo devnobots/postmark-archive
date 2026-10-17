@@ -1,14 +1,16 @@
 // Standard Gauge: write SQL that puts today's homepage pieces (data/current.js) into the database.
-// Usage: node tools/seed_from_site.mjs data/current.js > supabase/seed.sql
+// Usage: node tools/seed_from_site.mjs data/current.js data/past.js > supabase/seed.sql   (past.js is optional)
 import fs from 'node:fs';
 import vm from 'node:vm';
 import { fromSiteItem } from '../admin/src/lib/site-data.mjs';
 
-const file = process.argv[2];
-if (!file) { console.error('Usage: node tools/seed_from_site.mjs data/current.js'); process.exit(1); }
+const [file, pastFile] = process.argv.slice(2);
+if (!file) { console.error('Usage: node tools/seed_from_site.mjs data/current.js [data/past.js]'); process.exit(1); }
 const sandbox = { window: {} };
 vm.runInNewContext(fs.readFileSync(file, 'utf8'), sandbox);
+if (pastFile) vm.runInNewContext(fs.readFileSync(pastFile, 'utf8'), sandbox);
 const { drop, items } = sandbox.window.SG_DATA;
+const past = (sandbox.window.SG_PAST || { drops: [] }).drops;
 const q = v => v === null || v === undefined ? 'null' : typeof v === 'number' || typeof v === 'boolean' ? String(v)
   : typeof v === 'object' ? "'" + JSON.stringify(v).replace(/'/g, "''") + "'::jsonb" : "'" + String(v).replace(/'/g, "''") + "'";
 const cols = ['drop_id', 'position', 'status', 'category', 'name_ja', 'name_en', 'cap_ja', 'size_line', 'measurements', 'price_jpy',
@@ -20,6 +22,16 @@ items.forEach((d, i) => {
   r.drop_id = '(select id from public.drops where no = ' + drop.no + ')';
   sql += 'insert into public.pieces (' + cols.join(', ') + ') values (' +
     cols.map(c => c === 'drop_id' ? r.drop_id : q(r[c])).join(', ') + ');\n';
+});
+// past drops: each drop and its sold pieces
+past.forEach(pd => {
+  sql += `insert into public.drops (no, release_date, status) values (${pd.no}, '${String(pd.date).replace(/\./g, '-')}', 'past');\n`;
+  pd.pieces.forEach((d, i) => {
+    const r = fromSiteItem(d, i + 1);
+    r.drop_id = '(select id from public.drops where no = ' + pd.no + ')';
+    sql += 'insert into public.pieces (' + cols.join(', ') + ') values (' +
+      cols.map(c => c === 'drop_id' ? r.drop_id : q(r[c])).join(', ') + ');\n';
+  });
 });
 sql += 'commit;\n';
 process.stdout.write(sql);

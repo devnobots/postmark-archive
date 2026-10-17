@@ -71,6 +71,22 @@ export function currentJs(drop, pieces) {
     'window.SG_DATA = ' + JSON.stringify(data, null, 1) + ';\n';
 }
 
+// the whole past-drops file: window.SG_PAST = { current, drops: [{ no, date, pieces }] }, newest drop first
+export function pastJs(liveDrop, drops, pieces) {
+  const past = drops.filter(d => d.status === 'past').sort((a, b) => b.no - a.no);
+  const data = {
+    current: liveDrop ? liveDrop.no : null,
+    drops: past.map(d => ({
+      no: d.no, date: siteDropDate(d.release_date),
+      pieces: pieces.filter(p => String(p.drop_id) === String(d.id) && p.status !== 'draft').sort((a, b) => a.position - b.position)
+        .map(p => toSiteItem(p, d)),
+    })),
+  };
+  return '// Standard Gauge: the past drops (newest first). Written by the back office; edit there, not here.\n' +
+    '// Published ' + new Date().toISOString() + '\n' +
+    'window.SG_PAST = ' + JSON.stringify(data, null, 1) + ';\n';
+}
+
 // site piece -> database row (used once, to bring today's pieces into the database)
 export function fromSiteItem(d, position) {
   const m = /^(.*) ([A-Z]{2})$/.exec(d.city || '');
