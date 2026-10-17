@@ -236,7 +236,8 @@ function EditorForm({ piece, pieces, live, categories, site }) {
         <label htmlFor="f-size">サイズ表記</label>
         <div className="inline">
           <input id="f-size" {...register('size_line')} readOnly={v.size_auto} />
-          <label className="toggle"><input type="checkbox" {...register('size_auto')} />自動</label>
+          <button type="button" className={'btn small auto' + (v.size_auto ? ' on' : '')} aria-pressed={!!v.size_auto}
+            onClick={() => setValue('size_auto', !v.size_auto, { shouldDirty: true })}>自動</button>
         </div>
       </div>
 

@@ -73,8 +73,8 @@ label { display: block; font-size: 13px; color: var(--muted); }
 .unit span { color: var(--muted); font-size: 13px; }
 .x { width: 44px; height: 44px; border: 0; background: none; color: var(--muted); font-size: 18px; cursor: pointer; }
 .inline { display: flex; align-items: center; gap: 10px; }
-.toggle { display: inline-flex; align-items: center; gap: 6px; min-height: 44px; font-size: 13px; color: var(--muted); cursor: pointer; }
-.toggle input { width: 20px; min-height: 20px; height: 20px; }
+.btn.auto { flex: none; color: var(--muted); }
+.btn.auto.on { background: var(--ink); color: var(--paper); border-color: var(--ink); }
 .price-show { font-family: var(--en); font-size: 18px; white-space: nowrap; }
 .grades { display: flex; gap: 8px; margin-bottom: 8px; }
 .grades button { width: 56px; min-height: 44px; border: 1px solid #cfc8b8; border-radius: 4px; background: #fff; font-family: var(--en); font-size: 17px; cursor: pointer; }
