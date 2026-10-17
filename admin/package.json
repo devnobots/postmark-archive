@@ -2,7 +2,11 @@
   "name": "standard-gauge-admin",
   "private": true,
   "type": "module",
-  "scripts": { "dev": "vite", "build": "vite build" },
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "test": "playwright test"
+  },
   "dependencies": {
     "@refinedev/core": "5.0.12",
     "@refinedev/react-hook-form": "5.0.4",
@@ -15,5 +19,9 @@
     "react-hook-form": "7.90.0",
     "react-router": "7.18.4"
   },
-  "devDependencies": { "@vitejs/plugin-react": "6.1.2", "vite": "8.3.4" }
+  "devDependencies": {
+    "@playwright/test": "1.64.1",
+    "@vitejs/plugin-react": "6.1.2",
+    "vite": "8.3.4"
+  }
 }
