@@ -99,8 +99,8 @@ function Rows({ pieces, meter }) {
   const moveDrag = e => {
     if (!drag) return;
     const dy = e.clientY - drag.y0, y = drag.tops[drag.from].top + drag.tops[drag.from].height / 2 + dy;
-    let to = drag.tops.findIndex(r => y < r.top + r.height / 2);
-    if (to < 0) to = drag.tops.length - 1;
+    // the new place: how many other rows have their middle above the dragged row's middle
+    const to = drag.tops.filter((r, k) => k !== drag.from && r.top + r.height / 2 < y).length;
     setDrag({ ...drag, dy, to });
   };
   const end = () => { if (!drag) return; const { from, to } = drag; setDrag(null); move(from, to); };

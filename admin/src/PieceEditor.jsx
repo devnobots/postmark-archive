@@ -58,7 +58,8 @@ export function measurementsOf(meas) {
   });
 }
 
-function toRow(v, piece) {
+// soldAt: the time to record when a piece becomes sold (only passed when saving; the preview must not change every moment)
+function toRow(v, piece, soldAt = null) {
   const digits = String(v.price || '').replace(/[^0-9]/g, '');
   const sold = v.status === 'sold';
   const handle = sold && v.owner_kind === 'handle' ? String(v.owner_handle || '').trim().replace(/^@+/, '') : '';
@@ -71,7 +72,7 @@ function toRow(v, piece) {
     views: v.views || [], status: v.status, drop_id: v.drop_id ? (/^\d+$/.test(v.drop_id) ? Number(v.drop_id) : v.drop_id) : null,
     owner_handle: handle,
     owner_demo: !!(piece && piece.owner_demo && handle && handle === piece.owner_handle),   // a made-up handle stays plain text
-    sold_at: sold ? (piece && piece.sold_at) || new Date().toISOString() : null,
+    sold_at: sold ? (piece && piece.sold_at) || soldAt : null,
   };
 }
 
@@ -159,7 +160,7 @@ function EditorForm({ piece, pieces, drops, categories, site, reload }) {
 
   // ---------- save ----------
   const onSave = useCallback(async values => {
-    const data = { ...toRow(values, piece), bg: color.bg, ink: color.ink || null };
+    const data = { ...toRow(values, piece, new Date().toISOString()), bg: color.bg, ink: color.ink || null };
     if (ON_SITE(data.status) && !canBeOnSite) {
       setMsg({ bad: true, text: 'To mark it ' + STATUS_LABEL[data.status] + ', fill in what is missing' });
       return;
@@ -182,6 +183,7 @@ function EditorForm({ piece, pieces, drops, categories, site, reload }) {
       }
       reset(values);
       await invalidate({ resource: 'pieces', invalidates: ['list', 'detail'] });
+      await invalidate({ resource: 'piece_history', invalidates: ['list'] });
       setMsg({ text: 'Saved' + (recolored.length ? '. Stamp colors also updated by the rule: ' + recolored.join(', ') : '') });
       if (!piece) navigate('/pieces/' + id, { replace: true });
     } catch (e) {
