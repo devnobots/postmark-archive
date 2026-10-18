@@ -258,3 +258,21 @@ Everything below happens in the back office or on the hosting. Nothing needs a t
 - **Pushes:** I pushed after each section, so the live GitHub Pages site already shows POSTMARK ARCHIVE and PRIVATE COLLECTION.
 
 **For part D:** name the Vercel project `postmark-archive`; renaming the GitHub repo can wait.
+
+## Update: photo caption
+
+**What changed** (commit `b1b440e`, made by `tools/apply_photo_caption.py`)
+- **Desktop, homepage and past drops:** every full-size photo view now shows 細部や生地の質感まで検証いただけます, centered in the strip under the photo, in the site's muted Mincho (Shippori Mincho, 13px, letter-spacing 0.14em, #6b6e72).
+  - The white box is still 576 × 768. The photo fills the top 712px, so the caption never covers it.
+  - The hover loupe now measures the photo inside that 712px area, so it still magnifies exactly the spot under the cursor. It turns off over the caption.
+- **Phone, both pages:** the line under the full-screen photos is now only the caption, in the same type. The gesture hint 「ダブルタップで拡大 · スワイプで次の写真」 is gone. Double-tap zoom and swiping still work.
+
+**Test results**
+- **The tool:** the first run printed `caption added:` for all 4 files, and the second printed `already applied`. The diff was exactly as expected: `drops.html | 8`, `index.html | 8`, `mobile.css | 2`, `mobile.js | 2`, 12 insertions and 8 deletions. **Nothing was edited by hand.**
+- **Browser checks (dev server):**
+  - **Desktop, both pages:** checked on the bag (cut-out photo) and on the MA-1's front view and full-bleed detail photo. The photo is 576 × 712 with the caption in the strip below it (its top is 728px down the box), and there were no page errors.
+  - **Loupe accuracy:** I compared what the loupe shows against the photo pixels under the cursor. At the center, the best match is at zero offset on every photo. Near the top edge (8px) and bottom edge (40px) of the full-bleed photo, also zero offset, on both pages. The cut-out photos are plain white at their edges, so they can't be measured there; the same code handles all photos.
+  - **Loupe off where it should be:** over the caption, and just below the photo area.
+  - **Phone, 375 and 320 wide, both pages:** the caption is on one line (267px of text), double-tap zooms in and back out, swiping moves to the next photo (the dots follow), and there were no page errors.
+- **Pixel tests:** `npm --prefix admin test` passed, 29 of 29, with no changes. **No baselines were retaken**, because the pixel tests don't open the full photo view.
+- **Checks:** `check_api`, `check_build`, `check_data`, `check_local` and `check_past` all pass, and `npm run build` succeeds.
