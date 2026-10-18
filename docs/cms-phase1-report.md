@@ -276,3 +276,5 @@ Everything below happens in the back office or on the hosting. Nothing needs a t
   - **Phone, 375 and 320 wide, both pages:** the caption is on one line (267px of text), double-tap zooms in and back out, swiping moves to the next photo (the dots follow), and there were no page errors.
 - **Pixel tests:** `npm --prefix admin test` passed, 29 of 29, with no changes. **No baselines were retaken**, because the pixel tests don't open the full photo view.
 - **Checks:** `check_api`, `check_build`, `check_data`, `check_local` and `check_past` all pass, and `npm run build` succeeds.
+
+**Later change (owner):** the caption now reads 細部や素材の質感まで、鮮明に。 everywhere (desktop and phone, both pages, and in `tools/apply_photo_caption.py`). Same position and type.

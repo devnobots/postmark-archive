@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """Postmark Archive: one caption under every full-size photo, on desktop and phone.
 
-    細部や生地の質感まで検証いただけます
+    細部や素材の質感まで、鮮明に。
 
 Desktop (homepage and past drops): the white photo box keeps its size (576 x 768). The photo now fills the top
 712px and the caption sits centered in the 56px below it, in the site's muted Mincho, so it never covers a photo.
@@ -17,7 +17,7 @@ Usage
 """
 import sys
 
-CAPTION = '細部や生地の質感まで検証いただけます'
+CAPTION = '細部や素材の質感まで、鮮明に。'
 MARK = 'full-caption'
 
 DESK_EDITS = [
