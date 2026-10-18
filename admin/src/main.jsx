@@ -1,4 +1,4 @@
-// Standard Gauge back office: start-up. Picks the mode, prepares the data, then shows the screens.
+// Postmark Archive back office: start-up. Picks the mode, prepares the data, then shows the screens.
 import { createRoot } from 'react-dom/client';
 import App from './App.jsx';
 import { makeDataProvider } from './config.js';

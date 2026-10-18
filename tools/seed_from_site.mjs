@@ -1,4 +1,4 @@
-// Standard Gauge: write SQL that puts today's homepage pieces (data/current.js) into the database.
+// Postmark Archive: write SQL that puts today's homepage pieces (data/current.js) into the database.
 // Usage: node tools/seed_from_site.mjs data/current.js data/past.js > supabase/seed.sql   (past.js is optional)
 import fs from 'node:fs';
 import vm from 'node:vm';

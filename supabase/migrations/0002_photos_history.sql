@@ -1,4 +1,4 @@
--- Standard Gauge back office, phases 2 and 3: change history (undo) and photo storage.
+-- Postmark Archive back office, phases 2 and 3: change history (undo) and photo storage.
 -- Run once in the Supabase SQL editor after 0001_init.sql.
 
 -- every change to a piece keeps the version before it, so it can be put back (undo), and deleted pieces can be restored

@@ -1,4 +1,4 @@
-// Standard Gauge back office: the piece editor (/pieces/:id and /pieces/new).
+// Postmark Archive back office: the piece editor (/pieces/:id and /pieces/new).
 // Form on the left (or the Edit tab on a phone), live preview on the right (or the Preview tab).
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useList, useOne, useCreate, useUpdate, useDelete, useInvalidate } from '@refinedev/core';
@@ -365,7 +365,7 @@ function EditorForm({ piece, pieces, drops, categories, site, reload }) {
           <div className="sold-box" role="group" aria-label="Who has it now">
             <label className="choice"><input type="radio" value="handle" {...register('owner_kind')} /> The buyer shared their Instagram</label>
             {v.owner_kind === 'handle' && <input aria-label="Buyer's Instagram handle" {...register('owner_handle')} placeholder="handle (without @)" autoComplete="off" autoCapitalize="none" />}
-            <label className="choice"><input type="radio" value="private" {...register('owner_kind')} /> Private archive (個人蔵)</label>
+            <label className="choice"><input type="radio" value="private" {...register('owner_kind')} /> Private collection (個人蔵)</label>
           </div>
         )}
       </div>

@@ -1,4 +1,4 @@
-// Standard Gauge back office: shorter title ideas from Claude. Runs on the server (Vercel Function, or
+// Postmark Archive back office: shorter title ideas from Claude. Runs on the server (Vercel Function, or
 // the back office's dev server), so the Anthropic key never reaches a browser.
 // The back office measures every idea in the real site before showing it; ideas that still do not fit are dropped.
 //
@@ -13,7 +13,7 @@ export const DEFAULT_MODEL = 'claude-sonnet-5-5';
 
 export function buildPrompt({ nameJa, nameEn, capJa, problems, facts }) {
   return [
-    'You write product titles for Standard Gauge, a shop selling one-of-a-kind American vintage clothing to Japanese buyers.',
+    'You write product titles for Postmark Archive, a shop selling one-of-a-kind American vintage clothing to Japanese buyers.',
     'The current titles are too long for the page. Suggest shorter versions that keep the meaning.',
     '',
     'Current Japanese title: ' + nameJa,

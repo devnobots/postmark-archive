@@ -1,4 +1,4 @@
-// Standard Gauge back office, local mode: everything is saved in this browser only (no accounts needed).
+// Postmark Archive back office, local mode: everything is saved in this browser only (no accounts needed).
 // Same shape as refine's Supabase data provider, so the screens do not know which one they use.
 // Starts with today's homepage pieces (data/current.js) the first time it opens.
 import { fromSiteItem } from './site-data.mjs';

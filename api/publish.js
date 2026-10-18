@@ -1,4 +1,4 @@
-// Standard Gauge back office: put the saved pieces on the live site.
+// Postmark Archive back office: put the saved pieces on the live site.
 // Asks Vercel to rebuild the site; the build reads the database and writes data/current.js (tools/build_site.mjs).
 // The site changes about a minute later. Nothing on the site changes when you only save.
 //

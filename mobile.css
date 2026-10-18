@@ -1,4 +1,4 @@
-/* Standard Gauge: phone layout (screens narrower than 760px). Desktop never loads these rules:
+/* Postmark Archive: phone layout (screens narrower than 760px). Desktop never loads these rules:
    every rule is scoped to html.m, which mobile-head sets only on phones. */
 
 html.m, html.m body { height: auto; overflow: auto; background: #f5f2eb; }

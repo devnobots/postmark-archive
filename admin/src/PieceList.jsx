@@ -1,4 +1,4 @@
-// Standard Gauge back office: the list of pieces, grouped by drop (live first, then upcoming, then past).
+// Postmark Archive back office: the list of pieces, grouped by drop (live first, then upcoming, then past).
 // Drag a piece by its handle (or use the arrows) to change its place in the drop.
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { useList, useUpdate, useCreate, useInvalidate } from '@refinedev/core';

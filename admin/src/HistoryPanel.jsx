@@ -1,4 +1,4 @@
-// Standard Gauge back office: a piece's earlier versions. Restore puts one back (the restore itself is kept too,
+// Postmark Archive back office: a piece's earlier versions. Restore puts one back (the restore itself is kept too,
 // so it can be undone in the same way).
 import { useList, useUpdate, useInvalidate } from '@refinedev/core';
 import { yenText } from './util.js';

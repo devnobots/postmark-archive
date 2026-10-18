@@ -1,4 +1,4 @@
-# Standard Gauge back office, phase 1: report
+# Postmark Archive back office, phase 1: report
 
 Parts A, B and C are done, committed and pushed. Part D (accounts, keys, Vercel) was not started.
 Everything below runs in **local mode** today: open the back office with `npm run dev`, then http://localhost:5173/admin/.
@@ -176,7 +176,7 @@ Everything below happens in the back office or on the hosting. Nothing needs a t
   - **New drop:** the number is filled in. Set the release date, add pieces to it, and preview the whole drop as the homepage and the phone list.
   - **"Make this the live drop":** the current drop becomes a past drop in the same step, and its unsold pieces move into the new drop and stay for sale.
 - **Ordering:** drag pieces by the ⠿ handle (finger or mouse), or use ↑↓.
-- **Sold:** with the buyer's Instagram handle, or as a private archive (個人蔵). The handle is shown as `CONSIGNEE: @handle` on desktop and in the 収蔵先 row on the phone.
+- **Sold:** with the buyer's Instagram handle, or as a private collection (個人蔵). The handle is shown as `CONSIGNEE: @handle` on desktop and in the 収蔵先 row on the phone.
 - **History:** every save keeps the version before it, and "Restore" puts one back; a restore can itself be undone. Deleted pieces appear under "Recently deleted" and can be restored as a draft.
 - **The past-drops page reads `data/past.js`.** It was tested pixel-identical on desktop, on phone, and on two sold piece pages. Publish writes both `data/current.js` and `data/past.js`.
 

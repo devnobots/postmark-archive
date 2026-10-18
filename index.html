@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <script>if (window.matchMedia('(max-width: 759px)').matches) document.documentElement.classList.add('m');</script>
 <link rel="stylesheet" href="mobile.css">
-<title>Standard Gauge — スタンダードゲージ</title>
+<title>POSTMARK ARCHIVE</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Old+Standard+TT:ital,wght@0,400;0,700;1,400&family=Shippori+Mincho:wght@400;600;800&display=swap">
@@ -173,7 +173,7 @@
 <body class="locked">
 <div id="gate">
   <form class="gate-box" id="gateForm">
-    <div class="gate-seal">STANDARD<br>GAUGE</div>
+    <div class="gate-seal">POSTMARK<br>ARCHIVE</div>
     <label for="gateCode">アクセスコード</label>
     <div class="gate-row">
       <input id="gateCode" type="password" inputmode="numeric" autocomplete="off" required>
@@ -184,7 +184,7 @@
 </div>
 <div id="frame"><div id="stage">
 
-  <header class="site-header"><div class="brand-title">STANDARD GAUGE</div></header>
+  <header class="site-header"><div class="brand-title">POSTMARK ARCHIVE</div></header>
 
   <div id="fan"></div>
   <div id="hit" aria-hidden="true"></div>
@@ -410,7 +410,7 @@ function renderListing() {
   if (d.sold) {
     var foundEl = document.getElementById('found');
     foundEl.textContent = foundEl.textContent.replace(/ \([A-Z]{3} \d{4}\)$/, '');
-    var who = !d.owner ? 'PRIVATE ARCHIVE'
+    var who = !d.owner ? 'PRIVATE COLLECTION'
       : d.demo ? '<span class="consignee-handle">@' + esc(d.owner) + '</span>'
       : '<a class="consignee-handle" href="https://www.instagram.com/' + encodeURIComponent(d.owner) + '/" target="_blank" rel="noopener">@' + esc(d.owner) + '</a>';
     foundEl.insertAdjacentHTML('beforeend', '\u00a0 · \u00a0CONSIGNEE: ' + who);

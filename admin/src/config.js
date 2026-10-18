@@ -1,4 +1,4 @@
-// Standard Gauge back office: which mode we run in.
+// Postmark Archive back office: which mode we run in.
 // Both VITE_SUPABASE_URL and VITE_SUPABASE_ANON_KEY set: Supabase mode (sign-in, shared database).
 // Either missing: local mode (this browser only, no sign-in).
 import { createClient } from '@supabase/supabase-js';

@@ -1,4 +1,4 @@
-// Standard Gauge: the past drops (newest first). Written by the back office; edit there, not here.
+// Postmark Archive: the past drops (newest first). Written by the back office; edit there, not here.
 window.SG_PAST = {
  "current": 12,
  "drops": [

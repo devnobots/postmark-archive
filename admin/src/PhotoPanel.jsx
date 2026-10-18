@@ -1,4 +1,4 @@
-// Standard Gauge back office: a piece's photos. Upload from the phone, check the cutout's edges, reorder.
+// Postmark Archive back office: a piece's photos. Upload from the phone, check the cutout's edges, reorder.
 // The first photo is the stamp photo (its colors also pick the stamp color by the rule).
 import { useEffect, useRef, useState } from 'react';
 import { loadPhoto, rotated, pieceMask, cutoutBlob, fullBlob } from './lib/cutout.mjs';

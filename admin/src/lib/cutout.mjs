@@ -1,4 +1,4 @@
-// Standard Gauge back office: photo cutout and web sizes, in the browser (works on a phone, nothing to install).
+// Postmark Archive back office: photo cutout and web sizes, in the browser (works on a phone, nothing to install).
 // - The background's colors are read from the photo's border; everything joined to the border that is close to
 //   them (within the tolerance) is background. That handles white paper, a plain wall or a table top.
 // - The piece is the largest remaining area, plus any other large area (a pair of socks is two). Small holes inside it are kept (a polar bear on a sweater);

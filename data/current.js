@@ -1,4 +1,4 @@
-// Standard Gauge: the pieces on the homepage. Written by the back office; edit there, not here.
+// Postmark Archive: the pieces on the homepage. Written by the back office; edit there, not here.
 // drop.date is the release date (Japan time). Prices, sizes and towns in the samples are samples.
 window.SG_DATA = {
   drop: { no: 12, date: '2026.10.09' },

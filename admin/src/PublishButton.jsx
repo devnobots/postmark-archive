@@ -1,4 +1,4 @@
-// Standard Gauge back office: Publish to site. Checks every Ready and Sold piece of the live drop, sets the stamp
+// Postmark Archive back office: Publish to site. Checks every Ready and Sold piece of the live drop, sets the stamp
 // colors by the rule, then puts the live drop (data/current.js) and the past drops (data/past.js) on the site.
 // Supabase mode asks the host to rebuild; local mode downloads the two files.
 import { useState } from 'react';

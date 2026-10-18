@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <script>if (window.matchMedia('(max-width: 759px)').matches) document.documentElement.classList.add('m');</script>
 <link rel="stylesheet" href="mobile.css">
-<title>過去の便 — Standard Gauge</title>
+<title>過去の便 — POSTMARK ARCHIVE</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Old+Standard+TT:ital,wght@0,400;0,700;1,400&family=Shippori+Mincho:wght@400;600;800&display=swap">
@@ -176,7 +176,7 @@
 </head>
 <body>
 <div class="archive">
-  <div class="arch-masthead"><a href="index.html">STANDARD GAUGE</a></div>
+  <div class="arch-masthead"><a href="index.html">POSTMARK ARCHIVE</a></div>
   <div class="arch-back"><a href="index.html" id="backLink">← 第12便 公開中</a></div>
   <h1 class="arch-title">過去の便</h1>
   <p class="arch-sub">すべて売約済。</p>
@@ -290,7 +290,7 @@ function renderListing() {
   if (d.sold) {
     var foundEl = document.getElementById('found');
     foundEl.textContent = foundEl.textContent.replace(/ \([A-Z]{3} \d{4}\)$/, '');
-    var who = !d.owner ? 'PRIVATE ARCHIVE'
+    var who = !d.owner ? 'PRIVATE COLLECTION'
       : d.demo ? '<span class="consignee-handle">@' + esc(d.owner) + '</span>'
       : '<a class="consignee-handle" href="https://www.instagram.com/' + encodeURIComponent(d.owner) + '/" target="_blank" rel="noopener">@' + esc(d.owner) + '</a>';
     foundEl.insertAdjacentHTML('beforeend', '\u00a0 · \u00a0CONSIGNEE: ' + who);

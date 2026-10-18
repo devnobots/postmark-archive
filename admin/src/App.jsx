@@ -1,4 +1,4 @@
-// Standard Gauge back office: routes, sign-in (Supabase mode) and the local-mode banner.
+// Postmark Archive back office: routes, sign-in (Supabase mode) and the local-mode banner.
 import { useEffect, useState } from 'react';
 import { Refine } from '@refinedev/core';
 import routerProvider from '@refinedev/react-router';
@@ -39,7 +39,7 @@ export default function App({ provider, persistent }) {
 function Header() {
   return (
     <header className="topbar">
-      <Link to="/" className="brand">STANDARD GAUGE <span>admin</span></Link>
+      <Link to="/" className="brand">POSTMARK ARCHIVE <span>admin</span></Link>
       <nav className="nav" aria-label="Sections">
         <NavLink to="/" end className={({ isActive }) => (isActive ? 'on' : '')}>Pieces</NavLink>
         <NavLink to="/drops" className={({ isActive }) => (isActive ? 'on' : '')}>Drops</NavLink>
@@ -101,7 +101,7 @@ function SignIn() {
   };
   return (
     <form className="signin" onSubmit={submit}>
-      <div className="brand">STANDARD GAUGE <span>admin</span></div>
+      <div className="brand">POSTMARK ARCHIVE <span>admin</span></div>
       <label>Email<input type="email" autoComplete="username" value={email} onChange={e => setEmail(e.target.value)} required /></label>
       <label>Password<input type="password" autoComplete="current-password" value={password} onChange={e => setPassword(e.target.value)} required /></label>
       {error && <p className="err">{error}</p>}

@@ -1,4 +1,4 @@
-// Standard Gauge back office: one place to open the title meter and remember results by text.
+// Postmark Archive back office: one place to open the title meter and remember results by text.
 import { TitleMeter } from './lib/measure.mjs';
 import { toSiteItem, siteDropDate } from './lib/site-data.mjs';
 

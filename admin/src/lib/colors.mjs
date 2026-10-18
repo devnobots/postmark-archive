@@ -1,4 +1,4 @@
-// Standard Gauge: the stamp color rule, in the browser (same rule as tools/stamp_colors.py).
+// Postmark Archive: the stamp color rule, in the browser (same rule as tools/stamp_colors.py).
 // 1. Only the 9 stamp inks.
 // 2. For each piece, its stamp photo's item pixels (alpha > 128 where the photo has transparency) give 4 main
 //    colors (k-means in Lab) with how much of the piece each covers.

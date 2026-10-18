@@ -1,4 +1,4 @@
-// Standard Gauge back office: measure titles in the real site, the way a visitor sees them.
+// Postmark Archive back office: measure titles in the real site, the way a visitor sees them.
 // Loads the site's own index.html?preview=meter in hidden frames (same origin as the back office), so the
 // fonts, sizes and wrapping rules are exactly the site's. Nothing here copies the site's CSS.
 

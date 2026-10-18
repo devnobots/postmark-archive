@@ -1,4 +1,4 @@
-// Standard Gauge back office: convert between a database piece and the site's piece format.
+// Postmark Archive back office: convert between a database piece and the site's piece format.
 // The site format is exactly what data/current.js holds (and what index.html has always used).
 // Used by the back office (preview, publish) and by tools/seed_from_site.mjs. Plain JS, no imports.
 
@@ -66,7 +66,7 @@ export function currentJs(drop, pieces) {
     drop: { no: drop.no, date: siteDropDate(drop.release_date) },
     items: pieces.filter(p => p.status !== 'draft').sort((a, b) => a.position - b.position).map(p => toSiteItem(p, drop)),
   };
-  return '// Standard Gauge: the pieces on the homepage. Written by the back office; edit there, not here.\n' +
+  return '// Postmark Archive: the pieces on the homepage. Written by the back office; edit there, not here.\n' +
     '// Published ' + new Date().toISOString() + '\n' +
     'window.SG_DATA = ' + JSON.stringify(data, null, 1) + ';\n';
 }
@@ -82,7 +82,7 @@ export function pastJs(liveDrop, drops, pieces) {
         .map(p => toSiteItem(p, d)),
     })),
   };
-  return '// Standard Gauge: the past drops (newest first). Written by the back office; edit there, not here.\n' +
+  return '// Postmark Archive: the past drops (newest first). Written by the back office; edit there, not here.\n' +
     '// Published ' + new Date().toISOString() + '\n' +
     'window.SG_PAST = ' + JSON.stringify(data, null, 1) + ';\n';
 }

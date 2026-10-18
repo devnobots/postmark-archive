@@ -1,4 +1,4 @@
-// Standard Gauge: phone layout (screens narrower than 760px). Uses the page's own data and stamp code
+// Postmark Archive: phone layout (screens narrower than 760px). Uses the page's own data and stamp code
 // (ITEMS, stampHTML, esc). Desktop is untouched: nothing here runs unless html has class "m".
 (function () {
   if (!document.documentElement.classList.contains('m')) return;
@@ -37,12 +37,12 @@
   function renderSheet() {
     var html = '';
     if (!ARCHIVE) {
-      html += '<a class="m-mast" href="index.html">STANDARD GAUGE</a>' +
+      html += '<a class="m-mast" href="index.html">POSTMARK ARCHIVE</a>' +
         '<div class="m-head"><h1>アメリカから、一点もの。</h1>' +
         '<div class="m-dropline"><b>' + esc(DROP_LABEL) + ' 公開中</b>　·　<a href="drops.html">過去の便を見る →</a></div>' +
         '<div class="m-count">全' + ITEMS.length + '点</div></div>' +
         '<div class="m-sheet">' + ITEMS.map(function (_, i) { return cell(i); }).join('') + '</div>' +
-        '<div class="m-foot"><a href="drops.html">過去の便を見る →</a><div class="m-brand">STANDARD GAUGE</div></div>';
+        '<div class="m-foot"><a href="drops.html">過去の便を見る →</a><div class="m-brand">POSTMARK ARCHIVE</div></div>';
     } else {
       var groups = [], seen = {};
       ITEMS.forEach(function (d, i) {
@@ -50,14 +50,14 @@
         if (!seen[k]) { seen[k] = { drop: d.drop, ix: [] }; groups.push(seen[k]); }
         seen[k].ix.push(i);
       });
-      html += '<a class="m-mast" href="index.html">STANDARD GAUGE</a>' +
+      html += '<a class="m-mast" href="index.html">POSTMARK ARCHIVE</a>' +
         '<div class="m-arch-back"><a href="index.html">← 第' + CURRENT_DROP_NO + '便 公開中</a></div>' +
         '<div class="m-arch-title">過去の便</div><div class="m-arch-sub">すべて売約済。</div>' +
         groups.map(function (g) {
           return '<section class="m-drop"><div class="m-drop-head"><b>第' + g.drop.no + '便</b>　·　' + esc(g.drop.date) +
             ' 公開　·　' + g.ix.length + '点 完売</div><div class="m-sheet">' + g.ix.map(cell).join('') + '</div></section>';
         }).join('') +
-        '<div class="m-foot"><a href="index.html">第' + CURRENT_DROP_NO + '便を見る →</a><div class="m-brand">STANDARD GAUGE</div></div>';
+        '<div class="m-foot"><a href="index.html">第' + CURRENT_DROP_NO + '便を見る →</a><div class="m-brand">POSTMARK ARCHIVE</div></div>';
     }
     root.innerHTML = html;
     scaleCells();
@@ -81,7 +81,7 @@
     var rows = d.meas.map(function (m) { return '<div class="m-row"><span class="k">' + esc(m[0]) + '</span><span class="v">' + esc(m[1]) + '</span></div>'; }).join('');
     if (d.grade) rows += '<div class="m-row"><span class="k">状態ランク</span><span class="v m-jp"><b>' + esc(d.grade) + '</b>' + esc(d.gradeNote || '') + '</span></div>';
     if (d.sold) {
-      var who = !d.owner ? '<span class="m-jp">個人蔵</span> <span class="tag">(PRIVATE ARCHIVE)</span>'
+      var who = !d.owner ? '<span class="m-jp">個人蔵</span> <span class="tag">(PRIVATE COLLECTION)</span>'
         : (d.demo ? '<span>@' + esc(d.owner) + '</span>'
           : '<a href="https://www.instagram.com/' + encodeURIComponent(d.owner) + '/" target="_blank" rel="noopener">@' + esc(d.owner) + '</a>') +
           ' <span class="tag">(CONSIGNEE)</span>';
@@ -89,7 +89,7 @@
     }
     var found = dropLabel(d) + '  ·  FOUND: ' + cityOf(d) + ' (' + String(d.date).split(' ')[0] + ' ' + d.year + ')';
     root.innerHTML =
-      '<div class="m-bar"><button class="m-back" aria-label="戻る">←</button><a class="m-mast" href="index.html">STANDARD GAUGE</a><span style="width:44px"></span></div>' +
+      '<div class="m-bar"><button class="m-back" aria-label="戻る">←</button><a class="m-mast" href="index.html">POSTMARK ARCHIVE</a><span style="width:44px"></span></div>' +
       '<div class="m-views">' + views + '</div><div class="m-dots">' + dots + '</div>' +
       '<div class="m-info"><div class="m-found">' + esc(found) + '</div>' +
       '<h2 class="m-title">' + titleHTML(d.nameJa) + '</h2><div class="m-en">' + esc(d.nameEn) + '</div>' + rows + '</div>' +

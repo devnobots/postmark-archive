@@ -1,4 +1,4 @@
-// Standard Gauge back office: where uploaded photos are kept.
+// Postmark Archive back office: where uploaded photos are kept.
 // Supabase mode: the database's photo storage (bucket "photos"); a view keeps the photo's public address,
 // and the site build copies it into the site. Local mode: this browser's IndexedDB; a view keeps "local:<key>".
 import { MODE, supabase } from './config.js';

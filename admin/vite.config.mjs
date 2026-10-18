@@ -1,4 +1,4 @@
-// Standard Gauge back office: dev server and build.
+// Postmark Archive back office: dev server and build.
 // The dev server shows the site at / and the back office at /admin/, from one address, so the preview
 // and title measuring can load the real site pages. /api/* runs the same server code Vercel runs.
 import { defineConfig, loadEnv } from 'vite';

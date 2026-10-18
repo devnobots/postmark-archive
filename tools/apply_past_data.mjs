@@ -1,4 +1,4 @@
-// Standard Gauge (developer, run once): the past-drops page reads its drops from data/past.js.
+// Postmark Archive (developer, run once): the past-drops page reads its drops from data/past.js.
 // The pieces are written fully resolved, exactly as drops.html built them; after this the back office
 // (or the site build) writes data/past.js from the database. The page looks and works exactly as before.
 // Usage: node tools/apply_past_data.mjs drops.html
@@ -30,7 +30,7 @@ const drops = past.map(drop => ({
   pieces: drop.pieces.map(p => Object.assign({}, items[p.base], { price: p.price, grade: p.grade, gradeNote: p.gradeNote, city: p.city,
     date: p.date, year: '2026', sold: true, owner: p.owner || '', demo: !!p.demo, drop: { no: drop.no, date: drop.date } })),
 }));
-const data = '// Standard Gauge: the past drops (newest first). Written by the back office; edit there, not here.\n' +
+const data = '// Postmark Archive: the past drops (newest first). Written by the back office; edit there, not here.\n' +
   'window.SG_PAST = ' + JSON.stringify({ current, drops }, null, 1) + ';\n';
 
 const LOOP_OLD = "    var d = Object.assign({}, ITEMS[p.base], { price: p.price, grade: p.grade, gradeNote: p.gradeNote, city: p.city, date: p.date, year: '2026', sold: true, owner: p.owner || '', demo: !!p.demo, drop: { no: drop.no, date: drop.date } });";

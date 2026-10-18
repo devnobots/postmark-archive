@@ -1,4 +1,4 @@
-// Standard Gauge back office: the live preview. The real site (index.html?preview=edit) in three frames,
+// Postmark Archive back office: the live preview. The real site (index.html?preview=edit) in three frames,
 // each at its real size and scaled down to fit, so the site lays out exactly as it will for visitors.
 import { useEffect, useRef, useState } from 'react';
 import { siteDrop } from './meter.js';

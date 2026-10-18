@@ -1,4 +1,4 @@
--- Standard Gauge back office: tables (phase 1). Run once in the Supabase SQL editor, or with `supabase db push`.
+-- Postmark Archive back office: tables (phase 1). Run once in the Supabase SQL editor, or with `supabase db push`.
 -- Everything a visitor sees comes from these tables. Nothing here is readable without signing in as an admin:
 -- the site build reads with the server-only secret key, and visitors only ever get the built files.
 

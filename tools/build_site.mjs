@@ -1,4 +1,4 @@
-// Standard Gauge: build the site for hosting (Vercel runs this; you can run it too).
+// Postmark Archive: build the site for hosting (Vercel runs this; you can run it too).
 // 1. When the database settings are present (SUPABASE_URL and the server-only SUPABASE_SECRET_KEY, set in
 //    Vercel only), write data/current.js from the live drop's pieces (status ready or sold, in their order)
 //    and data/past.js from the past drops. Without them, the committed files are used as is.

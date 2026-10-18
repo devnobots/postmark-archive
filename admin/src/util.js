@@ -1,4 +1,4 @@
-// Standard Gauge back office: small shared helpers (no React).
+// Postmark Archive back office: small shared helpers (no React).
 
 // the piece's address on the site: same rule as index.html and mobile.js
 export function slug(nameEn) {

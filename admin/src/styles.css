@@ -1,4 +1,4 @@
-/* Standard Gauge back office. The site's palette and fonts; phone first (375px), quiet lines. */
+/* Postmark Archive back office. The site's palette and fonts; phone first (375px), quiet lines. */
 :root {
   --bg: #f5f2eb; --paper: #faf8f5; --ink: #1a2433; --muted: #6b6e72; --blue: #24418A; --rule: #e2dccd; --red: #b23a2a;
   --jp: 'Shippori Mincho', serif; --en: 'Old Standard TT', 'Shippori Mincho', serif;

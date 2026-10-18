@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Standard Gauge: check every Japanese title can wrap cleanly on a phone.
+"""Postmark Archive: check every Japanese title can wrap cleanly on a phone.
 
 Japanese has no spaces, so a browser can only break a title cleanly where we put a space between
 words. This fails if any title has an unbroken run longer than 12 characters (the longest real word

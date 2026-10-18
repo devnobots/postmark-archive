@@ -70,7 +70,7 @@ test('a new drop: build it, preview it, make it live, publish both files; the si
   await expect(page.locator('.drop').first().locator('.past-stamp')).toHaveCount(1);   // its sold piece: the socks
 });
 
-test('mark sold with the buyer\'s handle, or as a private archive', async ({ page }) => {
+test('mark sold with the buyer\'s handle, or as a private collection', async ({ page }) => {
   await openPiece(page, 0);
   await page.getByRole('group', { name: 'Status' }).getByRole('button', { name: 'Sold' }).click();
   await page.getByLabel('The buyer shared their Instagram').check();
@@ -82,10 +82,10 @@ test('mark sold with the buyer\'s handle, or as a private archive', async ({ pag
   const phone = page.frameLocator('iframe[data-frame="phone"]');
   await expect(phone.locator('.m-row').last()).toContainText('@test.buyer (CONSIGNEE)');
   await expect(phone.locator('.m-buy button')).toHaveText('売約済');
-  await page.getByLabel('Private archive (個人蔵)').check();
+  await page.getByLabel('Private collection (個人蔵)').check();
   await page.getByRole('button', { name: 'Save' }).click();
   await expect(page.getByTestId('save-state')).toContainText('Saved');
-  await expect(phone.locator('.m-row').last()).toContainText('個人蔵 (PRIVATE ARCHIVE)', { timeout: 15000 });
+  await expect(phone.locator('.m-row').last()).toContainText('個人蔵 (PRIVATE COLLECTION)', { timeout: 15000 });
   await page.goto('/admin/');
   await expect(page.getByTestId('group-live').getByTestId('piece-row').first().locator('.chip').first()).toHaveText('Sold');
 });

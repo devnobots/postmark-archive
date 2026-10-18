@@ -1,4 +1,4 @@
-// Standard Gauge back office tests: run against the dev server in local mode (no accounts).
+// Postmark Archive back office tests: run against the dev server in local mode (no accounts).
 // npm --prefix admin test
 import { defineConfig, devices } from '@playwright/test';
 

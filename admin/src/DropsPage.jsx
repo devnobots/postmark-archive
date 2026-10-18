@@ -1,4 +1,4 @@
-// Standard Gauge back office: drops. Build the next drop, preview it whole, and make it the live drop
+// Postmark Archive back office: drops. Build the next drop, preview it whole, and make it the live drop
 // (the current one moves to past drops in the same step). Publish puts the change on the site.
 import { useEffect, useState } from 'react';
 import { useList, useCreate, useUpdate, useInvalidate } from '@refinedev/core';

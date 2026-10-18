@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Standard Gauge: pick each stamp's background color by rule, not by eye.
+"""Postmark Archive: pick each stamp's background color by rule, not by eye.
 
 Rule
 1. Use only the 9 stamp inks in PALETTE (keeps every drop looking like one stamp series).

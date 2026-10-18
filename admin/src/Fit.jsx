@@ -1,4 +1,4 @@
-// Standard Gauge back office: title fit checks (measured in the real site) and shorter title ideas.
+// Postmark Archive back office: title fit checks (measured in the real site) and shorter title ideas.
 import { useEffect, useRef, useState } from 'react';
 import { LIMITS } from './lib/measure.mjs';
 import { authHeader } from './config.js';
