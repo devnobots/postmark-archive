@@ -97,7 +97,7 @@
       (d.sold ? '<button class="sold" disabled>売約済</button>' : '<button class="m-cart">購入する</button>') + '</div>' +
       '<div class="m-photo" role="dialog" aria-modal="true" aria-label="写真"><button class="m-close" aria-label="閉じる">×</button>' +
       '<div class="m-strip">' + d.views.map(function (v) { return '<div class="m-pane"><img src="' + v.full + '" alt="' + esc(d.nameEn) + '"></div>'; }).join('') + '</div>' +
-      '<div class="m-dots">' + dots + '</div><div class="m-help">細部や素材の質感まで、鮮明に。<span class="m-pinch">ピンチで拡大できます</span></div></div>';
+      '<div class="m-dots">' + dots + '</div><div class="m-help"><span class="m-cap">細部や素材の質感まで、鮮明に。</span><span class="m-pinch">ピンチで拡大できます</span></div></div>';
     window.scrollTo(0, 0);
     root.querySelector('.m-back').addEventListener('click', function () {
       if (fromSheet) { fromSheet = false; history.back(); }              // back to the sheet, same scroll spot

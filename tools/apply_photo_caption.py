@@ -55,7 +55,7 @@ def main():
     if sorted(names) != sorted(EDITS):
         sys.exit('Usage: python3 tools/apply_photo_caption.py index.html drops.html mobile.js mobile.css')
     srcs = {f: open(f, encoding='utf-8').read() for f in files}
-    done = [f for f, s in srcs.items() if (MARK in s if f.endswith('.html') else CAPTION in s or 'font-size: 13px; letter-spacing: .14em; color: #6b6e72; }' in s)]
+    done = [f for f, s in srcs.items() if (MARK in s if f.endswith('.html') else CAPTION in s or 'font-size: 13px; letter-spacing: .14em; color: #6b6e72; }' in s or '.m-pinch' in s)]
     if len(done) == len(files):
         print('already applied')
         return
