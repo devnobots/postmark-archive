@@ -216,3 +216,45 @@ Everything below happens in the back office or on the hosting. Nothing needs a t
 - **Needs a real project to test:** uploads to storage, the history table and the publish button in Supabase mode. Their local-mode versions are tested.
 - **Local mode:** photos uploaded in local mode stay in that browser and can't be published until the database is connected. Publish says so.
 - **The jeans:** the title still says ブラックデニム / "Faded Black Denim" although the photo is blue jeans. This is content for whoever writes the Japanese titles.
+
+## Update: POSTMARK ARCHIVE
+
+**What changed**
+- **The site's name is POSTMARK ARCHIVE**, as an uppercase English wordmark letter-spaced exactly as STANDARD GAUGE was:
+  - the homepage masthead and the past-drops masthead,
+  - the phone mastheads, top bar and footers,
+  - the access-code seal (POSTMARK / ARCHIVE on two lines),
+  - the tab titles: `POSTMARK ARCHIVE` and `過去の便 — POSTMARK ARCHIVE`. There is no katakana name anywhere.
+  - Done by `tools/apply_rename.py`: 4 files, 15 insertions and 15 deletions, exactly as expected, and it reports `already applied` when run again.
+- **Back office and server:** the header, sign-in screen and tab title (`POSTMARK ARCHIVE admin`), the title-ideas prompt ("You write product titles for Postmark Archive"), the comment line written at the top of `data/current.js` and `data/past.js`, and every code comment in `admin/src`, `api`, `tools` (the tools still in use), `supabase` and the docs.
+  - **Not renamed, as instructed:** the repo, the folder, the `package.json` names, the `sg-` storage keys, the database tables, and the font name `Old Standard TT` (checked, still in every file that uses it).
+- **PRIVATE COLLECTION:** a sold piece whose buyer didn't share a handle now says PRIVATE COLLECTION (was PRIVATE ARCHIVE) on desktop (`CONSIGNEE: PRIVATE COLLECTION`) and on the phone (`個人蔵 (PRIVATE COLLECTION)`). In the editor, the choice reads "Private collection (個人蔵)".
+- **Unsold pieces leave the site when a new drop goes live.** In "Make this the live drop":
+  - the old drop becomes a past drop, and its sold pieces stay with it;
+  - each unsold piece goes back to Draft with no drop, saved through the normal path so the history records it, and waits in the list under "Not in a drop";
+  - the confirmation says: "N unsold piece(s) from Drop X leave the site and go back to Draft (no drop). You can add one to a later drop."
+- **Near ties:** the stamp color rule decides them. No change; the bag and the bucket hat swap mustard and peach at the next publish.
+
+**Test results**
+- **Pixel checks:** before retaking the baselines, 5 failed, all only in the expected areas. I measured where the differing pixels were and looked at them:
+  - desktop masthead (503, 37)–(777, 75), on the homepage and the past-drops page;
+  - phone masthead (58, 17)–(317, 54);
+  - phone piece-page top bar (82, 7)–(293, 42);
+  - the phone footer's brand line on the past-drops page (96, 1834)–(279, 1868).
+
+  Nothing else changed. The seal and the PRIVATE COLLECTION row aren't inside these screenshots; the tests that open those pages pass. The baselines were then retaken and committed.
+- **`npm --prefix admin test`:** 29 passed. The release test now checks:
+  - the homepage shows only the new drop's own piece;
+  - the 6 unsold pieces are Drafts under "Not in a drop";
+  - the published `data/current.js` holds only the new drop's piece;
+  - Drop 12 in the published `data/past.js` holds only its sold piece (the socks).
+- **Check scripts:** `check_data`, `check_local`, `check_api`, `check_past` and `check_build` all pass, as do `check_titles.py` (17 titles), the self-check (`SELFCHECK OK`) and `npm run build`.
+
+**Old-name lines that remain** (old one-off tools from before the back office, no longer used): `tools/apply_archive_links.py`, `apply_consignee_and_ma1.py`, `apply_desktop_fixes.py`, `apply_drop_lockup.py`, `apply_drop_tie.py`, `apply_grade_display.py`, `apply_home_layout.py`, `apply_listing_data.py`, `apply_listing_postmark.py`, `apply_masthead.py`, `apply_meas_figures.py`, `apply_mobile.py`, `apply_palette.py`, `apply_site_data.py`, `apply_sold_pages.py`, `apply_sold_stamps.py`, `apply_virtual_pivot_fan.py`, `set_demo_prices.py`. `tools/apply_rename.py` mentions the old name on purpose, since it's the text it replaces.
+
+**Decisions I made**
+- **Earlier report sections:** they now say Postmark Archive too, and "private collection" where they described the sold choice, so the report reads as one document.
+- **The release test:** it checks Drop 12's own pieces in `past.js`, not the whole file. Past drops 9–11 legitimately contain other sold pieces with the same names, such as an earlier ringer tee.
+- **Pushes:** I pushed after each section, so the live GitHub Pages site already shows POSTMARK ARCHIVE and PRIVATE COLLECTION.
+
+**For part D:** name the Vercel project `postmark-archive`; renaming the GitHub repo can wait.
