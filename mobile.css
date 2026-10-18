@@ -82,12 +82,13 @@ html.m #m-root { display: block; color: #1a2433; font-family: 'Old Standard TT',
 .m-photo.open { display: block; }
 .m-photo .m-close { position: absolute; top: calc(6px + env(safe-area-inset-top)); right: 8px; z-index: 2; width: 44px; height: 44px;
   border: 0; background: none; font-size: 26px; color: #1a2433; cursor: pointer; }
-.m-photo .m-strip { position: absolute; left: 0; right: 0; top: 60px; bottom: 90px; display: flex; overflow-x: auto;
+.m-photo .m-strip { position: absolute; left: 0; right: 0; top: 60px; bottom: 94px; display: flex; overflow-x: auto;
   scroll-snap-type: x mandatory; scrollbar-width: none; }
 .m-photo .m-strip::-webkit-scrollbar { display: none; }
 .m-photo .m-pane { flex: none; width: 100%; height: 100%; scroll-snap-align: center; overflow: hidden; display: flex; align-items: center; justify-content: center; }
 .m-photo img { max-width: 100%; max-height: 100%; object-fit: contain; transition: transform .25s ease; touch-action: pinch-zoom; }
 .m-photo img.zoom { transform: scale(2.5); }
-.m-photo .m-dots { position: absolute; left: 0; right: 0; bottom: 58px; }
-.m-photo .m-help { position: absolute; left: 0; right: 0; bottom: 26px; text-align: center; font-family: 'Shippori Mincho', serif;
+.m-photo .m-dots { position: absolute; left: 0; right: 0; bottom: 62px; }
+.m-photo .m-help { position: absolute; left: 0; right: 0; bottom: 10px; text-align: center; font-family: 'Shippori Mincho', serif;
   font-size: 13px; letter-spacing: .14em; color: #6b6e72; }
+.m-photo .m-help .m-pinch { display: block; margin-top: 3px; font-size: 12px; }
