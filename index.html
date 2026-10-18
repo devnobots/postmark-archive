@@ -139,7 +139,9 @@
   #fullLoupe::before { top: 0; left: 50%; width: 1px; height: 100%; transform: translateX(-50%); }
   #fullLoupe::after { top: 50%; left: 0; width: 100%; height: 1px; transform: translateY(-50%); }
   .full-box.zooming { cursor: none; }
-  .full-box img { display: block; width: 100%; height: 100%; object-fit: contain; }
+  .full-box img { display: block; width: 100%; height: 712px; object-fit: contain; }
+  .full-caption { position: absolute; left: 0; right: 0; bottom: 21px; text-align: center; font-family: 'Shippori Mincho', serif;
+    font-size: 13px; letter-spacing: 0.14em; color: #6b6e72; pointer-events: none; }
   #full .icon-btn { top: 20px; right: 20px; color: var(--card); }
   .legend { font-size: 11px; color: var(--ink-3); margin-top: -12px; letter-spacing: 0.3px; }
   .title h2 { word-break: keep-all; } /* long names wrap at their spaces, never mid-word */
@@ -226,7 +228,7 @@
 
   <div id="full" role="dialog" aria-modal="true" aria-label="写真">
     <button id="fullBg" aria-label="閉じる"></button>
-    <div class="full-box"><img id="fullImg" alt=""><div id="fullLoupe"></div></div>
+    <div class="full-box"><img id="fullImg" alt=""><div class="full-caption">細部や生地の質感まで検証いただけます</div><div id="fullLoupe"></div></div>
     <button class="icon-btn" id="fullClose" aria-label="閉じる"><svg viewBox="0 0 24 24" width="24" height="24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M5 5 L19 19 M19 5 L5 19"/></svg></button>
   </div>
 
@@ -489,7 +491,7 @@ fullBox.addEventListener('mousemove', function (e) {
   if (!nw) return;
   var r = fullBox.getBoundingClientRect(), k = 576 / (r.width || 576);
   var x = (e.clientX - r.left) * k, y = (e.clientY - r.top) * k;
-  var s = Math.min(576 / nw, 768 / nh), w = nw * s, h = nh * s, ox = (576 - w) / 2, oy = (768 - h) / 2; // object-fit: contain
+  var s = Math.min(576 / nw, 712 / nh), w = nw * s, h = nh * s, ox = (576 - w) / 2, oy = (712 - h) / 2; // object-fit: contain, in the 712px photo area above the caption
   if (x < ox || x > ox + w || y < oy || y > oy + h) { showFullLoupe(false); return; }
   showFullLoupe(true);
   fullLoupe.style.left = Math.round(x) + 'px'; fullLoupe.style.top = Math.round(y) + 'px';

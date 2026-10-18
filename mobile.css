@@ -90,4 +90,4 @@ html.m #m-root { display: block; color: #1a2433; font-family: 'Old Standard TT',
 .m-photo img.zoom { transform: scale(2.5); }
 .m-photo .m-dots { position: absolute; left: 0; right: 0; bottom: 58px; }
 .m-photo .m-help { position: absolute; left: 0; right: 0; bottom: 26px; text-align: center; font-family: 'Shippori Mincho', serif;
-  font-size: 12px; letter-spacing: .1em; color: #6b6e72; }
+  font-size: 13px; letter-spacing: .14em; color: #6b6e72; }
