@@ -3,6 +3,11 @@
 import { test, expect } from '@playwright/test';
 import fs from 'node:fs';
 import { fileURLToPath } from 'node:url';
+import vm from 'node:vm';
+
+const SB = { window: {} };
+vm.runInNewContext(fs.readFileSync(new URL('../../data/current.js', import.meta.url), 'utf8'), SB);
+const UNSOLD = SB.window.SG_DATA.items.filter(d => !d.sold).map(d => d.nameEn);       // Drop 12's unsold pieces
 
 async function openPiece(page, n = 0) {
   await page.goto('/admin/');
@@ -46,6 +51,7 @@ test('a new drop: build it, preview it, make it live, publish both files; the si
   await expect(home.locator('.drop-status-current')).toHaveText('第13便 公開中');
   await page.getByTestId('drop-13').getByRole('button', { name: 'Make this the live drop' }).click();
   await expect(page.getByTestId('drops-msg')).toContainText('Drop 13 is now the live drop and Drop 12 is a past drop');
+  await expect(page.getByTestId('drops-msg')).toContainText(UNSOLD.length + ' unsold piece(s) went back to Draft (no drop)');
   await expect(page.getByText('Live').locator('..').getByTestId('drop-13')).toBeVisible();
   await expect(page.getByTestId('drop-12')).toContainText('past');
   // publish: two files
@@ -63,11 +69,21 @@ test('a new drop: build it, preview it, make it live, publish both files; the si
   await page.addInitScript(() => localStorage.setItem('sg-access', '1234'));
   await page.goto('/index.html');
   await expect(page.locator('.drop-status-current')).toHaveText('第13便 公開中');
-  await expect(page.locator('.fan-stamp')).toHaveCount(7);                       // the new hat + 6 unsold pieces moved in
+  await expect(page.locator('.fan-stamp')).toHaveCount(1);                       // only the new drop's own piece
   await page.goto('/drops.html');
   await expect(page.locator('.drop-head b').first()).toHaveText('第12便');          // Drop 12 is now a past drop
   await expect(page.locator('#backLink')).toHaveText('← 第13便 公開中');
   await expect(page.locator('.drop').first().locator('.past-stamp')).toHaveCount(1);   // its sold piece: the socks
+  // the unsold pieces are in neither file, and wait in the list as drafts with no drop
+  const built = { window: {} }; vm.runInNewContext(files['current.js'] + files['past.js'], built);
+  expect(built.window.SG_DATA.items.map(d => d.nameEn)).toEqual(['1980s Denim Bucket Hat']);
+  const drop12 = built.window.SG_PAST.drops.find(d => d.no === 12);
+  expect(drop12.pieces.map(d => d.nameEn)).toEqual(SB.window.SG_DATA.items.filter(d => d.sold).map(d => d.nameEn));   // only the sold socks
+  await page.unrouteAll();
+  await page.goto('/admin/');
+  const loose = page.getByTestId('group-loose').getByTestId('piece-row');
+  await expect(loose).toHaveCount(UNSOLD.length);
+  for (let i = 0; i < UNSOLD.length; i++) await expect(loose.nth(i).locator('.chip').first()).toHaveText('Draft');
 });
 
 test('mark sold with the buyer\'s handle, or as a private collection', async ({ page }) => {

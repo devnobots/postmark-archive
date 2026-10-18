@@ -1,5 +1,6 @@
 // Postmark Archive back office: drops. Build the next drop, preview it whole, and make it the live drop
-// (the current one moves to past drops in the same step). Publish puts the change on the site.
+// (the current one moves to past drops in the same step; its unsold pieces leave the site and go back to Draft,
+// one piece, one drop). Publish puts the change on the site.
 import { useEffect, useState } from 'react';
 import { useList, useCreate, useUpdate, useInvalidate } from '@refinedev/core';
 import { Link } from 'react-router';
@@ -36,21 +37,22 @@ export default function DropsPage() {
   };
   const setDate = async (d, date) => { await update({ resource: 'drops', id: d.id, values: { release_date: date || null }, successNotification: false }); await refresh(); };
 
-  // the next drop goes live; the current one becomes a past drop. Unsold pieces stay for sale in the new drop.
+  // the next drop goes live; the current one becomes a past drop. Its sold pieces stay with it; its unsold pieces
+  // leave the site and go back to Draft with no drop (they can be added to a later drop on purpose).
   const release = async d => {
     const ready = inDrop(d).filter(p => ON_SITE(p.status));
     if (!ready.length) return setMsg({ bad: true, text: 'Drop ' + d.no + ' has no Ready pieces yet.' });
     const unsold = live ? inDrop(live).filter(p => p.status === 'ready') : [];
     const text = 'Make Drop ' + d.no + ' the live drop?' + (live ? '\n\nDrop ' + live.no + ' moves to past drops.' : '') +
-      (unsold.length ? '\n' + unsold.length + ' unsold piece(s) from Drop ' + live.no + ' move into Drop ' + d.no + ' and stay for sale.' : '') +
+      (unsold.length ? '\n' + unsold.length + ' unsold piece(s) from Drop ' + live.no + ' leave the site and go back to Draft (no drop). You can add one to a later drop.' : '') +
       '\n\nNothing changes on the site until you press Publish to site.';
     if (!window.confirm(text)) return;
     if (live) await update({ resource: 'drops', id: live.id, values: { status: 'past' }, successNotification: false });   // one live drop at a time
     await update({ resource: 'drops', id: d.id, values: { status: 'live', release_date: d.release_date || today() }, successNotification: false });
-    let pos = inDrop(d).reduce((m, p) => Math.max(m, p.position || 0), 0);
-    for (const p of unsold) await update({ resource: 'pieces', id: p.id, values: { drop_id: d.id, position: ++pos }, successNotification: false });
+    for (const p of unsold) await update({ resource: 'pieces', id: p.id, values: { status: 'draft', drop_id: null }, successNotification: false });
     await refresh();
-    setMsg({ text: 'Drop ' + d.no + ' is now the live drop' + (live ? ' and Drop ' + live.no + ' is a past drop' : '') + '. Press Publish to site to put it on the site.' });
+    setMsg({ text: 'Drop ' + d.no + ' is now the live drop' + (live ? ' and Drop ' + live.no + ' is a past drop' : '') +
+      (unsold.length ? '. ' + unsold.length + ' unsold piece(s) went back to Draft (no drop)' : '') + '. Press Publish to site to put it on the site.' });
   };
 
   const group = (title, list, kind) => list.length > 0 && (
