@@ -27,6 +27,42 @@
       c.querySelector('.m-scale').style.transform = 'scale(' + (c.clientWidth / 156) + ')';
     });
   }
+  // sold stamps in black and white without a CSS filter (filters are what ran iPhones out of memory when zoomed):
+  // the same math as the desktop's grayscale(1) contrast(1.25) brightness(1.04), done once per image and kept
+  var GRAY = {};
+  function grayV(r, g, b) {
+    var v = (0.2126 * r + 0.7152 * g + 0.0722 * b) / 255;
+    v = Math.min(1, Math.max(0, (v - 0.5) * 1.25 + 0.5));
+    return Math.round(Math.min(1, v * 1.04) * 255);
+  }
+  function grayColor(css) {
+    var m = /rgba?\((\d+),\s*(\d+),\s*(\d+)/.exec(css); if (!m) return css;
+    var v = grayV(+m[1], +m[2], +m[3]); return 'rgb(' + v + ', ' + v + ', ' + v + ')';
+  }
+  function graySold() {
+    root.querySelectorAll('.stamp.is-sold .stamp-art').forEach(function (art) {
+      art.style.backgroundColor = grayColor(getComputedStyle(art).backgroundColor);
+      var price = art.querySelector('.stamp-price'); if (price) price.style.color = grayColor(getComputedStyle(price).color);
+      var img = art.querySelector('img'); if (!img) return;
+      var src = img.getAttribute('src');
+      function show(url) { img.src = url; img.classList.add('m-gray'); }
+      function fallback() { art.classList.add('m-gray-css'); }        // the old filter, only if the image can't be read
+      if (GRAY[src]) return show(GRAY[src]);
+      var im = new Image();
+      im.onload = function () {
+        try {
+          var c = document.createElement('canvas'); c.width = im.naturalWidth; c.height = im.naturalHeight;
+          var x = c.getContext('2d'); x.drawImage(im, 0, 0);
+          var px = x.getImageData(0, 0, c.width, c.height), a = px.data;
+          for (var k = 0; k < a.length; k += 4) { var v = grayV(a[k], a[k + 1], a[k + 2]); a[k] = a[k + 1] = a[k + 2] = v; }
+          x.putImageData(px, 0, 0);
+          GRAY[src] = c.toDataURL('image/png'); show(GRAY[src]);
+        } catch (e) { fallback(); }
+      };
+      im.onerror = fallback;
+      im.src = src;
+    });
+  }
   function cell(i) {
     var d = ITEMS[i];
     return '<button class="m-cell" data-i="' + i + '" aria-label="' + esc(d.nameJa + ' ' + (d.sold ? '売約済' : d.price)) + '">' +
@@ -61,6 +97,7 @@
     }
     root.innerHTML = html;
     scaleCells();
+    graySold();
     root.querySelectorAll('.m-cell').forEach(function (c) {
       c.addEventListener('click', function () {
         sheetScroll = window.scrollY; fromSheet = true;
@@ -139,7 +176,12 @@
     if (i >= 0) renderListing(i); else renderSheet();
   }
   window.addEventListener('hashchange', route);
-  window.addEventListener('resize', scaleCells);
+  // pinch-zoom fires resize on iPhone; only rescale when the page width really changes (turning the phone)
+  var cellsW = document.documentElement.clientWidth;
+  window.addEventListener('resize', function () {
+    var w = document.documentElement.clientWidth;
+    if (w !== cellsW) { cellsW = w; scaleCells(); }
+  });
   var mq = window.matchMedia('(max-width: 759px)');
   (mq.addEventListener ? mq.addEventListener('change', function () { location.reload(); }) : mq.addListener(function () { location.reload(); }));
   route();

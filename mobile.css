@@ -4,6 +4,20 @@
 html.m, html.m body { height: auto; overflow: auto; background: #f5f2eb; }
 html.m #frame, html.m #overlay, html.m #full, html.m .archive { display: none !important; }
 html.m body.locked #m-root { visibility: hidden; }
+/* zoom safety: iPhone browsers redraw CSS filters at the zoomed size, and the stamps' drop-shadow filters ran the tab
+   out of memory when pinch-zooming (white blocks, then a crash). On the phone the same faint shadows are plain
+   box-shadows, which cost nothing to zoom; the cut-out photo's small filter shadow is left off. */
+html.m .stamp-shadow { filter: none; transition: none; box-shadow: 0 10px 10px hsla(28, 25%, 20%, 0.07), 0 2px 3px hsla(28, 25%, 20%, 0.04); }
+html.m .stamp-art img.cut { filter: none; }
+/* the perforation holes show a soft shade, as the old blurred shadow did: a tinted block right behind the paper (no filter) */
+html.m .stamp-shadow { position: relative; }
+html.m .stamp-shadow::before { content: ''; position: absolute; inset: 0; background: linear-gradient(hsla(28, 25%, 20%, 0.06), hsla(28, 25%, 20%, 0.09)); }
+html.m .stamp-paper { position: relative; }
+/* sold stamps: black and white is drawn once by mobile.js (graySold), not by a filter; the photo stays hidden until it's ready */
+html.m .stamp.is-sold .stamp-art { filter: none; transition: none; }
+html.m .stamp.is-sold .stamp-art img:not(.m-gray) { visibility: hidden; }
+html.m .stamp.is-sold .stamp-art.m-gray-css { filter: grayscale(1) contrast(1.25) brightness(1.04); }
+html.m .stamp.is-sold .stamp-art.m-gray-css img { visibility: visible; }
 
 #m-root { display: none; }
 html.m #m-root { display: block; color: #1a2433; font-family: 'Old Standard TT', 'Shippori Mincho', serif;
