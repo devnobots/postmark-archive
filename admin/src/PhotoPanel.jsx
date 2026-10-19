@@ -1,7 +1,7 @@
 // Postmark Archive back office: a piece's photos. Upload from the phone, check the cutout's edges, reorder.
 // The first photo is the stamp photo (its colors also pick the stamp color by the rule).
 import { useEffect, useRef, useState } from 'react';
-import { loadPhoto, rotated, pieceMask, cutoutBlob, fullBlob } from './lib/cutout.mjs';
+import { loadPhoto, rotated, pieceMask, cutoutBlob, fullBlob, zoomBlob } from './lib/cutout.mjs';
 import { savePhoto, photoUrl } from './photos.js';
 
 // addresses the browser can show, for a list of stored photo paths
@@ -98,12 +98,14 @@ function CutoutDialog({ file, stampColor, onCancel, onDone }) {
       const src = rotated(photo, turns);
       const full = await fullBlob(src);
       const fullPath = await savePhoto(full.blob, 'full');
+      const z = await zoomBlob(file, turns);           // the deep-zoom copy (up to 4000px), only for big uploads
+      const zoom = z ? { zoom: await savePhoto(z.blob, 'zoom') } : {};
       if (bleed) {                                   // the stamp shows a 900px copy; the large view uses the full one
         const small = await fullBlob(src, 900);
-        return onDone({ img: await savePhoto(small.blob, 'stamp'), full: fullPath, ar: +full.ar.toFixed(3), bleed: true });
+        return onDone({ img: await savePhoto(small.blob, 'stamp'), full: fullPath, ...zoom, ar: +full.ar.toFixed(3), bleed: true });
       }
       const cutPath = await savePhoto(cut.blob, 'cut');
-      onDone({ img: cutPath, full: fullPath, ar: +cut.ar.toFixed(3) });
+      onDone({ img: cutPath, full: fullPath, ...zoom, ar: +cut.ar.toFixed(3) });
     } catch (e) { setError('The photo could not be saved: ' + (e && e.message || e)); setBusy(''); }
   };
 

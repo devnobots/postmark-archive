@@ -43,7 +43,7 @@ export default function PublishButton({ drops, pieces, meter }) {
     if (bad.length) return setMsg({ bad });
     const pastIds = new Set(drops.filter(d => d.status === 'past').map(d => String(d.id)));
     const shown = pieces.filter(p => ON_SITE(p.status) && (String(p.drop_id) === String(live.id) || pastIds.has(String(p.drop_id))));
-    if (MODE === 'local' && shown.some(p => (p.views || []).some(v => isLocal(v.img) || isLocal(v.full)))) {
+    if (MODE === 'local' && shown.some(p => (p.views || []).some(v => isLocal(v.img) || isLocal(v.full) || isLocal(v.zoom)))) {
       return setMsg({ text: 'Photos added in local mode stay in this browser, so they cannot be published yet. They can once the database is connected (the last setup step).' });
     }
     if (onSite.length > PALETTE.length) return setMsg({ text: 'The live drop has more pieces than stamp inks (' + PALETTE.length + '). Move a piece to another drop.' });

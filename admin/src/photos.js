@@ -58,5 +58,5 @@ export async function photoUrl(p) {
 
 // the same views with addresses the preview frames can load
 export async function resolveViews(views) {
-  return Promise.all((views || []).map(async v => ({ ...v, img: await photoUrl(v.img), full: await photoUrl(v.full) })));
+  return Promise.all((views || []).map(async v => ({ ...v, img: await photoUrl(v.img), full: await photoUrl(v.full), ...(v.zoom ? { zoom: await photoUrl(v.zoom) } : {}) })));
 }

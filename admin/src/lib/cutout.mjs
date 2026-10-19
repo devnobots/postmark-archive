@@ -5,9 +5,11 @@
 //   large background-colored holes are removed (the inside of a bag's strap).
 // - Stamp photo: trimmed to the piece, 640px on its long side, transparent background (WebP, or PNG where the
 //   browser cannot write WebP). Full photo: up to 2400px on its long side (enough for the 3x loupe), JPEG.
+// - Zoom photo: up to 4000px on its long side, JPEG, for the deep zoom in the site's full photo view. Only made when
+//   the upload is bigger than the full photo; a smaller upload is never enlarged.
 import { rgbToLab } from './colors.mjs';
 
-export const STAMP_SIDE = 640, FULL_SIDE = 2400, WORK_SIDE = 900;
+export const STAMP_SIDE = 640, FULL_SIDE = 2400, WORK_SIDE = 900, ZOOM_SIDE = 4000;
 const ROUGH = 2.5;                 // lightness change per pixel above which a pixel counts as texture, not backdrop
 
 function canvas(w, h) { const c = document.createElement('canvas'); c.width = w; c.height = h; return c; }
@@ -184,6 +186,19 @@ export async function cutoutBlob(img, m) {
   let blob = await toBlob(out, 'image/webp', 0.88);
   if (!blob || blob.type !== 'image/webp') blob = await toBlob(out, 'image/png');   // browsers that cannot write WebP
   return { blob, ar: out.height / out.width, canvas: out };
+}
+
+// the zoom photo: the original file read again at up to 4000px on its long side (the editor works on a 2400px copy),
+// turned like the rest, as a JPEG. null when the upload is not bigger than the full photo.
+export async function zoomBlob(file, turns = 0, maxSide = ZOOM_SIDE) {
+  const img = await loadPhoto(file, maxSide);
+  if (Math.max(img.width, img.height) <= FULL_SIDE) { img.close && img.close(); return null; }
+  const c = rotated(img, turns);
+  img.close && img.close();
+  const blob = await toBlob(c, 'image/jpeg', 0.88);
+  const out = { blob, width: c.width, height: c.height };
+  c.width = c.height = 0;                                  // let the phone have its memory back straight away
+  return out;
 }
 
 // the full photo for the large view and the loupe: at most 2400px on its long side
