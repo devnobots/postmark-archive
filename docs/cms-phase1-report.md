@@ -331,3 +331,54 @@ Everything below happens in the back office or on the hosting. Nothing needs a t
 - **Clean-up later:** `/zoom-test.html` and `assets/test/` are public at their address. Delete both when testing is over.
 
 **Later change (owner): the zoom photo loads in the background.** As soon as a piece's page opens, `zoom.js` starts downloading that photo's zoom version and the viewer. It starts right after the page's own load, so it never slows the page. It also starts when you switch thumbnails on desktop or swipe to another photo on the phone. On a slow connection (1.5 MB/s), the full view is ready about 0.3 s after the click instead of waiting about 5 s for the download. Clicking before the download finishes doesn't start a second download. A page with no piece open loads nothing extra.
+
+## Update: stamp paper
+
+**What changed** (commit `2b83eb2`)
+- **Perforated edge:** it now comes from four small SVG masks in `assets/stamp/`. The holes keep the 12px spacing, but each is moved by up to 0.45px, varied in size by up to 0.35px and very slightly out of round.
+  - Small stamps take one of three edges by position (1, 2, 3, 1, 2, 3…), so neighbours never match.
+  - The tall listing stamp has its own edge.
+- **Paper:** a fine cotton grain from one 384px image tile (`grain.png`, 99.7KB, shown at 192px), on a slightly lighter base (#fdfcf9, was #faf8f5).
+- **Where:** everywhere stamps appear, which is the homepage fan, the listing stamp, past drops, the phone sheets and the phone piece page. The back office's preview frames show it too.
+- **Phone memory:** nothing is computed in the browser and no CSS filters were added. The phone pages still have zero filters (counted on the live site), so the iPhone memory fix from `9af883e` is intact.
+
+**Hashes from step 3:** all match the doc, including the grain (numpy 2.5.4, scipy 1.18.1, in `.venv-tools`).
+```
+perf-192-1.svg       eaa8a88c1ee1
+perf-192-2.svg       4b3786355e08
+perf-192-3.svg       4909e3b74f5b
+perf-240-1.svg       9572a59b2e2b
+grain.png (pixels)   4fe47ddde22f
+```
+The four SVGs are 3.4–3.8KB each.
+
+**Applying it:** `tools/apply_stamp_paper.py` printed `stamp paper updated:` for both pages, then `already applied`. The diff was exactly `drops.html | 10`, `index.html | 10`, 14 insertions and 6 deletions. **Nothing was edited by hand.**
+
+**Browser check (dev server, then the live site)**
+- **Edges in use:**
+
+  | Page | Stamps | Edges |
+  |---|---|---|
+  | Homepage fan | 7 | 3 / 2 / 2 |
+  | Past drops | 10 | 4 / 3 / 3 |
+  | Phone homepage sheet | 7 | 3 / 2 / 2 |
+  | Phone past-drops sheet | 10 | 4 / 3 / 3 |
+
+  No two neighbours in a row share an edge. The only repeat in page order is the last stamp of one past drop and the first of the next, which never sit side by side.
+- **Tall stamps:** the desktop listing stamp and the phone piece page's stamps use `perf-240-1`.
+- **Sold stamps** are still black and white, with the grain.
+- **Every file loads,** with no page errors.
+- **Same tone:** on the phone baseline, blank paper averages 247.7 before and 247.3 after. Per color, it was (250, 248, 245) before and (249.3, 247.9, 244.6) after.
+
+**Tests**
+- `npm --prefix admin test`: 32 passed, after the baselines below.
+- All `check_*.mjs` pass, and `npm run build` succeeds. `dist/assets/stamp/` holds the four SVGs and `grain.png`.
+
+**Baselines retaken:** all six site baselines (commit `9ba91d8`), along with `admin/tests/screenshots/`. Before retaking them, I recreated each screenshot exactly as the tests take it and checked every changed pixel against where the stamps are:
+- `site-desktop`, `site-phone`, `drops-desktop`, `drops-phone` and `drops-sold-phone`: every changed pixel is inside a stamp (within 30px of its paper, which covers its shadow).
+- `drops-sold-desktop`: also the 1.8× listing stamp's own large soft shadow, which reaches up to about 90px below the paper. Those pixels changed by only 1–2 levels out of 255.
+- Nothing outside the stamps changed on any page.
+
+**iPhone check (step 5):** this can't be done from here, so it needs a real iPhone. Pinch-zoom the photos and the stamp sheet in DuckDuckGo or Safari, and check that the page doesn't reload or crash. What I could verify: the phone pages have zero CSS filters, and the new edges are masks of the same kind as before (the old edge was also a mask).
+
+**Anything changed or done by hand:** nothing in the doc's steps. `apply_stamp_paper.py` applied cleanly.
