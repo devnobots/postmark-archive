@@ -278,3 +278,54 @@ Everything below happens in the back office or on the hosting. Nothing needs a t
 - **Checks:** `check_api`, `check_build`, `check_data`, `check_local` and `check_past` all pass, and `npm run build` succeeds.
 
 **Later change (owner):** the caption now reads 細部や素材の質感まで、鮮明に。 everywhere (desktop and phone, both pages, and in `tools/apply_photo_caption.py`). Same position and type.
+
+## Update: deep zoom
+
+**What changed**
+- **The full photo view has deep zoom on desktop and phone, on the homepage and the past-drops page** (commit `1607f36`). It uses OpenSeadragon 4.1.0, the viewer from the Grade A Vinyl site, and the small hover loupe on the listing is unchanged.
+  - **Desktop:** click to zoom in, scroll to zoom, drag to look around.
+  - **Phone:** pinch or double-tap to zoom, drag to look around. When not zoomed in, swipe sideways or tap a dot for the next photo.
+  - The caption and hint lines are unchanged.
+- **The viewer is kept in the site** at `assets/vendor/openseadragon-4.1.0.min.js`, 247KB, with its BSD-3 license beside it. It loads only the first time someone opens a full view.
+- **Each photo zooms its biggest version:** the new `views[].zoom` when there is one, otherwise `full`.
+- **Back office** (commit `b653629`): an upload bigger than 2400px also gets a zoom photo of up to 4000px, as a JPEG, for both "Use cutout" and "Use whole photo". Smaller uploads get none, because they're never enlarged.
+- **Test piece:** The Rolling Stones, *Some Girls* LP, at `/zoom-test.html`. It's the homepage in preview mode with this piece added, so nothing is saved, the live homepage is unchanged, and the page isn't linked from anywhere (`noindex`).
+
+**Test results**
+- **Tool:** `tools/apply_deep_zoom.py` printed `deep zoom added:` for all 3 files, then `already applied`. Diff: `drops.html | 1`, `index.html | 1`, `tools/build_site.mjs | 2`.
+- **Test page** (dev server and the live site): it opens the Some Girls listing with no access code and loads the 4000px zoom photo. Three clicks zoom to 10.65×, and the zoom stops at exactly 12.5×, the limit where 1 photo pixel = 1.5 screen pixels. The normal homepage still has its 7 pieces, with no Some Girls.
+- **Desktop** (1280×880, 1600×1000 and 1024×700, both pages):
+  - the viewer sits on the photo frame within 0.01px;
+  - click zooms 2.2×, scrolling zooms further, and a drag moves the view;
+  - ×, the background and Esc each remove the viewer and bring the plain photo back;
+  - reopening on another photo opens that photo, with a single viewer;
+  - no requests leave the site, and there are no page errors.
+- **Phone** (375 and 320 wide, both pages):
+  - the viewer opens on the photo that was tapped;
+  - a swipe goes to the next photo, and a dot jumps to its photo;
+  - double-tap zooms 2.2×, and a two-finger pinch zooms further (2.2× → 3.6×);
+  - a drag while zoomed in pans the photo instead of changing it;
+  - × removes the viewer;
+  - no page errors.
+- **Suite:** `npm --prefix admin test` 32 passed (29 before, plus 3 new in `admin/tests/deepzoom.spec.mjs`). All `check_*.mjs` scripts pass, and `npm run build` succeeds. `dist/` contains `zoom.js`, `zoom-test.html`, `assets/vendor/` and `assets/test/`. No baselines were retaken, because no pixel test changed.
+
+**The zoom photo's actual size:** `assets/test/some-girls-zoom.jpg` is 4000 × 4000, a 5.9MB JPEG at quality 88. The full photo is 2400 × 2400 (2.2MB), and the stamp photo is 640 × 640.
+
+**The zoom size the back office uses:** 4000px, not capped.
+- A 6000 × 4000 upload, the size of a 24MP phone photo, gives a 4000 × 2667 zoom photo next to the 2400 × 1600 full photo. The existing 24MP test passes with this step included.
+- The browser canvas is 10.7 million pixels, under iPhone's 16.7-million-pixel canvas limit, and it's released right after the JPEG is made.
+- I can't measure a real iPhone's memory from here, so this should be confirmed by uploading one 24MP photo from the phone.
+
+**What I changed or decided, and why**
+- **The test photo was `assets/4000x.jpg`, a 4000 × 4000 JPEG, not `.png`.** I used it as the source and moved it to `photo-originals/4000x.jpg`, which is git-ignored and not published.
+- **`npm pack` ran in my scratch folder instead of `/tmp`.** The result is the same file: `//! openseadragon 4.1.0`.
+- **The back office's dev server serves a fixed list of site files.** I added `zoom.js` and `zoom-test.html` to it (`admin/vite.config.mjs`), because without that they returned 404 at `npm run dev`. The live site wasn't affected.
+- **The zoom photo is read again from the original file at save time.** The editor works on a 2400px copy, so it can't make a 4000px version from that.
+- **Two smaller back-office fixes:**
+  - the preview frames now resolve local zoom photos;
+  - in local mode, Publish refuses a local zoom photo, as it already does for the other photo sizes.
+- **`check_build.mjs`:** its scratch copy of the site now includes `zoom.js` and `zoom-test.html`, which the build requires. It now also checks that a `zoom` address is copied and rewritten, and that the zoom files are in the built site.
+- **Two side effects in the full view on desktop:**
+  - the viewer centers each photo in its frame, so a photo that isn't 3:4 (like the square LP) sits a little higher than 28px above the caption;
+  - the hover loupe no longer appears in the full view, because the viewer replaces it.
+- **Clean-up later:** `/zoom-test.html` and `assets/test/` are public at their address. Delete both when testing is over.
