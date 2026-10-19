@@ -1,0 +1,30 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex">
+<title>Zoom test — POSTMARK ARCHIVE</title>
+</head>
+<body>
+<!-- Postmark Archive: a test-only page for the deep zoom. It shows the homepage with one extra test piece
+     (The Rolling Stones, Some Girls LP, a big photo) through the homepage's preview mode. Nothing is saved to the
+     database and nothing changes for visitors; this page is not linked from anywhere. -->
+<script src="data/current.js"></script>
+<script>
+(function () {
+  var test = {
+    bg: '#F2D98A', nameJa: '70年代 ローリング・ストーンズ 女たち LP', capJa: '女たち LP', nameEn: '1970s Rolling Stones Some Girls LP',
+    size: '幅 31 · 高さ 31', price: '¥13,200', grade: 'B', gradeNote: 'ジャケットに角スレ', city: 'BOSTON MA', date: 'SEP 30', year: '2026',
+    meas: [['幅', '31 cm'], ['高さ', '31 cm']],
+    views: [{ img: 'assets/test/some-girls-stamp.jpg', full: 'assets/test/some-girls-full.jpg', zoom: 'assets/test/some-girls-zoom.jpg', ar: 1, bleed: true }],
+    test: true
+  };
+  var data = JSON.parse(JSON.stringify(window.SG_DATA));
+  data.items = data.items.filter(function (d) { return !d.test; }).concat([test]);
+  try { localStorage.setItem('sg-preview-zoomtest', JSON.stringify(data)); } catch (e) {}
+  location.replace('index.html?preview=zoomtest#1970s-rolling-stones-some-girls-lp');
+})();
+</script>
+</body>
+</html>

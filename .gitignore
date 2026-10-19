@@ -7,3 +7,4 @@ dist/
 .vercel
 admin/test-results/
 admin/playwright-report/
+photo-originals/
