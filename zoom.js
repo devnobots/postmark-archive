@@ -134,10 +134,57 @@
     phone = null;
   }
 
+  // ---------------- start loading early ----------------
+  // as soon as a piece's page opens, the viewer and the shown photo's biggest version download in the background,
+  // so the full view opens straight onto a photo that is already here (the viewer reuses the downloaded image)
+  var warm = {};
+  function preload(url) {
+    if (!url || warm[url]) return;
+    if (document.readyState !== 'complete') {         // after the page's own photos, so it never slows the page itself
+      warm[url] = 'queued';
+      window.addEventListener('load', function () { delete warm[url]; preload(url); });
+      return;
+    }
+    var im = new Image();
+    im.decoding = 'async';
+    im.src = url;
+    warm[url] = im;                                   // kept, so the browser keeps it ready
+    loadOSD().catch(function () {});
+  }
+  function preloadDesk() {                            // the listing's shown photo (desktop)
+    var s = window.state, items = window.ITEMS;
+    if (!s || !items || s.open < 0 || !items[s.open]) return;
+    var v = items[s.open].views[s.view] || items[s.open].views[0];
+    if (v) preload(v.zoom || v.full);
+  }
+  function preloadPhone() {                           // the piece page's shown photo (phone)
+    var views = document.querySelector('#m-root .m-views');
+    if (!views) return;
+    var k = Math.round(views.scrollLeft / (views.clientWidth || 1));
+    var im = document.querySelectorAll('#m-root .m-photo .m-strip img')[k];
+    if (im) preload(zoomUrl(im.getAttribute('src')));
+    if (!views.sgWarm) {                              // swiping to another photo loads that one too
+      views.sgWarm = true;
+      var t = 0;
+      views.addEventListener('scroll', function () { clearTimeout(t); t = setTimeout(preloadPhone, 150); });
+    }
+  }
+  // desktop: switching thumbnails
+  document.addEventListener('click', function (e) {
+    if (e.target.closest && e.target.closest('#thumbs')) setTimeout(preloadDesk, 0);
+  }, true);
+  // phone: the piece page is drawn by mobile.js on load and on each address change (after this script's listeners)
+  function phoneRoute() { setTimeout(preloadPhone, 0); }
+  window.addEventListener('hashchange', phoneRoute);
+  // a shared link may have opened a piece before this script loaded
+  function warmNow() { preloadDesk(); preloadPhone(); }
+  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', warmNow); else setTimeout(warmNow, 0);
+
   // ---------------- watch the full views open and close ----------------
   new MutationObserver(function (list) {
     list.forEach(function (m) {
       var t = m.target;
+      if (t.id === 'overlay' && t.classList.contains('open')) preloadDesk();
       if (t.id === 'full') { if (t.classList.contains('open')) openDesk(); else closeDesk(); }
       else if (t.classList && t.classList.contains('m-photo')) { if (t.classList.contains('open')) openPhone(t); else if (phone && phone.photo === t) closePhone(); }
     });

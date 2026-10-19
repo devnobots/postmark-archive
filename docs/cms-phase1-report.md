@@ -329,3 +329,5 @@ Everything below happens in the back office or on the hosting. Nothing needs a t
   - the viewer centers each photo in its frame, so a photo that isn't 3:4 (like the square LP) sits a little higher than 28px above the caption;
   - the hover loupe no longer appears in the full view, because the viewer replaces it.
 - **Clean-up later:** `/zoom-test.html` and `assets/test/` are public at their address. Delete both when testing is over.
+
+**Later change (owner): the zoom photo loads in the background.** As soon as a piece's page opens, `zoom.js` starts downloading that photo's zoom version and the viewer. It starts right after the page's own load, so it never slows the page. It also starts when you switch thumbnails on desktop or swipe to another photo on the phone. On a slow connection (1.5 MB/s), the full view is ready about 0.3 s after the click instead of waiting about 5 s for the download. Clicking before the download finishes doesn't start a second download. A page with no piece open loads nothing extra.
