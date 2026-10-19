@@ -1,43 +1,73 @@
-// Postmark Archive (desktop): the space around a card is the exit. No close buttons are shown on the item card or the
-// large photo; outside the white card (or the white photo board), the pointer becomes a small tracked-out CLOSE, and a
-// click anywhere there closes it: the large photo first, then the item. Esc does the same (the pages' own handler).
-// The old close buttons stay in the page, invisible, for keyboard and screen-reader users. The phone layout has its own.
+// Postmark Archive (desktop): closing the item card and the large photo.
+// - A visible, typographic [ 閉じる ] inside each card, part of its text grid, instead of an icon:
+//   the item card: at the right end of the eyebrow line (第12便 · FOUND: …), same baseline, font and color;
+//   the large photo: on the caption's baseline, in the caption's type, at the right edge of the photo frame.
+// - Clicking the space around a card still closes it (the large photo first, then the item); Esc as before.
+//   A drag that starts on the photo (panning the zoom) and ends outside never closes.
+// The phone layout has its own close and back buttons.
 (function () {
   if (document.documentElement.classList.contains('m')) return;
   var css = document.createElement('style');
   css.textContent =
-    '#closeBtn, #fullClose { width: 1px !important; height: 1px !important; padding: 0 !important; overflow: hidden; clip-path: inset(50%); opacity: 0; }\n' +
-    'html.sg-exiting, html.sg-exiting * { cursor: none !important; }\n' +
-    '#sg-exit { position: fixed; left: 0; top: 0; z-index: 2147483646; pointer-events: none; user-select: none; transform: translate(-50%, -50%);\n' +
-    '  font: 400 11px "Old Standard TT", serif; letter-spacing: 0.34em; padding-left: 0.34em; white-space: nowrap; color: #1a2433;\n' +
-    '  opacity: 0; transition: opacity 120ms ease; }\n' +
-    '#sg-exit.on { opacity: 1; }\n' +
-    '#sg-exit.dark { color: #f5f2eb; }';
+    '.sg-head { display: flex; align-items: baseline; justify-content: space-between; gap: 24px; }\n' +
+    '.sg-head #found { flex: 1 1 auto; min-width: 0; }\n' +
+    '.sg-close { position: static; width: auto; height: auto; flex: none; padding: 0; margin: 0; border: 0; background: none;\n' +
+    '  font-family: inherit; font-weight: normal; line-height: inherit; cursor: pointer; white-space: nowrap; transition: opacity 120ms ease; }\n' +
+    '.sg-close:hover { opacity: 0.55; }\n' +
+    '.sg-close:focus-visible { outline: none; }\n' +
+    'html.sg-kbd .sg-close:focus-visible { outline: 1px solid currentColor; outline-offset: 4px; }\n' +   // only for keyboard users
+    '#full .full-box #fullClose { position: absolute; top: auto; right: 48px; bottom: 32px; height: 18px; font-size: 12px; line-height: 1.5;\n' +
+    '  letter-spacing: 0.08em; color: #666666; font-family: "Shippori Mincho", serif; }';
   document.head.appendChild(css);
-  var label = document.createElement('div');
-  label.id = 'sg-exit'; label.setAttribute('aria-hidden', 'true'); label.textContent = 'CLOSE';
-  document.body.appendChild(label);
+  var LABEL = '[ 閉じる ]';
+  // the focus ring shows only once the keyboard is used (a card opened from a link focuses its close button)
+  document.addEventListener('keydown', function (e) { if (e.key === 'Tab') document.documentElement.classList.add('sg-kbd'); }, true);
+  document.addEventListener('mousedown', function () { document.documentElement.classList.remove('sg-kbd'); }, true);
+  function asText(btn) { btn.textContent = LABEL; btn.classList.remove('icon-btn'); btn.classList.add('sg-close'); }
 
+  // the item card: the eyebrow line becomes a row, the close at its right end
+  var found = document.getElementById('found'), closeBtn = document.getElementById('closeBtn');
+  if (found && closeBtn) {
+    var head = document.createElement('div');
+    head.className = 'sg-head';
+    found.parentNode.insertBefore(head, found);
+    head.appendChild(found);
+    var hadFocus = document.activeElement === closeBtn;   // a shared link opened the card before this script ran
+    asText(closeBtn);
+    closeBtn.classList.add('found');                  // the eyebrow's own size, color and letter-spacing
+    head.appendChild(closeBtn);
+    if (hadFocus || isOpen('overlay')) closeBtn.focus({ preventScroll: true });
+    // a sold piece's eyebrow that no longer fits beside the close: CONSIGNEE goes to a second line, cleanly
+    // (第11便 · FOUND: ASHEVILLE, NC   [ 閉じる ] / CONSIGNEE: PRIVATE COLLECTION) instead of wrapping mid-phrase
+    var SEP = '  ·  CONSIGNEE:';
+    var fit = function () {
+      if (found.querySelector('br') || !found.textContent.includes('CONSIGNEE:')) return;
+      if (found.getBoundingClientRect().height <= parseFloat(getComputedStyle(found).fontSize) * 2) return;   // one line: fine
+      for (var n = found.firstChild; n; n = n.nextSibling) {
+        if (n.nodeType !== 3) continue;
+        var k = n.data.indexOf(SEP);
+        if (k < 0) continue;
+        var rest = n.splitText(k);
+        rest.data = rest.data.slice(SEP.length - 'CONSIGNEE:'.length);
+        found.insertBefore(document.createElement('br'), rest);
+        return;
+      }
+    };
+    new MutationObserver(fit).observe(found, { childList: true });
+    fit();
+  }
+  // the large photo: on the caption's line, at the right edge of the photo frame
+  var fullClose = document.getElementById('fullClose'), box = document.querySelector('#full .full-box');
+  if (fullClose && box) { asText(fullClose); box.appendChild(fullClose); }
+
+  // clicking the space around a card closes it
   function isOpen(id) { var el = document.getElementById(id); return !!(el && el.classList.contains('open')); }
   function inside(t, sel) { return !!(t && t.closest && t.closest(sel)); }
-  // which view a point outside its card would close: 'full' (the large photo), 'item', or '' (not an exit)
-  function zoneOf(t) {
+  function zoneOf(t) {                                // 'full', 'item', or '' (inside a card, or nothing open)
     if (isOpen('full')) return inside(t, '.full-box, #sg-zoom') ? '' : 'full';
     if (isOpen('overlay')) return inside(t, '#overlay .panel') ? '' : 'item';
     return '';
   }
-  var zone = '';
-  function show(z, x, y) {
-    zone = z;
-    document.documentElement.classList.toggle('sg-exiting', !!z);
-    label.classList.toggle('on', !!z);
-    label.classList.toggle('dark', z === 'full');
-    if (z && x != null) { label.style.left = x + 'px'; label.style.top = y + 'px'; }
-  }
-  document.addEventListener('mousemove', function (e) { show(zoneOf(e.target), e.clientX, e.clientY); }, true);
-  document.documentElement.addEventListener('mouseleave', function () { show(''); });
-
-  // a click that starts and ends outside the card closes it (a drag that began on the photo never does)
   var downZone = '';
   window.addEventListener('mousedown', function (e) { downZone = e.button === 0 ? zoneOf(e.target) : ''; }, true);
   window.addEventListener('click', function (e) {
@@ -46,13 +76,5 @@
     if (!z || z !== start) return;
     e.preventDefault(); e.stopPropagation();
     if (z === 'full') window.closeFull(); else window.closeItem();
-    var now = document.elementFromPoint(e.clientX, e.clientY);
-    show(zoneOf(now), e.clientX, e.clientY);
   }, true);
-  // Esc (handled by the page) closes a view: look again at what is under the pointer now
-  document.addEventListener('keyup', function () {
-    if (!zone) return;
-    var x = parseFloat(label.style.left) || 0, y = parseFloat(label.style.top) || 0;
-    show(zoneOf(document.elementFromPoint(x, y)), x, y);
-  });
 })();
