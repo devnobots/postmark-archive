@@ -35,6 +35,15 @@ export default function DropsPage() {
     await refresh();
     setMsg({ text: 'Drop ' + no + ' added. Add pieces to it, then make it the live drop when it is ready.' });
   };
+  const setJewelry = async (d, jewelry) => {
+    try {
+      await update({ resource: 'drops', id: d.id, values: { jewelry }, successNotification: false, errorNotification: false });
+      await refresh();
+      setMsg({ text: 'Drop ' + d.no + ': jewelry colours ' + (jewelry ? 'on' : 'off') + '. The stamp colours change the next time this drop is published (Publish to site).' });
+    } catch (e) {
+      setMsg({ bad: true, text: 'Drop ' + d.no + ': not saved (' + ((e && e.message) || e) + '). If the database says the column jewelry does not exist, run supabase/migrations/0004_drop_jewelry.sql in the Supabase SQL editor.' });
+    }
+  };
   const setStory = async (d, story) => {
     try {
       await update({ resource: 'drops', id: d.id, values: { story }, successNotification: false, errorNotification: false });
@@ -78,6 +87,12 @@ export default function DropsPage() {
               </label>
             ) : <div className="note">Released {d.release_date ? siteDropDate(d.release_date) : '—'}</div>}
             {kind !== 'past' && <StoryField drop={d} onSave={v => setStory(d, v)} />}
+            {kind !== 'past' && (
+              <label className="inline" style={{ marginTop: 6, display: 'flex', gap: 8, alignItems: 'center' }}>
+                <input type="checkbox" data-testid={'jewelry-' + d.no} checked={!!d.jewelry} onChange={e => setJewelry(d, e.target.checked)} style={{ width: 22, height: 22 }} />
+                Jewelry: neutral stamp colours for the whole drop
+              </label>
+            )}
             <div className="list-actions" style={{ margin: '8px 0 0' }}>
               {kind !== 'past' && <Link className="btn small" to={'/pieces/new?drop=' + d.id} style={{ display: 'inline-flex', alignItems: 'center', textDecoration: 'none' }}>+ Add a piece</Link>}
               {kind !== 'past' && <button className="btn small" onClick={() => setPreview(preview && preview.id === d.id ? null : d)}>{preview && preview.id === d.id ? 'Hide preview' : 'Preview the drop'}</button>}

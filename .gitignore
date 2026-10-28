@@ -8,3 +8,7 @@ dist/
 admin/test-results/
 admin/playwright-report/
 photo-originals/
+
+# jewelry test page (sample photos, never published)
+jewlery_test/
+jewelry-test.html

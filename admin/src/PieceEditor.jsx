@@ -5,7 +5,7 @@ import { useList, useOne, useCreate, useUpdate, useDelete, useInvalidate } from 
 import { useForm, useWatch, useFieldArray } from 'react-hook-form';
 import { useNavigate, useParams, useSearchParams, Link } from 'react-router';
 import { sizeLine, toSiteItem } from './lib/site-data.mjs';
-import { scoresForImage, assignInks, PALETTE } from './lib/colors.mjs';
+import { scoresForImage, assignInks, PALETTE, NEUTRAL_PALETTE, paletteFor } from './lib/colors.mjs';
 import { STATES, STATUS_LABEL, CATEGORY_EN, MEAS_EN, today, yenText, missingFields, slug, loadSiteData, dropName } from './util.js';
 import { openMeter } from './meter.js';
 import { photoUrl, resolveViews } from './photos.js';
@@ -78,11 +78,11 @@ function toRow(v, piece, soldAt = null) {
 
 // ---------- the stamp color rule (same inks and scoring as tools/stamp_colors.py) ----------
 // The edited piece and every other finished piece in its drop with a photo: each gets a different ink.
-function useRuleColors(piece, views, pieces, dropId) {
+function useRuleColors(piece, views, pieces, dropId, palette = PALETTE) {
   const [rule, setRule] = useState(null);         // { mine, changes: [{ p, to }] } or { error }
   const others = pieces.filter(p => String(p.drop_id) === String(dropId) && ON_SITE(p.status) && (!piece || p.id !== piece.id) && (p.views || []).length);
   const first = views && views[0] && views[0].img;
-  const key = JSON.stringify([first, others.map(p => [p.id, p.views[0].img, p.bg])]);
+  const key = JSON.stringify([palette[0][0], first, others.map(p => [p.id, p.views[0].img, p.bg])]);
   useEffect(() => {
     if (!first) { setRule(null); return; }
     if (others.length + 1 > PALETTE.length) { setRule({ error: 'This drop has more pieces than stamp inks (' + PALETTE.length + '). Move a piece to another drop.' }); return; }
@@ -90,8 +90,8 @@ function useRuleColors(piece, views, pieces, dropId) {
     const t = setTimeout(async () => {
       try {
         const all = [...others.map(p => p.views[0].img), first];
-        const scores = await Promise.all(all.map(async img => scoresForImage(await photoUrl(img))));
-        const pick = assignInks(scores);
+        const scores = await Promise.all(all.map(async img => scoresForImage(await photoUrl(img), palette)));
+        const pick = assignInks(scores, palette);
         if (live) setRule({ mine: pick[pick.length - 1], changes: others.map((p, i) => ({ p, to: pick[i] })).filter(x => x.to.bg !== x.p.bg || (x.to.ink || null) !== (x.p.ink || null)) });
       } catch (e) { if (live) setRule({ error: 'The stamp photo could not be read for its colors.' }); }
     }, 250);
@@ -119,7 +119,7 @@ function EditorForm({ piece, pieces, drops, categories, site, reload }) {
   const [fit, setFit] = useState(null);                 // the latest fit result for the current titles
   const [tab, setTab] = useState('form');
   const wide = useWide();
-  const rule = useRuleColors(piece, v.views, pieces, v.drop_id);
+  const rule = useRuleColors(piece, v.views, pieces, v.drop_id, paletteFor(drops.find(d => String(d.id) === String(v.drop_id))));
 
   // ---------- the title meter opens before the preview frames ----------
   const [meter, setMeter] = useState(null);
@@ -243,7 +243,7 @@ function EditorForm({ piece, pieces, drops, categories, site, reload }) {
 
   const lastWord = String(v.name_ja || '').trim().split(' ').pop() || '';
   const dropChoices = drops.filter(d => d.status !== 'past' || (piece && String(piece.drop_id) === String(d.id))).sort((a, b) => b.no - a.no);
-  const inkName = (PALETTE.find(([, hex]) => hex === color.bg) || [''])[0];
+  const inkName = ([...PALETTE, ...NEUTRAL_PALETTE].find(([, hex]) => hex === color.bg) || [''])[0];
   const formPane = (
     <form className="form" onSubmit={e => { e.preventDefault(); submit(); }} noValidate>
       <div className="field">

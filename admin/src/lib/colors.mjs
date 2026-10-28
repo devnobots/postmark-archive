@@ -12,6 +12,12 @@ export const PALETTE = [
   ['mustard', '#E8B53A'], ['butter', '#F2D98A'], ['peach', '#D98C6A'], ['brick', '#C2412D'], ['sky', '#9DC3D9'],
   ['teal', '#6E9E8C'], ['sage', '#A9B79A'], ['lilac', '#C9B3D6'], ['cream', '#EFE3C8'],
 ];
+// a jewelry drop (drops.jewelry): light neutrals, so silver, turquoise and coral are not fighting a colour
+export const NEUTRAL_PALETTE = [
+  ['bone', '#ECE5D6'], ['oat', '#DCD5C7'], ['mist', '#E0E2DB'], ['linen', '#E6DDCB'], ['ash', '#D8D6CF'],
+  ['shell', '#E9E3D9'], ['sand', '#D9D2C3'], ['fog', '#E3E0D7'], ['ivory', '#EFE8DA'],
+];
+export function paletteFor(drop) { return drop && drop.jewelry ? NEUTRAL_PALETTE : PALETTE; }
 export const DARK_INKS = ['brick'];
 export const CREAM_TEXT = '#FFFDF6';
 const MIN_WEIGHT = 0.05;
@@ -122,9 +128,9 @@ export function mainColors(rgb, k = 4, restarts = 8) {
 }
 
 // one score per ink (PALETTE order); higher = the ink stands further from the piece's main colors
-export function scoresFor(rgb) {
+export function scoresFor(rgb, palette = PALETTE) {
   const doms = mainColors(rgb).filter(([, w]) => w > MIN_WEIGHT);
-  return PALETTE.map(([, hex]) => {
+  return palette.map(([, hex]) => {
     const p = hexToLab(hex);
     const ds = doms.map(([c, w]) => Math.hypot(p[0] - c[0], p[1] - c[1], p[2] - c[2]) / (0.5 + w));
     return ds.length ? Math.min(...ds) : 0;
@@ -132,8 +138,8 @@ export function scoresFor(rgb) {
 }
 
 // every piece a different ink, with the highest total score (exact search; a drop has at most 9 pieces)
-export function assignInks(scores) {
-  const n = scores.length, m = PALETTE.length;
+export function assignInks(scores, palette = PALETTE) {
+  const n = scores.length, m = palette.length;
   if (n > m) throw new Error(n + ' pieces but only ' + m + ' inks');
   // upper bound for pruning: each remaining row's best score
   const rowBest = scores.map(r => Math.max(...r));
@@ -147,13 +153,14 @@ export function assignInks(scores) {
     const order = [...Array(m).keys()].sort((a, b) => scores[i][b] - scores[i][a]);
     for (const c of order) if (!used[c]) { used[c] = true; pick[i] = c; go(i + 1, total + scores[i][c]); used[c] = false; }
   })(0, 0);
-  return bestPick.map(c => ({ name: PALETTE[c][0], bg: PALETTE[c][1], ink: DARK_INKS.includes(PALETTE[c][0]) ? CREAM_TEXT : null }));
+  return bestPick.map(c => ({ name: palette[c][0], bg: palette[c][1], ink: DARK_INKS.includes(palette[c][0]) ? CREAM_TEXT : null }));
 }
 
 // ---------- browser only: read a photo's pixels ----------
 const cache = new Map();
-export async function scoresForImage(url) {
-  if (cache.has(url)) return cache.get(url);
+export async function scoresForImage(url, palette = PALETTE) {
+  const key = palette[0][0] + ' ' + url;
+  if (cache.has(key)) return cache.get(key);
   const p = (async () => {
     const img = new Image();
     img.crossOrigin = 'anonymous';
@@ -164,9 +171,9 @@ export async function scoresForImage(url) {
     const c = document.createElement('canvas'); c.width = w; c.height = h;
     const g = c.getContext('2d', { willReadFrequently: true });
     g.drawImage(img, 0, 0, w, h);
-    return scoresFor(itemPixels(g.getImageData(0, 0, w, h).data, w, h));
+    return scoresFor(itemPixels(g.getImageData(0, 0, w, h).data, w, h), palette);
   })();
-  cache.set(url, p);
-  p.catch(() => cache.delete(url));
+  cache.set(key, p);
+  p.catch(() => cache.delete(key));
   return p;
 }

@@ -5,7 +5,7 @@ import { useState } from 'react';
 import { Link } from 'react-router';
 import { useUpdate, useInvalidate } from '@refinedev/core';
 import { currentJs, pastJs } from './lib/site-data.mjs';
-import { scoresForImage, assignInks, PALETTE } from './lib/colors.mjs';
+import { scoresForImage, assignInks, PALETTE, paletteFor } from './lib/colors.mjs';
 import { MODE, authHeader } from './config.js';
 import { missingFields } from './util.js';
 import { checkCached, titlesOf } from './meter.js';
@@ -50,8 +50,9 @@ export default function PublishButton({ drops, pieces, meter }) {
     setBusy(true);
     try {
       // stamp colors by the rule, over the whole live drop
-      const scores = await Promise.all(onSite.map(async p => scoresForImage(await photoUrl(p.views[0].img))));
-      const pick = assignInks(scores);
+      const palette = paletteFor(live);                                   // neutral inks for a jewelry drop
+      const scores = await Promise.all(onSite.map(async p => scoresForImage(await photoUrl(p.views[0].img), palette)));
+      const pick = assignInks(scores, palette);
       const colored = onSite.map((p, i) => ({ ...p, bg: pick[i].bg, ink: pick[i].ink }));
       for (let i = 0; i < onSite.length; i++) {
         const p = onSite[i], to = pick[i];
