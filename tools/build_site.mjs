@@ -12,7 +12,7 @@ import { fileURLToPath } from 'node:url';
 import { currentJs, pastJs } from '../admin/src/lib/site-data.mjs';
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');   // fileURLToPath: folders with spaces
-const SITE_FILES = ['index.html', 'drops.html', 'mobile.css', 'mobile.js', 'zoom.js', 'exit.js', 'zoom-test.html', 'assets', 'data'];
+const SITE_FILES = ['index.html', 'drops.html', 'mobile.css', 'mobile.js', 'zoom.js', 'exit.js', 'zoom-test.html', 'favicon.ico', 'favicon.svg', 'apple-touch-icon.png', 'assets', 'data'];
 const { SUPABASE_URL, SUPABASE_SECRET_KEY } = process.env;
 
 async function get(p) {
