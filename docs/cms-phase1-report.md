@@ -460,3 +460,53 @@ The four SVGs are 3.4–3.8KB each.
 **Reminder for the owner (step 6):** publish each new drop on a Friday, Japan time. Its release date sets the "次の便" date (+7 days). If a drop is released on another day, that line follows that day, and the 金曜 promise under the headline would be wrong that week.
 
 **Anything changed or done by hand:** nothing in the doc's steps. `.DS_Store` (macOS Finder) and `collection_png/` stay untracked.
+
+## Update: jewelry drops
+
+**Part A: the test page** (local only; `jewelry-test.html` and `jewlery_test/` are git-ignored and never published)
+- **Step 4 output** (the same on a second run):
+  ```
+  j1: il_fullxfull.7332717113_cv1r.avif  backdrop under 35  piece (544, 235, 1075, 1416)  stamp photo 288x640
+  j2: native_jewelry_062226033.webp  backdrop under 15  piece (244, 206, 962, 1370)  stamp photo 395x640
+  j3: native_pendants_042926015.webp  backdrop under 15  piece (285, 118, 926, 1486)  stamp photo 300x640
+  written: jewelry-test.html (7 stamps: j1 j2 j3 j1 j2 j3 j1)
+  ```
+- **What the page shows:**
+  - desktop: 7 stamps, each on a different light neutral, with the story line;
+  - the piece card and the large photo with the zoom viewer open;
+  - phone: the 7-stamp sheet;
+  - no page errors.
+- **Screenshots:** `docs/jewelry-test-desktop.png`, `docs/jewelry-test-card.png` and `docs/jewelry-test-phone.png`.
+- **The cutouts:**
+  - **Clean:** the silver outlines, the stamped edges and the turquoise come out clean, with no black halo, and the chain is trimmed off above each bail.
+  - **Black left inside enclosed gaps:** the tool removes only the black that touches the photo's edge, so fully enclosed openings keep the black backdrop. You can see it inside the bail loops (the silver pendant's bail, and the gap between the turquoise pendant's bail and body), plus some small holes between the stamped pendant's arrows.
+  - **The polished silver pendant (j1):** two black shapes at its bottom edge, either reflections in the polished metal or enclosed gaps. This is the "polished silver can lose some edges" case.
+  - **The turquoise pendant (j2):** a short stub of chain is left at the top right of its bail.
+  - **Nothing is missing** from any piece.
+
+**Part B: the back office** (commit `296d588`)
+- **The tool:** four `updated:` lines plus `written: supabase/migrations/0004_drop_jewelry.sql`, then `already applied`. The diff for `admin` was `4 files changed, 43 insertions(+), 20 deletions(-)`, exactly as expected.
+- **What it does:** live and upcoming drops get a **"Jewelry: neutral stamp colours for the whole drop"** checkbox.
+  - When it's ticked, the colour rule scores against the nine neutrals (bone, oat, mist, linen, ash, shell, sand, fog, ivory) instead of the nine inks, with the same scoring and one colour per piece.
+  - The piece editor shows that neutral, and **Publish to site** colours the live drop with it.
+- **The public pages are untouched.**
+
+**Tests, checks and build**
+- `tests/jewelry.spec.mjs` + `tests/colors.spec.mjs`: 3 passed.
+- `npm --prefix admin test`: 38 passed (36 before, plus 2 new). **No pixel baseline changed.**
+- All five `tools/tests/check_*.mjs` pass, and `npm run build` succeeds.
+- `dist/` contains no `jewelry-test.html` and nothing from `jewlery_test/`.
+
+**Migrations**
+- **0003 (story line): already run.** The live database has `drops.story`.
+- **0004 (jewelry): not run. This is an owner action.** The repo isn't linked to Supabase, so I didn't look for credentials, and the live database has no `drops.jewelry` yet. Until it's run, ticking the box in the live back office shows an error naming this file; nothing else changes.
+  - **To run it:** open https://supabase.com/dashboard/project/bzssycsmpscoxnadzpvv/sql/new, paste the line below and press **Run**:
+    ```
+    alter table public.drops add column if not exists jewelry boolean not null default false;
+    ```
+
+**Anything changed or done by hand**
+- `jewlery_test/` held the three photos but **no mock-up PNG.** The tool only skips the mock-up, so it wasn't needed.
+- `collection_png/` is no longer in the folder.
+- **Viewing the test page:** the back office's dev server only serves its listed site files, so `jewelry-test.html` returns 404 at `npm run dev`. I viewed it with a plain local web server from the repo folder instead, and didn't change the dev server's list.
+- `.DS_Store` (macOS Finder) stays untracked.
