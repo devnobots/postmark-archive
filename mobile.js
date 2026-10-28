@@ -75,8 +75,9 @@
     if (!ARCHIVE) {
       html += '<a class="m-mast" href="index.html">POSTMARK ARCHIVE</a>' +
         '<div class="m-head"><h1>アメリカから、一点もの。</h1>' +
-        '<div class="m-dropline"><b>' + esc(DROP_LABEL) + ' 公開中</b>　·　<a href="drops.html">過去の便を見る →</a></div>' +
-        '<div class="m-count">全' + ITEMS.length + '点</div></div>' +
+        '<div class="m-sub">' + phraseHTML('七点ずつ、七日間だけ。') + '<br>' + phraseHTML('見つけた町と日付を添えてお届けします。') + '</div>' +
+        '<div class="m-dropline"><b>' + esc(DROP_LABEL) + ' 公開中' + (dropLeft(DROP.date, Date.now()) ? ' · ' + dropLeft(DROP.date, Date.now()) : '') + '</b>　·　<a href="drops.html">過去の便を見る →</a></div>' +
+        (DROP.story ? '<div class="m-story">' + phraseHTML('今回の便：' + DROP.story) + '</div>' : '<div class="m-count">全' + ITEMS.length + '点</div>') + '</div>' +
         '<div class="m-sheet">' + ITEMS.map(function (_, i) { return cell(i); }).join('') + '</div>' +
         '<div class="m-foot"><a href="drops.html">過去の便を見る →</a><div class="m-brand">POSTMARK ARCHIVE</div></div>';
     } else {

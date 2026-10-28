@@ -60,10 +60,18 @@ export function toSiteItem(p, drop) {
 // '2026-10-09' -> '2026.10.09'
 export function siteDropDate(iso) { return iso ? iso.replace(/-/g, '.') : ''; }
 
+// the homepage's drop: { no, date } plus story (今回の便：...) only when the drop has one
+export function siteDropData(drop) {
+  const d = { no: drop.no, date: siteDropDate(drop.release_date) };
+  const story = String(drop.story || '').trim();
+  if (story) d.story = story;
+  return d;
+}
+
 // the whole homepage file: window.SG_DATA = {...}
 export function currentJs(drop, pieces) {
   const data = {
-    drop: { no: drop.no, date: siteDropDate(drop.release_date) },
+    drop: siteDropData(drop),
     items: pieces.filter(p => p.status !== 'draft').sort((a, b) => a.position - b.position).map(p => toSiteItem(p, drop)),
   };
   return '// Postmark Archive: the pieces on the homepage. Written by the back office; edit there, not here.\n' +

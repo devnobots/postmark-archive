@@ -35,6 +35,9 @@ html.m #m-root { display: block; color: #1a2433; font-family: 'Old Standard TT',
 .m-dropline a { color: #6b6e72; text-decoration: none; border-bottom: 1px solid rgba(107,110,114,.4); padding-bottom: 2px;
   display: inline-block; line-height: 2; }
 .m-count { margin-top: 18px; font-family: 'Shippori Mincho', serif; font-size: 12px; letter-spacing: .2em; color: #6b6e72; }
+.m-sub { margin-top: 10px; font-family: 'Shippori Mincho', serif; font-size: 13px; letter-spacing: .04em; line-height: 1.7; color: #4a4f57; }
+.m-story { margin-top: 18px; font-family: 'Shippori Mincho', serif; font-size: 13px; letter-spacing: .04em; line-height: 1.7; color: #6b6e72; }
+.m-sub .ph, .m-story .ph { display: inline-block; }
 .m-sheet { display: grid; grid-template-columns: 1fr 1fr; gap: 16px 14px; padding: 20px 16px 8px; }
 .m-cell { position: relative; display: block; width: 100%; aspect-ratio: 156 / 192; padding: 0; border: 0; background: none;
   cursor: pointer; -webkit-tap-highlight-color: transparent; }

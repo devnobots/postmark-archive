@@ -35,6 +35,15 @@ export default function DropsPage() {
     await refresh();
     setMsg({ text: 'Drop ' + no + ' added. Add pieces to it, then make it the live drop when it is ready.' });
   };
+  const setStory = async (d, story) => {
+    try {
+      await update({ resource: 'drops', id: d.id, values: { story }, successNotification: false, errorNotification: false });
+      await refresh();
+      setMsg({ text: 'Drop ' + d.no + ': story line saved. Press Publish to site to put it on the site.' });
+    } catch (e) {
+      setMsg({ bad: true, text: 'Drop ' + d.no + ': the story line was not saved (' + ((e && e.message) || e) + '). If the database says the column story does not exist, run supabase/migrations/0003_drop_story.sql in the Supabase SQL editor.' });
+    }
+  };
   const setDate = async (d, date) => { await update({ resource: 'drops', id: d.id, values: { release_date: date || null }, successNotification: false }); await refresh(); };
 
   // the next drop goes live; the current one becomes a past drop. Its sold pieces stay with it; its unsold pieces
@@ -69,6 +78,7 @@ export default function DropsPage() {
                 <input type="date" value={d.release_date || ''} onChange={e => setDate(d, e.target.value)} style={{ maxWidth: 200 }} />
               </label>
             ) : <div className="note">Released {d.release_date ? siteDropDate(d.release_date) : '—'}</div>}
+            {kind !== 'past' && <StoryField drop={d} onSave={v => setStory(d, v)} />}
             <div className="list-actions" style={{ margin: '8px 0 0' }}>
               {kind !== 'past' && <Link className="btn small" to={'/pieces/new?drop=' + d.id} style={{ display: 'inline-flex', alignItems: 'center', textDecoration: 'none' }}>+ Add a piece</Link>}
               {kind !== 'past' && <button className="btn small" onClick={() => setPreview(preview && preview.id === d.id ? null : d)}>{preview && preview.id === d.id ? 'Hide preview' : 'Preview the drop'}</button>}
@@ -92,6 +102,23 @@ export default function DropsPage() {
       {group('Upcoming', all.filter(d => d.status === 'draft'), 'draft')}
       {group('Past', all.filter(d => d.status === 'past'), 'past')}
     </main>
+  );
+}
+
+// the drop's story line: shown under the homepage headline as 今回の便：<story>. Saved when the field loses focus.
+function StoryField({ drop, onSave }) {
+  const [v, setV] = useState(drop.story || '');
+  useEffect(() => { setV(drop.story || ''); }, [drop.story]);
+  const n = [...v.trim()].length;
+  return (
+    <label className="inline" style={{ marginTop: 6, display: 'block' }}>Story line (Japanese, optional)
+      <input type="text" data-testid={'story-' + drop.no} value={v} maxLength={60}
+        placeholder="マウントドーラのハロルドさんが、四十年かけて集めた万年筆。"
+        onChange={e => setV(e.target.value)}
+        onBlur={() => { if (v.trim() !== (drop.story || '')) onSave(v.trim()); }} />
+      <span className="note" style={{ display: 'block' }}>Shown under the headline as 今回の便：… Where the seven pieces were found, or whose collection they are. Leave it empty to hide the line.
+        {' '}{n} characters{n > 40 ? ' (over 40: it takes two lines on desktop)' : ''}. The phone breaks lines only between phrases.</span>
+    </label>
   );
 }
 

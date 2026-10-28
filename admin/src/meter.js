@@ -1,10 +1,10 @@
 // Postmark Archive back office: one place to open the title meter and remember results by text.
 import { TitleMeter } from './lib/measure.mjs';
-import { toSiteItem, siteDropDate } from './lib/site-data.mjs';
+import { toSiteItem, siteDropData } from './lib/site-data.mjs';
 
 const cache = new Map();
 
-export function siteDrop(drop) { return { no: drop ? drop.no : 1, date: drop ? siteDropDate(drop.release_date) : '' }; }
+export function siteDrop(drop) { return drop ? siteDropData(drop) : { no: 1, date: '' }; }
 
 // sample: a database piece with an English title (its #address must open the piece page in the meter's frames)
 export async function openMeter(sample, drop) {
