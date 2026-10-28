@@ -425,3 +425,38 @@ The four SVGs are 3.4–3.8KB each.
 **Anything changed or done by hand:** nothing in the doc's steps.
 - `git status` showed `.DS_Store` besides `collection_png/`. That's macOS Finder's folder file, not a change to the site.
 - Both are left untracked and uncommitted.
+
+## Update: a new seven every week
+
+**What changed** (commit `4b76bc3`, made by `tools/apply_weekly_drops.py`)
+- **Homepage line under the headline:** 金曜に、新しい七点。見つけた町と日付を添えてお届けします。 On the phone it's two lines.
+- **The あと日 countdown is gone.** In its place, the status line shows the next drop, `次の便 10月16日（金）`, which is the live drop's release date + 7 days. It appears only during those seven days, in Japan time.
+  - Desktop: `第12便 公開中 · 次の便 10月16日（金） · 過去の便を見る →`.
+  - Phone: the next drop is on its own line under the status line, so the status line never wraps (checked at 375 and 320).
+- **Past drops:**
+  - The line under the title reads これまでの便。残っている品は、今もお求めいただけます。 (two lines on the phone).
+  - Each header reads `N点 完売` when everything is sold, otherwise `N点 · 残りM点`.
+  - Unsold pieces show in color with their price and open with カートに入れる.
+  - A past drop with nothing left isn't shown.
+- **Back office:** "Make this the live drop" now keeps the old drop's unsold pieces with it, still on sale. The confirmation and the message say so. To take a piece off the site, set it to Draft.
+- **Unchanged:** the story line, the phrase-safe line breaks, the database (no migration).
+- **The tool:** eight `updated:` lines, then `already applied`. The diff was `8 files changed, 80 insertions(+), 47 deletions(-)`, exactly as expected. **Nothing was edited by hand.**
+
+**Tests, checks and build**
+- `npm --prefix admin test`: 36 passed after the baselines below. That includes the rewritten next-drop tests in `story.spec.mjs` (with the month-end case 2026.10.30 → 11月6日（金）) and phase 3. Phase 3 now proves that, after a release, Drop 12's 6 unsold pieces stay in `past.js` in order, show on past drops with `7点·残り6点`, and open with カートに入れる, with nothing going back to Draft.
+- All five `tools/tests/check_*.mjs` pass, and `npm run build` succeeds.
+- **Browser check:** the desktop and phone homepages, the next-drop line during the week (clock set to 2026-10-11), and past drops with the new line all look right, with no page errors. Every past drop is sold out today, so each header still reads N点 完売.
+- **Live site:** the new homepage line and past-drops line are live. The next-drop line isn't showing today, which is correct, because Drop 12's week ended on 10/16.
+
+**Baselines retaken:** four of the six site baselines failed, as the doc expected. I rerendered all six and compared each with its old version pixel for pixel:
+- **site-desktop:** only the line under the headline (y 681–697).
+- **site-phone:** only the first line of the two under the headline (y 116–128). Nothing shifted, because it's still two lines.
+- **drops-desktop:** only the line under the title (y 229–242). Stamps and drop headers are identical.
+- **drops-phone:** the title line is now two lines, so the page is 19px taller.
+  - With that 19px shift, everything below is identical except some stamp perforation edges, which differ by at most 4 levels out of 255.
+  - The stamp code didn't change. That's the same stamps redrawn at their new position.
+- **drops-sold-desktop and drops-sold-phone:** these passed, and rerendering them gives identical images, so they're unchanged. On the desktop piece page the past-drops text is hidden behind the card's background, and the phone piece page doesn't show it.
+
+**Reminder for the owner (step 6):** publish each new drop on a Friday, Japan time. Its release date sets the "次の便" date (+7 days). If a drop is released on another day, that line follows that day, and the 金曜 promise under the headline would be wrong that week.
+
+**Anything changed or done by hand:** nothing in the doc's steps. `.DS_Store` (macOS Finder) and `collection_png/` stay untracked.
