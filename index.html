@@ -342,14 +342,13 @@ function renderFan() {
     hit.style.cursor = state.lifted >= 0 ? 'pointer' : 'default';
 }
 function setLift(i) { if (i === state.lifted) return; state.lifted = i; state.mode = 'lift'; renderFan(); if (i >= 0) jostle(i); }
-// the stamps touching the one being lifted (one at the ends of the fan, two in between) shake 1px, then settle
+// the stamps touching the one being lifted (one at the ends of the fan, two in between) move 1px away from it (0.4s), then back (0.4s)
 var STILL = window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches;
 function jostle(i) {
   if (STILL || !Element.prototype.animate) return;
-  [i - 1, i + 1].forEach(function (n) {
-    var s = fanBtns[n] && fanBtns[n].firstElementChild;
-    if (s) s.animate([{ transform: 'none' }, { transform: 'translateX(1px)' }, { transform: 'translateX(-1px)' }, { transform: 'translateX(1px)' },
-      { transform: 'translateX(-1px)' }, { transform: 'translateX(1px)' }, { transform: 'none' }], { duration: 420, easing: 'linear' });
+  [-1, 1].forEach(function (dir) {
+    var s = fanBtns[i + dir] && fanBtns[i + dir].firstElementChild;
+    if (s) s.animate([{ transform: 'none' }, { transform: 'translateX(' + dir + 'px)' }, { transform: 'none' }], { duration: 800, easing: 'ease-in-out' });
   });
 }
 function setFanned(v) { state.fanned = v; state.mode = 'fan'; state.lifted = -1; renderFan(); }
