@@ -69,14 +69,21 @@
       '<div class="m-scale">' + stamp(d, d.views[0], false) + '</div></button>';
   }
 
+  // a past drop's count: 7点 完売 when every piece is sold, otherwise 7点 · 残り5点
+  function dropCount(list) {
+    var left = list.filter(function (d) { return !d.sold; }).length;
+    return list.length + '点' + (left ? '　·　残り' + left + '点' : ' 完売');
+  }
+
   // ---------- the sheet ----------
   function renderSheet() {
     var html = '';
     if (!ARCHIVE) {
       html += '<a class="m-mast" href="index.html">POSTMARK ARCHIVE</a>' +
         '<div class="m-head"><h1>アメリカから、一点もの。</h1>' +
-        '<div class="m-sub">' + phraseHTML('七点ずつ、七日間だけ。') + '<br>' + phraseHTML('見つけた町と日付を添えてお届けします。') + '</div>' +
-        '<div class="m-dropline"><b>' + esc(DROP_LABEL) + ' 公開中' + (dropLeft(DROP.date, Date.now()) ? ' · ' + dropLeft(DROP.date, Date.now()) : '') + '</b>　·　<a href="drops.html">過去の便を見る →</a></div>' +
+        '<div class="m-sub">' + phraseHTML('金曜に、新しい七点。') + '<br>' + phraseHTML('見つけた町と日付を添えてお届けします。') + '</div>' +
+        '<div class="m-dropline"><b>' + esc(DROP_LABEL) + ' 公開中</b>　·　<a href="drops.html">過去の便を見る →</a></div>' +
+        (dropNext(DROP.date, Date.now()) ? '<div class="m-next">' + dropNext(DROP.date, Date.now()) + '</div>' : '') +
         (DROP.story ? '<div class="m-story">' + phraseHTML('今回の便：' + DROP.story) + '</div>' : '<div class="m-count">全' + ITEMS.length + '点</div>') + '</div>' +
         '<div class="m-sheet">' + ITEMS.map(function (_, i) { return cell(i); }).join('') + '</div>' +
         '<div class="m-foot"><a href="drops.html">過去の便を見る →</a><div class="m-brand">POSTMARK ARCHIVE</div></div>';
@@ -89,10 +96,10 @@
       });
       html += '<a class="m-mast" href="index.html">POSTMARK ARCHIVE</a>' +
         '<div class="m-arch-back"><a href="index.html">← 第' + CURRENT_DROP_NO + '便 公開中</a></div>' +
-        '<div class="m-arch-title">過去の便</div><div class="m-arch-sub">すべて売約済。</div>' +
+        '<div class="m-arch-title">過去の便</div><div class="m-arch-sub">これまでの便。<br>残っている品は、今もお求めいただけます。</div>' +
         groups.map(function (g) {
           return '<section class="m-drop"><div class="m-drop-head"><b>第' + g.drop.no + '便</b>　·　' + esc(g.drop.date) +
-            ' 公開　·　' + g.ix.length + '点 完売</div><div class="m-sheet">' + g.ix.map(cell).join('') + '</div></section>';
+            ' 公開　·　' + dropCount(g.ix.map(function (i) { return ITEMS[i]; })) + '</div><div class="m-sheet">' + g.ix.map(cell).join('') + '</div></section>';
         }).join('') +
         '<div class="m-foot"><a href="index.html">第' + CURRENT_DROP_NO + '便を見る →</a><div class="m-brand">POSTMARK ARCHIVE</div></div>';
     }

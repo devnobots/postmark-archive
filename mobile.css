@@ -32,6 +32,7 @@ html.m #m-root { display: block; color: #1a2433; font-family: 'Old Standard TT',
   word-break: keep-all; overflow-wrap: anywhere; text-wrap: balance; }
 .m-dropline { margin-top: 14px; font-family: 'Shippori Mincho', serif; font-size: 13px; letter-spacing: .16em; color: #6b6e72; }
 .m-dropline b { color: #1a2433; font-weight: 600; }
+.m-next { margin-top: 10px; font-family: 'Shippori Mincho', serif; font-size: 13px; letter-spacing: .16em; color: #1a2433; }
 .m-dropline a { color: #6b6e72; text-decoration: none; border-bottom: 1px solid rgba(107,110,114,.4); padding-bottom: 2px;
   display: inline-block; line-height: 2; }
 .m-count { margin-top: 18px; font-family: 'Shippori Mincho', serif; font-size: 12px; letter-spacing: .2em; color: #6b6e72; }

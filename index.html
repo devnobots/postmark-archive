@@ -203,7 +203,7 @@
 
   <div class="copy" id="copy">
     <h1>アメリカから、一点もの。</h1>
-    <p class="sub">七点ずつ、七日間だけ。見つけた町と日付を添えてお届けします。</p>
+    <p class="sub">金曜に、新しい七点。見つけた町と日付を添えてお届けします。</p>
     <p class="story" id="dropStory" hidden></p>
     <p class="hint" id="hint">切手にカーソル → 拡大　クリック → 詳細</p>
     <div class="drop-status-lockup at-bottom"><span class="drop-status-current">第12便 公開中</span><span class="drop-status-dot" aria-hidden="true">·</span><a class="drop-status-link" href="drops.html">過去の便を見る →</a></div>
@@ -517,15 +517,17 @@ document.addEventListener('keydown', function (e) {
   if (full.classList.contains('open')) closeFull(); else if (state.open >= 0) closeItem();
 });
 
-// homepage drop line reads from DROP. A drop is on sale for seven days from its release date (Japan time):
-// dropLeft gives 'あと7日' on release day ... 'あと2日', then '本日まで' on the seventh day, and '' outside those days.
-function dropLeft(date, now) {
+// homepage drop line reads from DROP. A new drop comes every week, on the same weekday as this one (Japan time):
+// dropNext gives '次の便 11月6日（金）' (release date + 7 days) during the seven days after the release, and ''
+// before the release date or once that day has come (until the next drop is published, the line just says 公開中).
+function dropNext(date, now) {
   var m = /^(\d{4})\.(\d{2})\.(\d{2})$/.exec(String(date || ''));
   if (!m) return '';
   var start = Date.UTC(+m[1], +m[2] - 1, +m[3]) - 9 * 3600 * 1000;           // midnight in Japan
   var day = Math.floor((now - start) / 86400000);                              // 0 on release day
   if (day < 0 || day > 6) return '';
-  return day === 6 ? '本日まで' : 'あと' + (7 - day) + '日';
+  var next = new Date(Date.UTC(+m[1], +m[2] - 1, +m[3] + 7));
+  return '次の便 ' + (next.getUTCMonth() + 1) + '月' + next.getUTCDate() + '日（' + '日月火水木金土'.charAt(next.getUTCDay()) + '）';
 }
 // Japanese text that may only break between phrases, so a narrow phone never splits a word: after 、 。 ： and
 // where hiragana meets kanji or katakana (マウントドーラと|オーランドで|見つけた|七点。). Each phrase is a span.
@@ -546,8 +548,8 @@ function phraseHTML(text) {
   var el = document.querySelector('.drop-status-current');
   if (el) {
     el.textContent = DROP_LABEL + ' 公開中';
-    var left = dropLeft(DROP.date, Date.now());
-    if (left) el.insertAdjacentHTML('afterend', '<span class="drop-status-dot" aria-hidden="true">·</span><span class="drop-status-left">' + left + '</span>');
+    var next = dropNext(DROP.date, Date.now());
+    if (next) el.insertAdjacentHTML('afterend', '<span class="drop-status-dot" aria-hidden="true">·</span><span class="drop-status-next">' + next + '</span>');
   }
   var st = document.getElementById('dropStory');
   if (st && DROP.story) { st.innerHTML = phraseHTML('今回の便：' + DROP.story); st.hidden = false; }

@@ -88,7 +88,7 @@ export function pastJs(liveDrop, drops, pieces) {
       no: d.no, date: siteDropDate(d.release_date),
       pieces: pieces.filter(p => String(p.drop_id) === String(d.id) && p.status !== 'draft').sort((a, b) => a.position - b.position)
         .map(p => toSiteItem(p, d)),
-    })),
+    })).filter(d => d.pieces.length),                               // a past drop with nothing left is not shown
   };
   return '// Postmark Archive: the past drops (newest first). Written by the back office; edit there, not here.\n' +
     '// Published ' + new Date().toISOString() + '\n' +

@@ -188,7 +188,7 @@
   <div class="arch-masthead"><a href="index.html">POSTMARK ARCHIVE</a></div>
   <div class="arch-back"><a href="index.html" id="backLink">← 第12便 公開中</a></div>
   <h1 class="arch-title">過去の便</h1>
-  <p class="arch-sub">すべて売約済。</p>
+  <p class="arch-sub">これまでの便。残っている品は、今もお求めいただけます。</p>
   <div id="drops"></div>
 </div>
 
@@ -263,11 +263,12 @@ var html = '';
 PAST.forEach(function (drop) {
   DROP = { no: drop.no, date: drop.date }; DROP_LABEL = '第' + drop.no + '便';
   html += '<section class="drop"><div class="drop-head"><b>' + DROP_LABEL + '</b><span>·</span><span>' + drop.date + ' 公開</span><span>·</span><span>' +
-          drop.pieces.length + '点 完売</span></div><div class="drop-row">';
+          (function (left) { return drop.pieces.length + '点' + (left ? '</span><span>·</span><span>残り' + left + '点' : ' 完売'); })(
+            drop.pieces.filter(function (p) { return !p.sold; }).length) + '</span></div><div class="drop-row">';
   drop.pieces.forEach(function (p) {
     var d = p;                                                     // resolved in data/past.js
     var n = PIECES.push(d) - 1;
-    html += '<button class="past-stamp" data-piece="' + n + '" aria-label="' + esc(d.nameJa + ' ' + d.price + ' 売約済') + '">' + stampHTML(d, d.views[0], { postmark: false }) + '</button>';
+    html += '<button class="past-stamp" data-piece="' + n + '" aria-label="' + esc(d.nameJa + ' ' + (d.sold ? '売約済' : d.price)) + '">' + stampHTML(d, d.views[0], { postmark: false }) + '</button>';
   });
   html += '</div></section>';
 });

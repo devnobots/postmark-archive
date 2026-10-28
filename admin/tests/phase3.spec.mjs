@@ -1,4 +1,5 @@
-// Phase 3: drops and archive. Build a drop, preview it, make it live (the old one moves to past drops), publish
+// Phase 3: drops and archive. Build a drop, preview it, make it live (the old one moves to past drops, its unsold
+// pieces still on sale there), publish
 // both data files; mark sold with a handle or 個人蔵; history and undo; delete and restore; drag to reorder.
 import { test, expect } from '@playwright/test';
 import fs from 'node:fs';
@@ -51,7 +52,7 @@ test('a new drop: build it, preview it, make it live, publish both files; the si
   await expect(home.locator('.drop-status-current')).toHaveText('第13便 公開中');
   await page.getByTestId('drop-13').getByRole('button', { name: 'Make this the live drop' }).click();
   await expect(page.getByTestId('drops-msg')).toContainText('Drop 13 is now the live drop and Drop 12 is a past drop');
-  await expect(page.getByTestId('drops-msg')).toContainText(UNSOLD.length + ' unsold piece(s) went back to Draft (no drop)');
+  await expect(page.getByTestId('drops-msg')).toContainText(UNSOLD.length + ' unsold piece(s) stay on sale in past drops');
   await expect(page.getByText('Live').locator('..').getByTestId('drop-13')).toBeVisible();
   await expect(page.getByTestId('drop-12')).toContainText('past');
   // publish: two files
@@ -73,17 +74,23 @@ test('a new drop: build it, preview it, make it live, publish both files; the si
   await page.goto('/drops.html');
   await expect(page.locator('.drop-head b').first()).toHaveText('第12便');          // Drop 12 is now a past drop
   await expect(page.locator('#backLink')).toHaveText('← 第13便 公開中');
-  await expect(page.locator('.drop').first().locator('.past-stamp')).toHaveCount(1);   // its sold piece: the socks
-  // the unsold pieces are in neither file, and wait in the list as drafts with no drop
+  const ALL12 = SB.window.SG_DATA.items.length;
+  await expect(page.locator('.drop').first().locator('.past-stamp')).toHaveCount(ALL12);   // sold and unsold
+  await expect(page.locator('.drop').first().locator('.drop-head')).toContainText(ALL12 + '点·残り' + UNSOLD.length + '点');
+  await expect(page.locator('.arch-sub')).toHaveText('これまでの便。残っている品は、今もお求めいただけます。');
+  // an unsold piece in past drops opens with its cart button
+  await page.locator('.drop').first().locator('.past-stamp .stamp:not(.is-sold)').first().click();
+  await expect(page.locator('.buy .cart')).toHaveText('カートに入れる');
+  // the unsold pieces stay with Drop 12 in past.js, and none go back to Draft
   const built = { window: {} }; vm.runInNewContext(files['current.js'] + files['past.js'], built);
   expect(built.window.SG_DATA.items.map(d => d.nameEn)).toEqual(['1980s Denim Bucket Hat']);
   const drop12 = built.window.SG_PAST.drops.find(d => d.no === 12);
-  expect(drop12.pieces.map(d => d.nameEn)).toEqual(SB.window.SG_DATA.items.filter(d => d.sold).map(d => d.nameEn));   // only the sold socks
+  expect(drop12.pieces.map(d => d.nameEn)).toEqual(SB.window.SG_DATA.items.map(d => d.nameEn));   // every piece, in order
+  expect(drop12.pieces.filter(d => !d.sold).map(d => d.nameEn)).toEqual(UNSOLD);
   await page.unrouteAll();
   await page.goto('/admin/');
-  const loose = page.getByTestId('group-loose').getByTestId('piece-row');
-  await expect(loose).toHaveCount(UNSOLD.length);
-  for (let i = 0; i < UNSOLD.length; i++) await expect(loose.nth(i).locator('.chip').first()).toHaveText('Draft');
+  await expect(page.getByTestId('group-live').getByTestId('piece-row')).toHaveCount(1);   // the new drop's hat
+  await expect(page.getByTestId('group-loose')).toHaveCount(0);                            // nothing went back to Draft
 });
 
 test('mark sold with the buyer\'s handle, or as a private collection', async ({ page }) => {
