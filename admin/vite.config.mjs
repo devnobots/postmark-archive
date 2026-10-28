@@ -9,7 +9,7 @@ import path from 'node:path';
 const SITE = path.resolve(__dirname, '..');
 const TYPES = { '.html': 'text/html; charset=utf-8', '.js': 'text/javascript; charset=utf-8', '.mjs': 'text/javascript; charset=utf-8',
   '.css': 'text/css; charset=utf-8', '.webp': 'image/webp', '.jpg': 'image/jpeg', '.png': 'image/png', '.svg': 'image/svg+xml', '.json': 'application/json' };
-const SITE_PATHS = /^\/(index\.html|drops\.html|mobile\.css|mobile\.js|zoom\.js|exit\.js|zoom-test\.html|favicon\.ico|favicon\.svg|apple-touch-icon\.png|assets\/|data\/|$)/;
+const SITE_PATHS = /^\/(index\.html|drops\.html|mobile\.css|mobile\.js|zoom\.js|exit\.js|zoom-test\.html|favicon\.ico|favicon\.svg|favicon-us\.svg|apple-touch-icon\.png|assets\/|data\/|$)/;
 
 function siteAndApi(env) {
   return {

@@ -27,7 +27,7 @@ db.pieces[0].views = [{ img: base + '/storage/v1/object/public/photos/p/abc-cut.
   zoom: base + '/storage/v1/object/public/photos/p/abc-zoom.jpg', ar: 1 }];   // the deep-zoom copy travels the same way
 
 const tmp = fs.mkdtempSync(path.join(os.tmpdir(), 'sg-build-'));
-for (const f of ['index.html', 'drops.html', 'mobile.css', 'mobile.js', 'zoom.js', 'exit.js', 'zoom-test.html', 'favicon.ico', 'favicon.svg', 'apple-touch-icon.png', 'assets', 'data', 'tools/build_site.mjs', 'admin/src/lib/site-data.mjs'])
+for (const f of ['index.html', 'drops.html', 'mobile.css', 'mobile.js', 'zoom.js', 'exit.js', 'zoom-test.html', 'favicon.ico', 'favicon.svg', 'favicon-us.svg', 'apple-touch-icon.png', 'assets', 'data', 'tools/build_site.mjs', 'admin/src/lib/site-data.mjs'])
   fs.cpSync(path.join(ROOT, f), path.join(tmp, f), { recursive: true });
 // run the build as a separate process without blocking, so the stand-in above can answer it
 const { stdout: out } = await promisify(execFile)('node', ['tools/build_site.mjs'], { cwd: tmp, env: { ...process.env, SUPABASE_URL: base, SUPABASE_SECRET_KEY: 'secret' }, encoding: 'utf8', timeout: 60000 });
