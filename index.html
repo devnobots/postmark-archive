@@ -9,16 +9,6 @@
 <link rel="icon" href="/favicon.ico" sizes="32x32">
 <link rel="icon" href="/favicon.svg" type="image/svg+xml">
 <link rel="apple-touch-icon" href="/apple-touch-icon.png">
-<script>/* the tab icon: American flag, Japanese flag, every 2 seconds (not with reduced motion) */
-(function () {
-  var svg = document.querySelector('link[rel="icon"][type="image/svg+xml"]'), ico = document.querySelector('link[rel="icon"][sizes]');
-  if (!svg || (window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches)) return;
-  if (ico) ico.remove();
-  var icons = ['/favicon.svg', '/favicon-us.svg'], k = 0;
-  new Image().src = icons[1];
-  setInterval(function () { k = 1 - k; svg.href = icons[k]; }, 2000);
-})();
-</script>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Old+Standard+TT:ital,wght@0,400;0,700;1,400&family=Shippori+Mincho:wght@400;600;800&display=swap">
