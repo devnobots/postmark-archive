@@ -382,3 +382,46 @@ The four SVGs are 3.4–3.8KB each.
 **iPhone check (step 5):** this can't be done from here, so it needs a real iPhone. Pinch-zoom the photos and the stamp sheet in DuckDuckGo or Safari, and check that the page doesn't reload or crash. What I could verify: the phone pages have zero CSS filters, and the new edges are masks of the same kind as before (the old edge was also a mask).
 
 **Anything changed or done by hand:** nothing in the doc's steps. `apply_stamp_paper.py` applied cleanly.
+
+## Update: seven pieces, seven days
+
+**What changed** (commit `b5ca7d5`, made by `tools/apply_drop_story.py`)
+- **The line under the headline**, desktop and phone, now reads 七点ずつ、七日間だけ。見つけた町と日付を添えてお届けします。 On the phone it's two lines, one sentence each.
+- **A countdown on the status line,** worked out in the visitor's browser from the drop's release date in Japan time:
+  - release day shows あと7日, then あと6日 … あと2日;
+  - the seventh day shows 本日まで;
+  - before or after the seven days, nothing is added.
+
+  On desktop it's greyed after its own `·`, as in `第12便 公開中 · あと5日 · 過去の便を見る →`.
+- **A story line per drop:** `今回の便：<story>`, set in the back office on the Drops page with a "Story line" field. It only appears on live and upcoming drops, and is saved when you click outside the field.
+  - Empty means no line on desktop, and the phone keeps 全N点.
+  - The story goes into `data/current.js` only when it isn't empty.
+- **Phone lines break only between phrases,** never inside a word.
+- **New migration:** `supabase/migrations/0003_drop_story.sql` adds `drops.story`.
+- **The tool:** six `updated:` lines plus `written: supabase/migrations/0003_drop_story.sql`, then `already applied`. The diff was `6 files changed, 83 insertions(+), 8 deletions(-)`, exactly as expected. **Nothing was edited by hand.**
+
+**Tests, checks and build**
+- **`admin/tests/story.spec.mjs`:** 3 passed. It covers the countdown on every day (before release, あと7日, あと5日, あと2日, 本日まで, over), the phone's two lines and phrases, and a story saved in the back office that then shows in the preview and the published `current.js`.
+- **`npm --prefix admin test`:** 35 passed (32 before, plus 3 new) after the two baselines below.
+- **Checks and build:** all five `tools/tests/check_*.mjs` pass, and `npm run build` succeeds.
+- **Browser check:**
+  - desktop and phone match the mock-ups, with each story fitting on one line on desktop;
+  - at 375 and 320 the phone lines stay on screen and break only between phrases;
+  - no page errors.
+- **Live site:** it shows the new line with no countdown and no story. Drop 12's seven days ended on 10/15, which is correct. The phone still shows 全7点.
+
+**Baselines retaken:** only the two homepage ones, along with `admin/tests/screenshots/`.
+- `site-desktop`: one changed region, y 681–697, which is the line under the headline.
+- `site-phone`: every row above y 116 (wordmark and headline) is identical. From there down it changes, because the new two-line text is added and the rest shifts down.
+- **The four past-drops baselines passed unchanged.**
+
+**The database column (step 7): not run. This is an owner action.** The Supabase CLI is installed on this computer, but the repo isn't linked to a project (there's no `supabase/config.toml`), so I didn't run it or look for credentials.
+- **Until it's run:** the live site works as before, but the Story line field in the live back office shows an error naming this file.
+- **To run it:** open the SQL editor at https://supabase.com/dashboard/project/bzssycsmpscoxnadzpvv/sql/new, paste the line below and press **Run**:
+  ```
+  alter table public.drops add column if not exists story text not null default '';
+  ```
+
+**Anything changed or done by hand:** nothing in the doc's steps.
+- `git status` showed `.DS_Store` besides `collection_png/`. That's macOS Finder's folder file, not a change to the site.
+- Both are left untracked and uncommitted.
