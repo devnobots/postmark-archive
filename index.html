@@ -177,8 +177,8 @@
   .stamp.is-sold .stamp-art { filter: grayscale(1) contrast(1.25) brightness(1.04); transition: filter 0.5s ease; }
   .stamp.is-sold .stamp-price { font-family: 'Shippori Mincho', serif; font-weight: 600; font-size: 11px; letter-spacing: 0.18em; }
   .fan-stamp.up .stamp.is-sold .stamp-art { filter: none; }
-  #fan .stamp-art { transition: filter 0.4s ease; }
-  #fan.neg .fan-stamp .stamp-art { filter: invert(1); } /* double-click the background: the stamp photos turn negative */
+  body { transition: filter 0.4s ease; }
+  body.neg { filter: invert(1); } /* double-click the background: the whole page (stamp photos too) turns negative */
   /* sold pages: open again, consignee on the top line */
   .cart.sold { background: none; color: #6b6e72; border: 1px solid rgba(107, 110, 114, 0.5); cursor: default; letter-spacing: 0.2em; }
   .found .consignee-handle { color: inherit; text-decoration: none; border-bottom: none; font-weight: normal; font-size: calc(1em + 1px); transition: opacity 120ms ease; }
@@ -378,11 +378,11 @@ hit.addEventListener('mousemove', function (e) {
 });
 hit.addEventListener('mouseleave', function () { setLift(-1); });
 hit.addEventListener('click', function () { if (state.fanned && state.lifted >= 0) openItem(state.lifted); });
-// double-click the background (not a stamp, card or link): the fan's photos turn negative; again to turn them back (desktop only)
+// double-click the background (not a stamp, card or link): the whole page turns negative; again to turn them back (desktop only)
 document.addEventListener('dblclick', function (e) {
   if (document.documentElement.classList.contains('m') || state.open >= 0 || e.target.closest('a, button, input, #gate')) return;
   if (window.getSelection) getSelection().removeAllRanges();
-  fanEl.classList.toggle('neg');
+  document.body.classList.toggle('neg');
 });
 
 
